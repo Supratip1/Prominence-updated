@@ -4,7 +4,14 @@ import {
   User,
   BarChart2,
   Menu,
-  X
+  X,
+  Home,
+  Star,
+  DollarSign,
+  FileText,
+  Search,
+  Code,
+  BookOpen
 } from 'lucide-react';
 import Button from '../UI/Button';
 
@@ -36,11 +43,14 @@ export default function Header() {
   };
 
   const links = [
-    { label: 'Dashboard', icon: <BarChart2 className="h-5 w-5 inline-block mr-1" />, href: '#', onClick: () => smoothScrollTo('hero') },
-    { label: 'Testimonials', href: '#testimonials', onClick: () => smoothScrollTo('testimonials') },
-    { label: 'Pricing', href: '#pricing', onClick: () => smoothScrollTo('pricing') },
-    { label: 'Content Analyzer', href: '#' },
-    { label: 'Keyword Research', href: '#' },
+    { label: 'Dashboard', icon: <Home className="h-5 w-5 inline-block mr-1" />, href: '#hero', onClick: () => smoothScrollTo('hero') },
+    { label: 'Features', icon: <Star className="h-5 w-5 inline-block mr-1" />, href: '#features', onClick: () => smoothScrollTo('features') },
+    { label: 'Testimonials', icon: <User className="h-5 w-5 inline-block mr-1" />, href: '#testimonials', onClick: () => smoothScrollTo('testimonials') },
+    { label: 'Pricing', icon: <DollarSign className="h-5 w-5 inline-block mr-1" />, href: '#pricing', onClick: () => smoothScrollTo('pricing') },
+    { label: 'Content Analyzer', icon: <FileText className="h-5 w-5 inline-block mr-1" />, href: '#' },
+    { label: 'Keyword Research', icon: <Search className="h-5 w-5 inline-block mr-1" />, href: '#' },
+    { label: 'API Docs', icon: <Code className="h-5 w-5 inline-block mr-1" />, href: '#' },
+    { label: 'Blog', icon: <BookOpen className="h-5 w-5 inline-block mr-1" />, href: '#' },
   ];
 
   return (
