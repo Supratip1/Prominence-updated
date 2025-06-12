@@ -66,7 +66,7 @@ const logos = [
 
 // Utility to randomly select one of the three animation URLs in public/lottie
 const lottieAnimations = [
-  '/lottie/Animation1.json',
+  
   '/lottie/Animation2.json',
   '/lottie/Animation3.json',
 ];
@@ -205,7 +205,7 @@ export default function Dashboard() {
         >
           {/* Animation */}
           <motion.div
-            className="order-1 lg:order-2 flex justify-center lg:justify-end w-full mb-4 lg:mb-0"
+            className="order-1 lg:order-2 flex justify-center lg:justify-end w-full mb-4 lg:mb-0 mt-8 lg:mt-0"
             variants={item}
           >
             <div className="w-full max-w-md overflow-hidden">
