@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://rsms.me/inter/inter.css" rel="stylesheet" />
+    <title>Prominance.ai</title>
+    <style>
+      /* Critical preloader styles */
+      #preloader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        z-index: 9999;
+
+        /* prepare for fade & scale */
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        opacity: 1;
+        transform: scale(1);
+      }
+      /* hidden state for preloader */
+      #preloader.hidden {
+        opacity: 0;
+        transform: scale(1.1); /* slight grow as it fades */
+        pointer-events: none;
+      }
+
+      /* App container starts invisible */
+      #root {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      /* when ready, fade it in */
+      #root.visible {
+        visibility: visible;
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Preloader -->
+    <div id="preloader">
+      <lottie-player
+        id="loader"
+        src="/lottie/openin.json"
+        background="transparent"
+        speed="1"
+        style="width:300px; height:300px;"
+        autoplay
+      ></lottie-player>
+    </div>
+
+    <!-- Your app -->
+    <div id="root"></div>
+
+    <!-- Lottie player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <script>
+      const pre = document.getElementById('preloader');
+      const root = document.getElementById('root');
+      const player = document.getElementById('loader');
+
+      player.addEventListener('complete', () => {
+        // trigger fade & scale out
+        pre.classList.add('hidden');
+
+        // after the transition, hide the element entirely
+        setTimeout(() => {
+          pre.style.display = 'none';
+        }, 500);
+
+        // fade in the app
+        root.classList.add('visible');
+      });
+    </script>
+
+    <!-- Your bundled script -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
