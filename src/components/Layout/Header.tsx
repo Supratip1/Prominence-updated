@@ -24,12 +24,23 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
 
+  const smoothScrollTo = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+    setOpen(false); // Close mobile menu after clicking
+  };
+
   const links = [
-    { label: 'Dashboard', icon: <BarChart2 className="h-5 w-5 inline-block mr-1" />, href: '#' },
+    { label: 'Dashboard', icon: <BarChart2 className="h-5 w-5 inline-block mr-1" />, href: '#', onClick: () => smoothScrollTo('hero') },
+    { label: 'Testimonials', href: '#testimonials', onClick: () => smoothScrollTo('testimonials') },
+    { label: 'Pricing', href: '#pricing', onClick: () => smoothScrollTo('pricing') },
     { label: 'Content Analyzer', href: '#' },
     { label: 'Keyword Research', href: '#' },
-    { label: 'Competitor Analysis', href: '#' },
-    { label: 'Reports', href: '#' },
   ];
 
   return (
@@ -47,14 +58,14 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {links.map((link) => (
-              <a
+              <button
                 key={link.label}
-                href={link.href}
-                className="text-white/80 hover:text-white transition-colors duration-200"
+                onClick={link.onClick || (() => {})}
+                className="text-white/80 hover:text-white transition-colors duration-200 cursor-pointer"
               >
                 {link.icon}
                 {link.label}
-              </a>
+              </button>
             ))}
           </nav>
 
@@ -79,14 +90,14 @@ export default function Header() {
         <div className="md:hidden bg-black/95 backdrop-blur-md">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {links.map((link) => (
-              <a
+              <button
                 key={link.label}
-                href={link.href}
-                className="block px-3 py-2 text-white/80 hover:text-white transition-colors duration-200"
+                onClick={link.onClick || (() => {})}
+                className="block w-full text-left px-3 py-2 text-white/80 hover:text-white transition-colors duration-200"
               >
                 {link.icon}
                 {link.label}
-              </a>
+              </button>
             ))}
           </div>
         </div>

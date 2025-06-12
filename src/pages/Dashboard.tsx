@@ -5,7 +5,10 @@ import {
   FileText,
   Search,
   Eye,
-  Activity
+  Activity,
+  Check,
+  Star,
+  ArrowRight
 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import Lottie from 'lottie-react';
@@ -64,9 +67,337 @@ const logos = [
   { src: '/logos/vercel.png',     alt: 'Vercel'     },
 ];
 
+// Testimonials data
+const testimonials = [
+  {
+    id: 1,
+    name: "Sarah Chen",
+    role: "Head of Growth",
+    company: "TechFlow",
+    avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Prominence.ai transformed how we track our brand visibility. Our AI search rankings improved by 300% in just 3 months.",
+    rating: 5
+  },
+  {
+    id: 2,
+    name: "Marcus Rodriguez",
+    role: "CEO",
+    company: "DataVault",
+    avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The insights we get from AI search tracking are invaluable. We can now optimize our content for LLM responses effectively.",
+    rating: 5
+  },
+  {
+    id: 3,
+    name: "Emily Watson",
+    role: "Marketing Director",
+    company: "CloudSync",
+    avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Finally, a tool that shows us how our brand appears in AI responses. The competitive analysis features are game-changing.",
+    rating: 5
+  },
+  {
+    id: 4,
+    name: "David Kim",
+    role: "Product Manager",
+    company: "InnovateLab",
+    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Prominence.ai helped us understand our AI visibility gaps. We're now mentioned in 80% more AI responses.",
+    rating: 5
+  },
+  {
+    id: 5,
+    name: "Lisa Thompson",
+    role: "CMO",
+    company: "GrowthHack",
+    avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The real-time tracking and alerts keep us ahead of the competition. Essential tool for modern marketing teams.",
+    rating: 5
+  },
+  {
+    id: 6,
+    name: "Alex Johnson",
+    role: "Founder",
+    company: "StartupX",
+    avatar: "https://images.pexels.com/photos/1300402/pexels-photo-1300402.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "As a startup, visibility is everything. This platform helped us get noticed by AI systems and increased our organic reach.",
+    rating: 5
+  },
+  {
+    id: 7,
+    name: "Rachel Green",
+    role: "SEO Manager",
+    company: "DigitalFirst",
+    avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The keyword tracking for AI responses is incredibly detailed. We can see exactly how our optimization efforts pay off.",
+    rating: 5
+  },
+  {
+    id: 8,
+    name: "Michael Brown",
+    role: "VP Marketing",
+    company: "ScaleUp",
+    avatar: "https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Prominence.ai gives us the competitive edge we need. The insights are actionable and the interface is beautiful.",
+    rating: 5
+  },
+  {
+    id: 9,
+    name: "Jennifer Lee",
+    role: "Content Director",
+    company: "ContentCorp",
+    avatar: "https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Our content strategy is now data-driven thanks to AI search insights. We know exactly what resonates with AI systems.",
+    rating: 5
+  },
+  {
+    id: 10,
+    name: "Robert Wilson",
+    role: "Growth Lead",
+    company: "TechNova",
+    avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The ROI tracking features help us justify our AI optimization spend. Clear metrics, clear results.",
+    rating: 5
+  },
+  {
+    id: 11,
+    name: "Amanda Davis",
+    role: "Brand Manager",
+    company: "BrandForce",
+    avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Brand monitoring in AI responses was impossible before this tool. Now we have complete visibility and control.",
+    rating: 5
+  },
+  {
+    id: 12,
+    name: "James Miller",
+    role: "Digital Strategist",
+    company: "FutureFlow",
+    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The competitive analysis dashboard shows us exactly where we stand vs competitors in AI search results.",
+    rating: 5
+  },
+  {
+    id: 13,
+    name: "Sophie Anderson",
+    role: "Marketing Lead",
+    company: "InnovateCo",
+    avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Implementation was seamless and results came quickly. Our AI visibility score improved dramatically in weeks.",
+    rating: 5
+  },
+  {
+    id: 14,
+    name: "Daniel Garcia",
+    role: "Product Lead",
+    company: "NextGen",
+    avatar: "https://images.pexels.com/photos/1300402/pexels-photo-1300402.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The API integration made it easy to incorporate AI visibility data into our existing analytics stack.",
+    rating: 5
+  },
+  {
+    id: 15,
+    name: "Olivia Martinez",
+    role: "Head of Digital",
+    company: "DigitalEdge",
+    avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Real-time alerts help us respond quickly to changes in AI search results. Invaluable for reputation management.",
+    rating: 5
+  },
+  {
+    id: 16,
+    name: "Thomas White",
+    role: "CMO",
+    company: "GrowthLab",
+    avatar: "https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The detailed reporting helps us communicate AI visibility ROI to stakeholders. Clear, professional, actionable.",
+    rating: 5
+  },
+  {
+    id: 17,
+    name: "Isabella Clark",
+    role: "SEO Director",
+    company: "SearchPro",
+    avatar: "https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Traditional SEO is evolving, and this tool keeps us ahead of the curve with AI-first optimization strategies.",
+    rating: 5
+  },
+  {
+    id: 18,
+    name: "Christopher Taylor",
+    role: "Founder",
+    company: "TechStart",
+    avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "As a tech startup, being visible in AI responses is crucial. This platform made it possible and measurable.",
+    rating: 5
+  },
+  {
+    id: 19,
+    name: "Victoria Adams",
+    role: "Marketing Manager",
+    company: "BrandBoost",
+    avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The keyword suggestion engine helped us discover new opportunities we never would have found otherwise.",
+    rating: 5
+  },
+  {
+    id: 20,
+    name: "Andrew Lewis",
+    role: "Growth Manager",
+    company: "ScaleTech",
+    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The user interface is intuitive and the data visualization makes complex AI metrics easy to understand.",
+    rating: 5
+  },
+  {
+    id: 21,
+    name: "Grace Robinson",
+    role: "Content Manager",
+    company: "ContentFlow",
+    avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Content optimization recommendations are spot-on. Our AI citation rate increased by 250% following their suggestions.",
+    rating: 5
+  },
+  {
+    id: 22,
+    name: "Nathan Hall",
+    role: "Digital Director",
+    company: "FutureBrand",
+    avatar: "https://images.pexels.com/photos/1300402/pexels-photo-1300402.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Comprehensive analytics and beautiful reporting. Everything we need to track and improve our AI search presence.",
+    rating: 5
+  },
+  {
+    id: 23,
+    name: "Zoe Turner",
+    role: "VP Growth",
+    company: "RapidScale",
+    avatar: "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The competitive benchmarking features help us stay ahead. We can see exactly how we compare to industry leaders.",
+    rating: 5
+  },
+  {
+    id: 24,
+    name: "Ryan Cooper",
+    role: "Product Manager",
+    company: "InnovateNow",
+    avatar: "https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Historical data tracking helps us understand trends and make informed decisions about our AI optimization strategy.",
+    rating: 5
+  },
+  {
+    id: 25,
+    name: "Mia Phillips",
+    role: "Brand Director",
+    company: "BrandVision",
+    avatar: "https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Customer support is exceptional. The team helped us set up custom tracking for our unique industry requirements.",
+    rating: 5
+  },
+  {
+    id: 26,
+    name: "Kevin Evans",
+    role: "Marketing Director",
+    company: "GrowthEngine",
+    avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "ROI is clear and measurable. We can directly attribute increased leads to improved AI search visibility.",
+    rating: 5
+  },
+  {
+    id: 27,
+    name: "Chloe Parker",
+    role: "SEO Lead",
+    company: "SearchFirst",
+    avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The platform evolves with the AI landscape. Regular updates ensure we're always optimizing for the latest algorithms.",
+    rating: 5
+  },
+  {
+    id: 28,
+    name: "Brandon Scott",
+    role: "Founder",
+    company: "TechPioneer",
+    avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Game-changing insights for startups. Understanding AI visibility helped us compete with much larger companies.",
+    rating: 5
+  },
+  {
+    id: 29,
+    name: "Aria Collins",
+    role: "Growth Lead",
+    company: "ScaleForward",
+    avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "The automation features save us hours every week. Set it up once and get continuous insights into AI performance.",
+    rating: 5
+  },
+  {
+    id: 30,
+    name: "Jordan Reed",
+    role: "Digital Manager",
+    company: "NextWave",
+    avatar: "https://images.pexels.com/photos/1300402/pexels-photo-1300402.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
+    content: "Excellent value for money. The insights we get far exceed the cost, and the time savings are substantial.",
+    rating: 5
+  }
+];
+
+// Pricing plans data
+const pricingPlans = [
+  {
+    name: "Starter",
+    price: 0,
+    period: "month",
+    description: "Perfect for individuals and small projects",
+    features: [
+      "5 keywords tracked",
+      "Weekly AI crawls",
+      "Basic visibility dashboard",
+      "Email notifications",
+      "Community support"
+    ],
+    buttonText: "Get Started Free",
+    popular: false
+  },
+  {
+    name: "Professional",
+    price: 49,
+    period: "month",
+    description: "Ideal for growing businesses and teams",
+    features: [
+      "100 keywords tracked",
+      "Daily AI crawls",
+      "Advanced analytics & insights",
+      "API access",
+      "Custom reports",
+      "Priority support",
+      "Competitor analysis",
+      "Historical data (12 months)"
+    ],
+    buttonText: "Start Free Trial",
+    popular: true
+  },
+  {
+    name: "Enterprise",
+    price: 199,
+    period: "month",
+    description: "For large organizations with advanced needs",
+    features: [
+      "Unlimited keywords",
+      "Real-time AI crawls",
+      "White-label reports",
+      "Team collaboration",
+      "Custom integrations",
+      "Dedicated account manager",
+      "Advanced security",
+      "Custom training & onboarding"
+    ],
+    buttonText: "Contact Sales",
+    popular: false
+  }
+];
+
 // Utility to randomly select one of the three animation URLs in public/lottie
 const lottieAnimations = [
-  
   '/lottie/Animation2.json',
   '/lottie/Animation3.json',
 ];
@@ -372,7 +703,7 @@ export default function Dashboard() {
 
         {/* Enhanced Trust Indicators with Space Theme */}
         <motion.div 
-          className="mb-4"
+          className="mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.8, ease: "easeOut" }}
@@ -402,6 +733,70 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.div>
+
+        {/* Testimonials Section */}
+        <motion.section
+          id="testimonials"
+          className="mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
+        >
+          <div className="text-center mb-12">
+            <motion.h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+              }}
+            >
+              Loved by thousands of teams
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-300 max-w-2xl mx-auto"
+              style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}
+            >
+              See what our customers are saying about their AI visibility transformation
+            </motion.p>
+          </div>
+          
+          <TestimonialCarousel testimonials={testimonials} />
+        </motion.section>
+
+        {/* Pricing Section */}
+        <motion.section
+          id="pricing"
+          className="mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.4, duration: 0.8 }}
+        >
+          <div className="text-center mb-12">
+            <motion.h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+              }}
+            >
+              Simple, transparent pricing
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-300 max-w-2xl mx-auto"
+              style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}
+            >
+              Choose the perfect plan for your AI visibility needs. Start free, upgrade when you're ready.
+            </motion.p>
+          </div>
+          
+          <PricingCards plans={pricingPlans} />
+        </motion.section>
       </div>
     </div>
   );
@@ -467,10 +862,192 @@ function ConveyorBelt({ logos }: { logos: { src: string; alt: string }[] }) {
   );
 }
 
+// Testimonial Carousel Component
+function TestimonialCarousel({ testimonials }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    function updateWidth() {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    }
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  const cardWidth = 320; // Width of each testimonial card
+  const gap = 24; // Gap between cards
+  const totalWidth = testimonials.length * (cardWidth + gap);
+  const duration = totalWidth / 30; // Adjust speed as needed
+
+  return (
+    <div className="relative overflow-hidden">
+      {/* Gradient overlays */}
+      <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
+      
+      <div
+        ref={containerRef}
+        className="flex"
+        style={{
+          width: totalWidth * 2,
+          animation: `testimonial-scroll ${duration}s linear infinite`,
+        }}
+      >
+        {/* First set */}
+        <div className="flex" style={{ gap: `${gap}px` }}>
+          {testimonials.map((testimonial) => (
+            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+          ))}
+        </div>
+        {/* Duplicate set for seamless loop */}
+        <div className="flex" style={{ gap: `${gap}px`, marginLeft: `${gap}px` }}>
+          {testimonials.map((testimonial) => (
+            <TestimonialCard key={`dup-${testimonial.id}`} testimonial={testimonial} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Individual Testimonial Card
+function TestimonialCard({ testimonial }) {
+  return (
+    <motion.div
+      className="flex-shrink-0 w-80 p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
+      }}
+      whileHover={{ 
+        scale: 1.02,
+        boxShadow: '0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+      }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+    >
+      {/* Rating Stars */}
+      <div className="flex mb-4">
+        {Array.from({ length: testimonial.rating }).map((_, i) => (
+          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+        ))}
+      </div>
+      
+      {/* Content */}
+      <p className="text-white/90 mb-6 leading-relaxed text-sm">
+        "{testimonial.content}"
+      </p>
+      
+      {/* Author */}
+      <div className="flex items-center">
+        <img
+          src={testimonial.avatar}
+          alt={testimonial.name}
+          className="w-10 h-10 rounded-full mr-3 object-cover"
+        />
+        <div>
+          <div className="text-white font-medium text-sm">{testimonial.name}</div>
+          <div className="text-gray-400 text-xs">
+            {testimonial.role} at {testimonial.company}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// Pricing Cards Component
+function PricingCards({ plans }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      {plans.map((plan, index) => (
+        <motion.div
+          key={plan.name}
+          className={`relative p-8 rounded-2xl border ${
+            plan.popular 
+              ? 'border-green-400/50 bg-gradient-to-b from-green-400/10 to-green-400/5' 
+              : 'border-white/10 bg-white/5'
+          } backdrop-blur-sm`}
+          style={{
+            background: plan.popular 
+              ? 'linear-gradient(135deg, rgba(173,255,47,0.1) 0%, rgba(173,255,47,0.05) 100%)'
+              : 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+            boxShadow: plan.popular
+              ? '0 8px 32px rgba(173,255,47,0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
+              : '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
+          }}
+          whileHover={{ 
+            scale: 1.02,
+            boxShadow: plan.popular
+              ? '0 12px 40px rgba(173,255,47,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+              : '0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+          }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          delay={index * 0.1}
+        >
+          {plan.popular && (
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <div className="bg-gradient-to-r from-green-400 to-green-500 text-black px-4 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+                <Star className="w-3 h-3 fill-current" />
+                Most Popular
+              </div>
+            </div>
+          )}
+
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+            <p className="text-gray-400 text-sm mb-4">{plan.description}</p>
+            <div className="mb-2">
+              <span className="text-4xl font-bold text-white">
+                ${plan.price}
+              </span>
+              <span className="text-gray-400">/{plan.period}</span>
+            </div>
+          </div>
+
+          <ul className="space-y-3 mb-8">
+            {plan.features.map((feature, featureIndex) => (
+              <li key={featureIndex} className="flex items-start gap-3">
+                <Check className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-300 text-sm">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <motion.button
+            className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${
+              plan.popular
+                ? 'bg-gradient-to-r from-green-400 to-green-500 text-black hover:from-green-300 hover:to-green-400'
+                : 'border-2 border-white/20 text-white hover:bg-white/10'
+            }`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {plan.buttonText}
+            {plan.popular && (
+              <ArrowRight className="w-4 h-4 inline-block ml-2" />
+            )}
+          </motion.button>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
 // Enhanced CSS animations
 const style = document.createElement('style');
 style.innerHTML = `
 @keyframes conveyor-seamless {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes testimonial-scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
