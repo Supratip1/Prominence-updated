@@ -1059,7 +1059,7 @@ export default function Dashboard() {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center space-y-6">
                       <motion.div
-                        className="w-24 h-24 mx-auto bg-gradient-to-r from-[#adff2f] to-[#7cfc00] rounded-full flex items-center justify-center shadow-2xl"
+                        className="w-28 h-28 sm:w-24 sm:h-24 mx-auto bg-gradient-to-r from-[#adff2f] to-[#7cfc00] rounded-full flex items-center justify-center shadow-2xl"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         animate={{ 
@@ -1071,13 +1071,13 @@ export default function Dashboard() {
                         }}
                         transition={{ duration: 2, repeat: Infinity }}
                       >
-                        <svg className="w-10 h-10 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-12 h-12 sm:w-10 sm:h-10 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z"/>
                         </svg>
                       </motion.div>
                       <div>
-                        <h3 className="text-2xl font-bold text-white mb-2">Demo Video Coming Soon</h3>
-                        <p className="text-gray-400">Experience the full power of our AI search optimization platform</p>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Demo Video Coming Soon</h3>
+                        <p className="text-gray-400 text-sm sm:text-base">Experience the full power of our AI search optimization platform</p>
                       </div>
                     </div>
                   </div>
@@ -1087,28 +1087,30 @@ export default function Dashboard() {
                 </div>
 
                 {/* Video Stats/Features */}
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <motion.div 
-                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10"
-                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                  >
-                    <div className="text-2xl font-bold text-[#adff2f] mb-2">300%</div>
-                    <div className="text-white text-sm">Average Visibility Increase</div>
-                  </motion.div>
-                  <motion.div 
-                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10"
-                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                  >
-                    <div className="text-2xl font-bold text-[#adff2f] mb-2">24/7</div>
-                    <div className="text-white text-sm">Real-time Monitoring</div>
-                  </motion.div>
-                  <motion.div 
-                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10"
-                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                  >
-                    <div className="text-2xl font-bold text-[#adff2f] mb-2">5min</div>
-                    <div className="text-white text-sm">Setup Time</div>
-                  </motion.div>
+                <div className="mt-8 overflow-x-auto sm:overflow-visible">
+                  <div className="flex sm:grid sm:grid-cols-3 gap-4 sm:gap-6 min-w-[600px] sm:min-w-0">
+                    <motion.div 
+                      className="flex-1 min-w-[200px] text-center p-4 bg-white/5 rounded-xl border border-white/10"
+                      whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                    >
+                      <div className="text-2xl font-bold text-[#adff2f] mb-2">300%</div>
+                      <div className="text-white text-sm">Average Visibility Increase</div>
+                    </motion.div>
+                    <motion.div 
+                      className="flex-1 min-w-[200px] text-center p-4 bg-white/5 rounded-xl border border-white/10"
+                      whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                    >
+                      <div className="text-2xl font-bold text-[#adff2f] mb-2">24/7</div>
+                      <div className="text-white text-sm">Real-time Monitoring</div>
+                    </motion.div>
+                    <motion.div 
+                      className="flex-1 min-w-[200px] text-center p-4 bg-white/5 rounded-xl border border-white/10"
+                      whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                    >
+                      <div className="text-2xl font-bold text-[#adff2f] mb-2">5min</div>
+                      <div className="text-white text-sm">Setup Time</div>
+                    </motion.div>
+                  </div>
                 </div>
               </div>
             </motion.div>
