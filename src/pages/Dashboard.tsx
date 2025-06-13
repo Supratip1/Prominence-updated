@@ -106,7 +106,7 @@ const mockKeywords = [
 const mockAnalytics = {
   totalKeywords: 247,
   avgVisibility: 78,
-  totalCitations: 1,234,
+  totalCitations: 1234,
   weeklyGrowth: 12.5
 };
 
