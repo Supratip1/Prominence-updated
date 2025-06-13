@@ -42,15 +42,20 @@ export default function Header() {
     setOpen(false); // Close mobile menu after clicking
   };
 
+  // Helper to navigate to home and scroll to section
+  const goToSection = (sectionId: string) => {
+    if (window.location.pathname !== '/dashboard' && window.location.pathname !== '/') {
+      window.location.href = `/dashboard#${sectionId}`;
+    } else {
+      smoothScrollTo(sectionId);
+    }
+    setOpen(false);
+  };
+
   const links = [
-    { label: 'Dashboard', icon: <Home className="h-5 w-5 inline-block mr-1" />, href: '#hero', onClick: () => smoothScrollTo('hero') },
-    { label: 'Features', icon: <Star className="h-5 w-5 inline-block mr-1" />, href: '#features', onClick: () => smoothScrollTo('features') },
-    { label: 'Testimonials', icon: <User className="h-5 w-5 inline-block mr-1" />, href: '#testimonials', onClick: () => smoothScrollTo('testimonials') },
-    { label: 'Pricing', icon: <DollarSign className="h-5 w-5 inline-block mr-1" />, href: '#pricing', onClick: () => smoothScrollTo('pricing') },
-    { label: 'Content Analyzer', icon: <FileText className="h-5 w-5 inline-block mr-1" />, href: '#content-analyzer', onClick: () => smoothScrollTo('content-analyzer') },
-    { label: 'Keyword Research', icon: <Search className="h-5 w-5 inline-block mr-1" />, href: '#keyword-research', onClick: () => smoothScrollTo('keyword-research') },
-    { label: 'API Docs', icon: <Code className="h-5 w-5 inline-block mr-1" />, href: '#api-docs', onClick: () => smoothScrollTo('api-docs') },
-    { label: 'Blog', icon: <BookOpen className="h-5 w-5 inline-block mr-1" />, href: '#blog', onClick: () => smoothScrollTo('blog') },
+    { label: 'Dashboard', icon: <Home className="h-5 w-5 inline-block mr-1" />, href: '#hero', onClick: () => goToSection('hero') },
+    { label: 'Testimonials', icon: <User className="h-5 w-5 inline-block mr-1" />, href: '#testimonials', onClick: () => goToSection('testimonials') },
+    { label: 'Pricing', icon: <DollarSign className="h-5 w-5 inline-block mr-1" />, href: '#pricing', onClick: () => goToSection('pricing') },
   ];
 
   return (
@@ -67,16 +72,27 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {links.map((link) => (
-              <button
-                key={link.label}
-                onClick={link.onClick || (() => {})}
-                className="text-white/80 hover:text-white transition-colors duration-200 cursor-pointer"
-              >
-                {link.icon}
-                {link.label}
-              </button>
-            ))}
+            {links.map((link) =>
+              link.onClick ? (
+                <button
+                  key={link.label}
+                  onClick={link.onClick}
+                  className="text-white/80 hover:text-white transition-colors duration-200 cursor-pointer"
+                >
+                  {link.icon}
+                  {link.label}
+                </button>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-white/80 hover:text-white transition-colors duration-200 cursor-pointer"
+                >
+                  {link.icon}
+                  {link.label}
+                </a>
+              )
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -99,16 +115,27 @@ export default function Header() {
       {open && (
         <div className="md:hidden bg-black/95 backdrop-blur-md">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            {links.map((link) => (
-              <button
-                key={link.label}
-                onClick={link.onClick || (() => {})}
-                className="block w-full text-left px-3 py-2 text-white/80 hover:text-white transition-colors duration-200"
-              >
-                {link.icon}
-                {link.label}
-              </button>
-            ))}
+            {links.map((link) =>
+              link.onClick ? (
+                <button
+                  key={link.label}
+                  onClick={link.onClick}
+                  className="block w-full text-left px-3 py-2 text-white/80 hover:text-white transition-colors duration-200"
+                >
+                  {link.icon}
+                  {link.label}
+                </button>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="block w-full text-left px-3 py-2 text-white/80 hover:text-white transition-colors duration-200"
+                >
+                  {link.icon}
+                  {link.label}
+                </a>
+              )
+            )}
           </div>
         </div>
       )}

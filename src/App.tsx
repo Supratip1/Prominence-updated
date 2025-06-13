@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Layout from './components/Layout/Layout';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
+import Analysis from './pages/Analysis';
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="analysis" element={<Analysis />} />
           </Route>
       </Routes>
     </Router>

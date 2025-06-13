@@ -1,26 +1,33 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { motion, useAnimation, useScroll, useTransform, Variants } from 'framer-motion';
 import {
+  ArrowRight,
+  Play,
+  Volume2,
+  VolumeX,
+  Check,
+  Star,
+  Zap,
+  Shield,
+  BarChart,
+  Users,
+  Sparkles,
+  Rocket,
+  Target,
+  Search,
+  BarChart2,
   TrendingUp,
   TrendingDown,
   FileText,
-  Search,
   Eye,
   Activity,
-  Check,
-  Star,
-  ArrowRight,
-  Play,
   Pause,
   BarChart3,
   Globe,
-  Zap,
-  Target,
-  Users,
   BookOpen,
   Code,
   ChevronRight,
   ExternalLink,
-  Sparkles,
   Brain,
   Lightbulb,
   MessageSquare,
@@ -34,13 +41,25 @@ import {
   RefreshCw,
   AlertCircle,
   CheckCircle,
-  Clock,
-  TrendingUp as TrendUp,
-  Volume2,
-  VolumeX
+  Clock
 } from 'lucide-react';
-import { motion, Variants } from 'framer-motion';
 import Lottie from 'lottie-react';
+import ConveyorBelt from '../components/ConveyorBelt';
+import { useLocation } from 'react-router-dom';
+
+// Analysis Components
+import AnalysisForm from '../components/AnalysisWorkflow/AnalysisForm';
+import CrawlProgress from '../components/AnalysisWorkflow/CrawlProgress';
+import LiveAssetFeed from '../components/AnalysisWorkflow/LiveAssetFeed';
+import AssetFilterBar from '../components/AnalysisWorkflow/AssetFilterBar';
+import AssetGrid from '../components/AnalysisWorkflow/AssetGrid';
+import AEOScorecard from '../components/AnalysisWorkflow/AEOScorecard';
+import AEOValidationPanel from '../components/AnalysisWorkflow/AEOValidationPanel';
+import OptimizationEngine from '../components/AnalysisWorkflow/OptimizationEngine';
+import ExportCSVButton from '../components/AnalysisWorkflow/ExportCSVButton';
+import SendToOptimizationButton from '../components/AnalysisWorkflow/SendToOptimizationButton';
+import AssetPreviewModal from '../components/AnalysisWorkflow/AssetPreviewModal';
+
 
 // Animation variants
 const container: Variants = {
@@ -495,13 +514,101 @@ const PremiumGradientText = ({ children, className = "" }) => (
   </span>
 );
 
+
+
+// Analysis interfaces
+interface Asset {
+  id: string;
+  type: 'webpage' | 'video' | 'screenshot' | 'document' | 'social';
+  title: string;
+  url: string;
+  sourceDomain: string;
+  thumbnail?: string;
+  description?: string;
+  createdAt: Date;
+  size?: string;
+  status: 'active' | 'inactive' | 'error';
+}
+
+interface AEOScore {
+  assetId: string;
+  engine: 'perplexity' | 'chatgpt' | 'claude';
+  score: number;
+  factors: {
+    relevance: number;
+    authority: number;
+    freshness: number;
+    engagement: number;
+  };
+  lastUpdated: Date;
+}
+
+interface ValidationResult {
+  assetId: string;
+  passed: boolean;
+  notes?: string;
+  validatedBy: string;
+  validatedAt: Date;
+}
+
+interface OptimizationSuggestion {
+  id: string;
+  assetId: string;
+  type: 'title' | 'description' | 'content' | 'technical' | 'structure';
+  priority: 'high' | 'medium' | 'low';
+  suggestion: string;
+  impact: string;
+  effort: 'low' | 'medium' | 'high';
+  implemented: boolean;
+}
+
 export default function Dashboard() {
+  const location = typeof window !== 'undefined' ? window.location : { hash: '' };
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100); // slight delay to ensure DOM is ready
+    }
+  }, [location.hash]);
+
   const [timeRange, setTimeRange] = useState<'7d' | '30d'>('7d');
   const [animationData, setAnimationData] = React.useState<any>(null);
   const [demoStep, setDemoStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setMuted] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
+
+  // Analysis workflow state
+  const [query, setQuery] = useState('');
+  const [isCrawling, setIsCrawling] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [message, setMessage] = useState('');
+  const [assetsSoFar, setAssetsSoFar] = useState<Asset[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [filters, setFilters] = useState({
+    type: 'all' as 'all' | Asset['type'],
+    source: 'all' as string,
+    status: 'all' as 'all' | Asset['status']
+  });
+  const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
+  
+  // AEO Scorecard state
+  const [scores, setScores] = useState<AEOScore[]>([]);
+  const [isScoring, setIsScoring] = useState(false);
+  
+  // Validation state
+  const [validated, setValidated] = useState<Record<string, ValidationResult>>({});
+  
+  // Optimization suggestions state
+  const [suggestions, setSuggestions] = useState<OptimizationSuggestion[]>([]);
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+
+
 
   useEffect(() => {
     const randomLottieUrl = lottieAnimations[Math.floor(Math.random() * lottieAnimations.length)];
@@ -519,6 +626,166 @@ export default function Dashboard() {
       return () => clearInterval(interval);
     }
   }, [isPlaying]);
+
+  // Analysis workflow handlers
+  const filteredAssets = assets.filter(asset => {
+    if (filters.type !== 'all' && asset.type !== filters.type) return false;
+    if (filters.source !== 'all' && asset.sourceDomain !== filters.source) return false;
+    if (filters.status !== 'all' && asset.status !== filters.status) return false;
+    return true;
+  });
+
+  const handleSubmit = async (domain: string) => {
+    setQuery(domain);
+    setIsCrawling(true);
+    setProgress(0);
+    setMessage('Starting asset discovery...');
+    setAssets([]);
+    setAssetsSoFar([]);
+    setScores([]);
+    setValidated({});
+    setSuggestions([]);
+
+    // Simulate crawling progress
+    const progressSteps = [
+      { percent: 10, message: 'Analyzing domain structure...', assets: 0 },
+      { percent: 25, message: 'Discovering web pages...', assets: 2 },
+      { percent: 40, message: 'Capturing screenshots...', assets: 4 },
+      { percent: 60, message: 'Finding media files...', assets: 6 },
+      { percent: 80, message: 'Processing documents...', assets: 8 },
+      { percent: 100, message: 'Analysis complete!', assets: 10 }
+    ];
+
+    for (const step of progressSteps) {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setProgress(step.percent);
+      setMessage(step.message);
+      
+      if (step.assets > 0) {
+        const newAssets = generateMockAssets(domain, step.assets);
+        setAssetsSoFar(newAssets);
+        if (step.percent === 100) {
+          setAssets(newAssets);
+        }
+      }
+    }
+
+    setIsCrawling(false);
+  };
+
+  const generateMockAssets = (domain: string, count: number): Asset[] => {
+    const assetTypes: Asset['type'][] = ['webpage', 'video', 'screenshot', 'document', 'social'];
+    const mockAssets: Asset[] = [];
+
+    for (let i = 1; i <= count; i++) {
+      const type = assetTypes[i % assetTypes.length];
+      mockAssets.push({
+        id: `asset-${i}`,
+        type,
+        title: `${domain} - ${type.charAt(0).toUpperCase() + type.slice(1)} ${i}`,
+        url: `https://${domain}/${type}/${i}`,
+        sourceDomain: domain,
+        description: `${type.charAt(0).toUpperCase() + type.slice(1)} content from ${domain}`,
+        createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+        size: type === 'video' ? `${Math.floor(Math.random() * 50 + 10)}MB` : 
+              type === 'document' ? `${Math.floor(Math.random() * 5 + 1)}MB` : undefined,
+        status: Math.random() > 0.1 ? 'active' : 'inactive'
+      });
+    }
+
+    return mockAssets;
+  };
+
+  const handleScoreComplete = async (engine: 'perplexity' | 'chatgpt' | 'claude') => {
+    setIsScoring(true);
+    
+    // Simulate AEO scoring
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const newScores: AEOScore[] = filteredAssets.map(asset => ({
+      assetId: asset.id,
+      engine,
+      score: Math.floor(Math.random() * 40 + 60), // 60-100 score
+      factors: {
+        relevance: Math.floor(Math.random() * 30 + 70),
+        authority: Math.floor(Math.random() * 40 + 60),
+        freshness: Math.floor(Math.random() * 50 + 50),
+        engagement: Math.floor(Math.random() * 35 + 65)
+      },
+      lastUpdated: new Date()
+    }));
+    
+    setScores(newScores);
+    setIsScoring(false);
+  };
+
+  const handleValidation = (assetId: string, passed: boolean, notes?: string) => {
+    setValidated(prev => ({
+      ...prev,
+      [assetId]: {
+        assetId,
+        passed,
+        notes,
+        validatedBy: 'Current User',
+        validatedAt: new Date()
+      }
+    }));
+  };
+
+  const handleGenerateSuggestions = async () => {
+    setIsGeneratingSuggestions(true);
+    
+    // Simulate AI suggestion generation
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    const suggestionTypes: OptimizationSuggestion['type'][] = ['title', 'description', 'content', 'technical', 'structure'];
+    const priorities: OptimizationSuggestion['priority'][] = ['high', 'medium', 'low'];
+    const efforts: OptimizationSuggestion['effort'][] = ['low', 'medium', 'high'];
+    
+    const newSuggestions: OptimizationSuggestion[] = filteredAssets.flatMap(asset => {
+      const numSuggestions = Math.floor(Math.random() * 3 + 1);
+      return Array.from({ length: numSuggestions }, (_, i) => {
+        const type = suggestionTypes[Math.floor(Math.random() * suggestionTypes.length)];
+        return {
+          id: `suggestion-${asset.id}-${i}`,
+          assetId: asset.id,
+          type,
+          priority: priorities[Math.floor(Math.random() * priorities.length)],
+          suggestion: getSuggestionText(type, asset),
+          impact: getImpactText(type),
+          effort: efforts[Math.floor(Math.random() * efforts.length)],
+          implemented: false
+        };
+      });
+    });
+    
+    setSuggestions(newSuggestions);
+    setIsGeneratingSuggestions(false);
+  };
+
+  const getSuggestionText = (type: OptimizationSuggestion['type'], asset: Asset): string => {
+    const suggestions = {
+      title: `Optimize title for "${asset.title}" to include primary keywords and stay under 60 characters`,
+      description: `Add compelling meta description highlighting unique value proposition`,
+      content: `Enhance content structure with H2/H3 headings and improve readability score`,
+      technical: `Optimize image alt tags and implement structured data markup`,
+      structure: `Improve internal linking and add breadcrumb navigation`
+    };
+    return suggestions[type];
+  };
+
+  const getImpactText = (type: OptimizationSuggestion['type']): string => {
+    const impacts = {
+      title: 'High - Directly affects click-through rates',
+      description: 'Medium - Improves search snippet appeal',
+      content: 'High - Enhances user engagement and dwell time',
+      technical: 'Medium - Improves accessibility and SEO signals',
+      structure: 'Low - Supports overall site architecture'
+    };
+    return impacts[type];
+  };
+
+
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -585,7 +852,7 @@ export default function Dashboard() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-blue-900/30 via-transparent to-transparent" />
       </div>
 
-      <div id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 lg:pt-12 pb-4 sm:pb-12 relative z-10">
+      <div id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 lg:pt-12 pb-4 sm:pb-12 relative z-10 mt-0 sm:mt-8 md:mt-16">
         {/* Hero Section */}
         <motion.div
           className="flex flex-col lg:grid lg:grid-cols-2 items-center gap-2 sm:gap-3 lg:gap-1 mb-2 sm:mb-3 lg:mb-4"
@@ -699,98 +966,177 @@ export default function Dashboard() {
                 </motion.span>
               </motion.p>
               
+
+
+              {/* Premium Start Analysis Section in Hero */}
               <motion.div
-                className="flex flex-row items-center justify-center lg:justify-start gap-x-4"
+                className="mt-12 max-w-2xl mx-auto lg:mx-0"
                 variants={textReveal}
               >
-                <motion.button
-                  className="
-                    relative overflow-hidden
-                    h-14 px-8 rounded-xl 
-                    bg-gradient-to-r from-[#adff2f] to-[#7cfc00]
-                    text-black text-base font-bold 
-                    shadow-lg shadow-green-500/30
-                    border border-green-400/30
-                    group
-                  "
-                  whileHover={buttonHover}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  style={{
-                    boxShadow: '0 0 20px rgba(173, 255, 47, 0.4), 0 4px 20px rgba(0, 0, 0, 0.3)'
-                  }}
-                  onClick={() => {
-                    const demoElement = document.getElementById('demo');
-                    if (demoElement) {
-                      demoElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
+                <motion.div
+                  className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/20 p-8 shadow-2xl"
+                  whileHover={{ scale: 1.02, boxShadow: "0 25px 50px rgba(173, 255, 47, 0.15)" }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    initial={false}
-                  />
-                  <span className="relative z-10 flex items-center gap-2">
-                    Try Demo
-                    <motion.div
-                      animate={{ x: [0, 3, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#adff2f]/10 to-[#7cfc00]/10 rounded-2xl" />
+                  
+                  <div className="relative z-10">
+                    <div className="text-center mb-6">
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        Start Your Analysis
+                      </h3>
+                      <p className="text-sm text-white/60">
+                        Discover hidden opportunities in seconds
+                      </p>
+                    </div>
+                    <form 
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.currentTarget);
+                        const domain = formData.get('domain') as string;
+                        if (domain) {
+                          // Redirect to analysis page with domain parameter
+                          window.location.href = `/analysis?domain=${encodeURIComponent(domain)}`;
+                        }
+                      }}
+                      className="space-y-4"
                     >
-                      →
-                    </motion.div>
-                  </span>
-                </motion.button>
-                
-                <motion.button
-                  className="
-                    relative
-                    h-14 px-8 rounded-xl 
-                    border-2 border-white/20 
-                    bg-white/5 backdrop-blur-sm
-                    text-white text-base font-semibold 
-                    shadow-lg shadow-white/10
-                    group
-                  "
-                  whileHover={buttonSecondaryHover}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
-                    initial={false}
-                  />
-                  <span className="relative z-10">Get GEO free</span>
-                </motion.button>
+                      <p className="text-center text-white/60 text-sm mb-8">
+                        Get instant insights into your digital assets and SEO performance
+                      </p>
+                      <div className="relative">
+                        <div className="flex flex-col sm:flex-row gap-2 w-full items-stretch sm:items-center">
+                          <input
+                            type="text"
+                            name="domain"
+                            placeholder="Enter your domain (e.g., yourcompany.com)"
+                            required
+                            className="flex-1 w-full h-14 pl-6 pr-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#adff2f]/50 focus:border-[#adff2f]/50 text-lg"
+                          />
+                          <motion.button
+                            type="submit"
+                            className="h-10 px-6 bg-gradient-to-r from-[#adff2f] to-[#7cfc00] text-black font-bold rounded-lg transition-all shadow-lg shadow-green-500/30 w-full sm:w-auto mt-2 sm:mt-0"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            Analyze →
+                          </motion.button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </motion.div>
               </motion.div>
             </motion.div>
           </motion.div>
         </motion.div>
 
-        {/* Enhanced Trust Indicators with Space Theme */}
-        <motion.div 
-          className="mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8, ease: "easeOut" }}
+        {/* Premium Demo Video Section */}
+        <motion.section 
+          id="demo" 
+          className="py-20 relative overflow-hidden"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <div className="flex flex-col md:flex-row items-center md:justify-start gap-4 md:gap-8 py-6 opacity-95 md:h-24">
-            <motion.p 
-              className="
-                text-base md:text-2xl font-bold
-                text-white/80
-                whitespace-nowrap mb-2 md:mb-0 md:mr-8 flex-shrink-0 
-                leading-none self-center
-                tracking-[-0.02em]
-              "
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              style={{
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                textShadow: '0 0 10px rgba(255, 255, 255, 0.3)'
-              }}
+          <div className="container mx-auto px-4">
+            {/* Premium Video Container */}
+            <motion.div
+              className="relative max-w-6xl mx-auto"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
             >
-              Trusted by top teams
-            </motion.p>
+              {/* Glow Effect */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-[#adff2f]/20 via-[#7cfc00]/20 to-[#adff2f]/20 rounded-3xl blur-2xl opacity-60" />
+              
+              {/* Video Container */}
+              <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/20 p-8 shadow-2xl">
+                <div className="aspect-video relative rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-black border border-white/10">
+                  {/* Placeholder for future video */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center space-y-6">
+                      <motion.div
+                        className="w-24 h-24 mx-auto bg-gradient-to-r from-[#adff2f] to-[#7cfc00] rounded-full flex items-center justify-center shadow-2xl"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        animate={{ 
+                          boxShadow: [
+                            "0 0 20px rgba(173, 255, 47, 0.3)",
+                            "0 0 40px rgba(173, 255, 47, 0.6)",
+                            "0 0 20px rgba(173, 255, 47, 0.3)"
+                          ]
+                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <svg className="w-10 h-10 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </motion.div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-white mb-2">Demo Video Coming Soon</h3>
+                        <p className="text-gray-400">Experience the full power of our AI search optimization platform</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Premium overlay effects */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/20 pointer-events-none" />
+                </div>
+
+                {/* Video Stats/Features */}
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <motion.div 
+                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10"
+                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                  >
+                    <div className="text-2xl font-bold text-[#adff2f] mb-2">300%</div>
+                    <div className="text-white text-sm">Average Visibility Increase</div>
+                  </motion.div>
+                  <motion.div 
+                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10"
+                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                  >
+                    <div className="text-2xl font-bold text-[#adff2f] mb-2">24/7</div>
+                    <div className="text-white text-sm">Real-time Monitoring</div>
+                  </motion.div>
+                  <motion.div 
+                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10"
+                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                  >
+                    <div className="text-2xl font-bold text-[#adff2f] mb-2">5min</div>
+                    <div className="text-white text-sm">Setup Time</div>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.section>
+
+        {/* Enhanced Trust Indicators with Space Theme */}
+        <motion.div className="mb-16">
+          <div className="flex flex-col md:flex-row items-center md:justify-start gap-4 md:gap-8 py-6 opacity-95 md:h-24">
+            <div className="flex items-center gap-4 mb-2 md:mb-0 md:mr-8 flex-shrink-0">
+              <div className="flex -space-x-2">
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full border-2 border-white/20 shadow-lg"></div>
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full border-2 border-white/20 shadow-lg"></div>
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-2 border-white/20 shadow-lg"></div>
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full border-2 border-white/20 shadow-lg"></div>
+              </div>
+              <motion.p 
+                className="text-base md:text-2xl font-bold text-white/80 whitespace-nowrap leading-none tracking-[-0.02em]"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                style={{
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                  textShadow: '0 0 10px rgba(255, 255, 255, 0.3)'
+                }}
+              >
+                Trusted by <span className="text-[#adff2f]">10,000+</span> teams
+              </motion.p>
+            </div>
             
             <div className="relative w-full overflow-hidden h-14 md:h-24 flex items-center">
               <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black z-10 pointer-events-none" />
@@ -798,92 +1144,6 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.div>
-
-        {/* Interactive Demo Section */}
-        <motion.section id="demo" className="relative py-20 overflow-hidden">
-          <div className="absolute top-4 right-4 z-20">
-            <button onClick={() => setMuted(!isMuted)} className="bg-black/60 p-2 rounded-full">
-              {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
-            </button>
-          </div>
-          <div className="container mx-auto px-4">
-            <motion.div
-              className="relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            >
-              <div className="aspect-video relative">
-                <Lottie
-                  animationData={animationData}
-                  loop={true}
-                  autoplay={true}
-                  className="w-full h-full"
-                />
-              </div>
-            </motion.div>
-          </div>
-        </motion.section>
-
-        {/* Features Section */}
-        <motion.section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.h2
-              className="text-3xl font-bold text-white mb-8 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              Why Prominence?
-            </motion.h2>
-            <FeaturesGrid />
-          </div>
-        </motion.section>
-
-        {/* Content Analyzer Section */}
-        <motion.section
-          id="content-analyzer"
-          className="mb-14"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 0.8 }}
-        >
-          <ContentAnalyzerSection />
-        </motion.section>
-
-        {/* Keyword Research Section */}
-        <motion.section
-          id="keyword-research"
-          className="mb-14"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-        >
-          <KeywordResearchSection />
-        </motion.section>
-
-        {/* API Docs Section */}
-        <motion.section
-          id="api-docs"
-          className="mb-14"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.3, duration: 0.8 }}
-        >
-          <ApiDocsSection />
-        </motion.section>
-
-        {/* Blog Section */}
-        <motion.section
-          id="blog"
-          className="mb-14"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4, duration: 0.8 }}
-        >
-          <BlogSection />
-        </motion.section>
 
         {/* Testimonials Section */}
         <motion.section id="testimonials" className="py-20">
@@ -915,46 +1175,7 @@ export default function Dashboard() {
           </div>
         </motion.section>
 
-        {/* Deep-Dive Tools Section */}
-        <motion.section id="deep-dive-tools" className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.h2
-              className="text-3xl font-bold text-white mb-8 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              Deep-Dive Tools
-            </motion.h2>
-            <div className="max-w-4xl mx-auto">
-              <div className="flex space-x-4 mb-8">
-                <button
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-                    activeTab === 'content' 
-                      ? 'bg-white/10 text-white border border-white/20' 
-                      : 'text-white/60 hover:text-white'
-                  }`}
-                  onClick={() => setActiveTab('content')}
-                >
-                  Content Analyzer
-                </button>
-                <button
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-                    activeTab === 'keywords' 
-                      ? 'bg-white/10 text-white border border-white/20' 
-                      : 'text-white/60 hover:text-white'
-                  }`}
-                  onClick={() => setActiveTab('keywords')}
-                >
-                  Keyword Research
-                </button>
-              </div>
-              <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
-                {activeTab === 'content' ? <ContentAnalyzerSection /> : <KeywordResearchSection />}
-              </div>
-            </div>
-          </div>
-        </motion.section>
+
       </div>
 
       {/* Footer Section */}
@@ -962,14 +1183,10 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col items-center gap-6 border-t border-white/10 bg-gradient-to-t from-black/80 via-black/60 to-transparent">
           {/* Navigation Links */}
           <nav className="flex flex-wrap justify-center gap-6 text-sm font-medium mb-2">
-            <a href="#hero" className="text-white/70 hover:text-green-300 transition">Dashboard</a>
-            <a href="#features" className="text-white/70 hover:text-green-300 transition">Features</a>
-            <a href="#testimonials" className="text-white/70 hover:text-green-300 transition">Testimonials</a>
-            <a href="#pricing" className="text-white/70 hover:text-green-300 transition">Pricing</a>
-            <a href="#content-analyzer" className="text-white/70 hover:text-green-300 transition">Content Analyzer</a>
-            <a href="#keyword-research" className="text-white/70 hover:text-green-300 transition">Keyword Research</a>
-            <a href="#api-docs" className="text-white/70 hover:text-green-300 transition">API Docs</a>
-            <a href="#blog" className="text-white/70 hover:text-green-300 transition">Blog</a>
+            <button onClick={() => document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="text-white/70 hover:text-green-300 transition">Dashboard</button>
+            <button onClick={() => window.location.href = '/analysis'} className="text-white/70 hover:text-green-300 transition">Asset Discovery</button>
+            <button onClick={() => document.getElementById('testimonials')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="text-white/70 hover:text-green-300 transition">Testimonials</button>
+            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="text-white/70 hover:text-green-300 transition">Pricing</button>
           </nav>
 
           {/* Divider */}
@@ -995,66 +1212,6 @@ export default function Dashboard() {
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-
-// Enhanced ConveyorBelt component
-function ConveyorBelt({ logos }: { logos: { src: string; alt: string }[] }) {
-  const setRef = useRef<HTMLDivElement>(null);
-  const [setWidth, setSetWidth] = React.useState(0);
-
-  useLayoutEffect(() => {
-    function updateWidth() {
-      if (setRef.current) {
-        setSetWidth(setRef.current.offsetWidth);
-      }
-    }
-    updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
-  }, [logos]);
-
-  const duration = Math.max(setWidth / 50, 10); // Slightly slower for premium feel
-
-  return (
-    <div style={{ width: '100%', overflow: 'hidden', height: '100%' }} className="relative">
-      <div
-        style={{
-          display: 'flex',
-          width: setWidth ? setWidth * 2 : 'auto',
-          animation: setWidth
-            ? `conveyor-seamless ${duration}s linear infinite` : undefined,
-        }}
-        className="h-16"
-      >
-        <div ref={setRef} style={{ display: 'flex' }}>
-          {logos.map(({ src, alt }, i) => (
-            <motion.img
-              key={alt + i}
-              src={src}
-              alt={alt}
-              className="h-12 md:h-20 mx-6 md:mx-12 object-contain min-w-[80px] md:min-w-[120px] opacity-80 hover:opacity-100 transition-opacity duration-300 bg-black rounded-[30px] p-2"
-              loading="lazy"
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            />
-          ))}
-        </div>
-        <div style={{ display: 'flex' }}>
-          {logos.map(({ src, alt }, i) => (
-            <motion.img
-              key={alt + '-dup-' + i}
-              src={src}
-              alt={alt}
-              className="h-12 md:h-20 mx-6 md:mx-12 object-contain min-w-[80px] md:min-w-[120px] opacity-80 hover:opacity-100 transition-opacity duration-300 bg-black rounded-[30px] p-2"
-              loading="lazy"
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            />
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
@@ -1176,7 +1333,7 @@ function ContentAnalyzerSection() {
                 ))}
               </ul>
               <motion.button
-                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-xl font-semibold"
+                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-xl font-semibold w-full sm:w-auto mt-2 sm:mt-0"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -1685,10 +1842,14 @@ function PricingCard({ plan, index }) {
           ? '0 12px 40px rgba(173,255,47,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
           : '0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
       }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+      transition={{ 
+        type: 'spring', 
+        stiffness: 300, 
+        damping: 25,
+        delay: index * 0.1 
+      }}
     >
       {plan.popular && (
         <div className="absolute top-2 md:-top-4 left-1/2 transform -translate-x-1/2 z-10">
@@ -1774,6 +1935,22 @@ style.innerHTML = `
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .text-responsive {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+  
+  .heading-responsive {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+  }
 }
 `;
 

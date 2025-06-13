@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://rsms.me/inter/inter.css" rel="stylesheet" />
-    <title>Prominance.ai</title>
+    <title>GEO Analytics – AI Visibility Dashboard</title>
     <style>
       /* Critical preloader styles */
       #preloader {
@@ -66,18 +66,30 @@
       const root = document.getElementById('root');
       const player = document.getElementById('loader');
 
-      player.addEventListener('complete', () => {
-        // trigger fade & scale out
-        pre.classList.add('hidden');
-
-        // after the transition, hide the element entirely
-        setTimeout(() => {
-          pre.style.display = 'none';
-        }, 500);
-
-        // fade in the app
+      // Check if this is the first load
+      const isFirstLoad = !sessionStorage.getItem('hasLoaded');
+      
+      if (!isFirstLoad) {
+        // If not first load, hide preloader immediately
+        pre.style.display = 'none';
         root.classList.add('visible');
-      });
+      } else {
+        // If first load, show preloader and set flag
+        sessionStorage.setItem('hasLoaded', 'true');
+        
+        player.addEventListener('complete', () => {
+          // trigger fade & scale out
+          pre.classList.add('hidden');
+
+          // after the transition, hide the element entirely
+          setTimeout(() => {
+            pre.style.display = 'none';
+          }, 500);
+
+          // fade in the app
+          root.classList.add('visible');
+        });
+      }
     </script>
 
     <!-- Your bundled script -->
