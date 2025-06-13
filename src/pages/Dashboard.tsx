@@ -617,35 +617,28 @@ export default function Dashboard() {
   const validateDomain = async (url: string): Promise<boolean> => {
     setIsValidating(true);
     setError('');
-    
+
+    const tryUrl = (prefix: 'https://' | 'http://') => {
+      const full = url.startsWith('http') ? url : prefix + url;
+      return fetch(full, { method: 'HEAD', mode: 'no-cors', cache: 'no-cache' });
+    };
+
     try {
-      // First try HTTPS
-      const httpsUrl = url.startsWith('http') ? url : `https://${url}`;
-      const httpsResponse = await fetch(httpsUrl, {
-        method: 'HEAD',
-        mode: 'no-cors',
-        cache: 'no-cache'
-      });
-      
-      if (httpsResponse.ok) {
+      // 1. Try HTTPS
+      await tryUrl('https://');
+      setIsValidating(false);
+      return true;
+    } catch {
+      // 2. Fallback to HTTP
+      try {
+        await tryUrl('http://');
         setIsValidating(false);
         return true;
+      } catch {
+        setIsValidating(false);
+        setError('Unable to reach this domain. Please check the URL and try again.');
+        return false;
       }
-      
-      // If HTTPS fails, try HTTP
-      const httpUrl = url.startsWith('http') ? url.replace('https://', 'http://') : `http://${url}`;
-      const httpResponse = await fetch(httpUrl, {
-        method: 'HEAD',
-        mode: 'no-cors',
-        cache: 'no-cache'
-      });
-      
-      setIsValidating(false);
-      return httpResponse.ok;
-    } catch (err) {
-      setIsValidating(false);
-      setError('Unable to reach this domain. Please check the URL and try again.');
-      return false;
     }
   };
 
