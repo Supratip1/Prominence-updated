@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo } from 'react';
 import { motion, useAnimation, useScroll, useTransform, Variants } from 'framer-motion';
 import {
   ArrowRight,
@@ -45,7 +45,8 @@ import {
 } from 'lucide-react';
 import Lottie from 'lottie-react';
 import ConveyorBelt from '../components/ConveyorBelt';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import debounce from 'lodash/debounce';
 
 // Analysis Components
 import AnalysisForm from '../components/AnalysisWorkflow/AnalysisForm';
@@ -585,6 +586,7 @@ export default function Dashboard() {
 
   // Analysis workflow state
   const [query, setQuery] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [isCrawling, setIsCrawling] = useState(false);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState('');
@@ -608,7 +610,78 @@ export default function Dashboard() {
   const [suggestions, setSuggestions] = useState<OptimizationSuggestion[]>([]);
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
 
+  const [domain, setDomain] = useState('');
+  const [isValidating, setIsValidating] = useState(false);
+  const navigate = useNavigate();
 
+  const validateDomain = async (url: string): Promise<boolean> => {
+    setIsValidating(true);
+    setError('');
+    
+    try {
+      // First try HTTPS
+      const httpsUrl = url.startsWith('http') ? url : `https://${url}`;
+      const httpsResponse = await fetch(httpsUrl, {
+        method: 'HEAD',
+        mode: 'no-cors',
+        cache: 'no-cache'
+      });
+      
+      if (httpsResponse.ok) {
+        setIsValidating(false);
+        return true;
+      }
+      
+      // If HTTPS fails, try HTTP
+      const httpUrl = url.startsWith('http') ? url.replace('https://', 'http://') : `http://${url}`;
+      const httpResponse = await fetch(httpUrl, {
+        method: 'HEAD',
+        mode: 'no-cors',
+        cache: 'no-cache'
+      });
+      
+      setIsValidating(false);
+      return httpResponse.ok;
+    } catch (err) {
+      setIsValidating(false);
+      setError('Unable to reach this domain. Please check the URL and try again.');
+      return false;
+    }
+  };
+
+  const debouncedValidate = useMemo(
+    () => debounce((url: string) => {
+      if (url) {
+        validateDomain(url);
+      }
+    }, 500),
+    []
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDomain(value);
+    setError('');
+    if (value) {
+      debouncedValidate(value);
+    }
+  };
+
+  const handleBlur = () => {
+    if (domain) {
+      validateDomain(domain);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!domain) return;
+
+    const isValid = await validateDomain(domain);
+    if (!isValid) return;
+
+    navigate(`/analysis?domain=${encodeURIComponent(domain)}`);
+  };
 
   useEffect(() => {
     const randomLottieUrl = lottieAnimations[Math.floor(Math.random() * lottieAnimations.length)];
@@ -634,67 +707,6 @@ export default function Dashboard() {
     if (filters.status !== 'all' && asset.status !== filters.status) return false;
     return true;
   });
-
-  const handleSubmit = async (domain: string) => {
-    setQuery(domain);
-    setIsCrawling(true);
-    setProgress(0);
-    setMessage('Starting asset discovery...');
-    setAssets([]);
-    setAssetsSoFar([]);
-    setScores([]);
-    setValidated({});
-    setSuggestions([]);
-
-    // Simulate crawling progress
-    const progressSteps = [
-      { percent: 10, message: 'Analyzing domain structure...', assets: 0 },
-      { percent: 25, message: 'Discovering web pages...', assets: 2 },
-      { percent: 40, message: 'Capturing screenshots...', assets: 4 },
-      { percent: 60, message: 'Finding media files...', assets: 6 },
-      { percent: 80, message: 'Processing documents...', assets: 8 },
-      { percent: 100, message: 'Analysis complete!', assets: 10 }
-    ];
-
-    for (const step of progressSteps) {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setProgress(step.percent);
-      setMessage(step.message);
-      
-      if (step.assets > 0) {
-        const newAssets = generateMockAssets(domain, step.assets);
-        setAssetsSoFar(newAssets);
-        if (step.percent === 100) {
-          setAssets(newAssets);
-        }
-      }
-    }
-
-    setIsCrawling(false);
-  };
-
-  const generateMockAssets = (domain: string, count: number): Asset[] => {
-    const assetTypes: Asset['type'][] = ['webpage', 'video', 'screenshot', 'document', 'social'];
-    const mockAssets: Asset[] = [];
-
-    for (let i = 1; i <= count; i++) {
-      const type = assetTypes[i % assetTypes.length];
-      mockAssets.push({
-        id: `asset-${i}`,
-        type,
-        title: `${domain} - ${type.charAt(0).toUpperCase() + type.slice(1)} ${i}`,
-        url: `https://${domain}/${type}/${i}`,
-        sourceDomain: domain,
-        description: `${type.charAt(0).toUpperCase() + type.slice(1)} content from ${domain}`,
-        createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
-        size: type === 'video' ? `${Math.floor(Math.random() * 50 + 10)}MB` : 
-              type === 'document' ? `${Math.floor(Math.random() * 5 + 1)}MB` : undefined,
-        status: Math.random() > 0.1 ? 'active' : 'inactive'
-      });
-    }
-
-    return mockAssets;
-  };
 
   const handleScoreComplete = async (engine: 'perplexity' | 'chatgpt' | 'claude') => {
     setIsScoring(true);
@@ -990,15 +1002,7 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <form 
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const formData = new FormData(e.currentTarget);
-                        const domain = formData.get('domain') as string;
-                        if (domain) {
-                          // Redirect to analysis page with domain parameter
-                          window.location.href = `/analysis?domain=${encodeURIComponent(domain)}`;
-                        }
-                      }}
+                      onSubmit={handleSubmit}
                       className="space-y-4"
                     >
                       <p className="text-center text-white/60 text-sm mb-8">
@@ -1011,8 +1015,15 @@ export default function Dashboard() {
                             name="domain"
                             placeholder="Enter your domain (e.g., yourcompany.com)"
                             required
+                            onBlur={handleBlur}
+                            onChange={handleInputChange}
                             className="flex-1 w-full h-14 pl-6 pr-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#adff2f]/50 focus:border-[#adff2f]/50 text-lg"
                           />
+                          {isValidating && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                            </div>
+                          )}
                           <motion.button
                             type="submit"
                             className="h-10 px-6 bg-gradient-to-r from-[#adff2f] to-[#7cfc00] text-black font-bold rounded-lg transition-all shadow-lg shadow-green-500/30 w-full sm:w-auto mt-2 sm:mt-0"
@@ -1022,6 +1033,9 @@ export default function Dashboard() {
                             Analyze →
                           </motion.button>
                         </div>
+                        {error && (
+                          <p className="text-sm text-red-400 mt-2">{error}</p>
+                        )}
                       </div>
                     </form>
                   </div>
