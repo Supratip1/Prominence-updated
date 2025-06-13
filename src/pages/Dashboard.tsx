@@ -8,7 +8,34 @@ import {
   Activity,
   Check,
   Star,
-  ArrowRight
+  ArrowRight,
+  Play,
+  Pause,
+  BarChart3,
+  Globe,
+  Zap,
+  Target,
+  Users,
+  BookOpen,
+  Code,
+  ChevronRight,
+  ExternalLink,
+  Sparkles,
+  Brain,
+  Lightbulb,
+  MessageSquare,
+  PieChart,
+  LineChart,
+  Calendar,
+  Filter,
+  Download,
+  Share2,
+  Settings,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  TrendingUp as TrendUp
 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import Lottie from 'lottie-react';
@@ -66,6 +93,22 @@ const logos = [
   { src: '/logos/perplexity.png', alt: 'Perplexity' },
   { src: '/logos/vercel.png',     alt: 'Vercel'     },
 ];
+
+// Mock data for demo
+const mockKeywords = [
+  { keyword: "best CRM software", score: 85, trend: "up", citations: 12 },
+  { keyword: "project management tools", score: 72, trend: "up", citations: 8 },
+  { keyword: "AI writing assistant", score: 91, trend: "down", citations: 15 },
+  { keyword: "cloud hosting providers", score: 68, trend: "up", citations: 6 },
+  { keyword: "design collaboration", score: 79, trend: "up", citations: 10 }
+];
+
+const mockAnalytics = {
+  totalKeywords: 247,
+  avgVisibility: 78,
+  totalCitations: 1,234,
+  weeklyGrowth: 12.5
+};
 
 // Testimonials data
 const testimonials = [
@@ -453,6 +496,8 @@ const PremiumGradientText = ({ children, className = "" }) => (
 export default function Dashboard() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d'>('7d');
   const [animationData, setAnimationData] = React.useState<any>(null);
+  const [demoStep, setDemoStep] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const randomLottieUrl = lottieAnimations[Math.floor(Math.random() * lottieAnimations.length)];
@@ -460,6 +505,16 @@ export default function Dashboard() {
       .then(res => res.json())
       .then(setAnimationData);
   }, []);
+
+  // Demo automation
+  useEffect(() => {
+    if (isPlaying) {
+      const interval = setInterval(() => {
+        setDemoStep(prev => (prev + 1) % 4);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying]);
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -660,13 +715,19 @@ export default function Dashboard() {
                   style={{
                     boxShadow: '0 0 20px rgba(173, 255, 47, 0.4), 0 4px 20px rgba(0, 0, 0, 0.3)'
                   }}
+                  onClick={() => {
+                    const demoElement = document.getElementById('demo');
+                    if (demoElement) {
+                      demoElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
                 >
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     initial={false}
                   />
                   <span className="relative z-10 flex items-center gap-2">
-                    Get GEO free
+                    Try Demo
                     <motion.div
                       animate={{ x: [0, 3, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -694,7 +755,7 @@ export default function Dashboard() {
                     className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
                     initial={false}
                   />
-                  <span className="relative z-10">Request a demo</span>
+                  <span className="relative z-10">Get GEO free</span>
                 </motion.button>
               </motion.div>
             </motion.div>
@@ -733,6 +794,315 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.div>
+
+        {/* Interactive Demo Section */}
+        <motion.section
+          id="demo"
+          className="mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
+        >
+          <div className="text-center mb-12">
+            <motion.h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+              }}
+            >
+              See it in action
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-300 max-w-2xl mx-auto mb-8"
+              style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}
+            >
+              Experience how Prominence.ai tracks your brand visibility across AI search engines
+            </motion.p>
+            
+            <motion.button
+              onClick={() => setIsPlaying(!isPlaying)}
+              className={`
+                inline-flex items-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all duration-300
+                ${isPlaying 
+                  ? 'bg-red-500/20 text-red-300 border-2 border-red-500/30' 
+                  : 'bg-green-500/20 text-green-300 border-2 border-green-500/30'
+                }
+                hover:scale-105 backdrop-blur-sm
+              `}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              {isPlaying ? 'Pause Demo' : 'Start Demo'}
+            </motion.button>
+          </div>
+
+          {/* Demo Dashboard */}
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 shadow-2xl"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+              }}
+            >
+              {/* Demo Header */}
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                  <span className="text-white/70 text-sm ml-4">prominence.ai/dashboard</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-white/50" />
+                  <Settings className="w-4 h-4 text-white/50" />
+                </div>
+              </div>
+
+              {/* Demo Content */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Analytics */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* KPI Cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <motion.div
+                      className="bg-white/10 rounded-xl p-4 border border-white/10"
+                      animate={demoStep >= 1 ? { scale: [1, 1.05, 1], borderColor: ['rgba(255,255,255,0.1)', 'rgba(173,255,47,0.5)', 'rgba(255,255,255,0.1)'] } : {}}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Target className="w-4 h-4 text-green-400" />
+                        <span className="text-white/70 text-xs">Keywords</span>
+                      </div>
+                      <div className="text-2xl font-bold text-white">{mockAnalytics.totalKeywords}</div>
+                      <div className="text-xs text-green-400">+12 this week</div>
+                    </motion.div>
+
+                    <motion.div
+                      className="bg-white/10 rounded-xl p-4 border border-white/10"
+                      animate={demoStep >= 2 ? { scale: [1, 1.05, 1], borderColor: ['rgba(255,255,255,0.1)', 'rgba(173,255,47,0.5)', 'rgba(255,255,255,0.1)'] } : {}}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Eye className="w-4 h-4 text-blue-400" />
+                        <span className="text-white/70 text-xs">Visibility</span>
+                      </div>
+                      <div className="text-2xl font-bold text-white">{mockAnalytics.avgVisibility}%</div>
+                      <div className="text-xs text-green-400">+{mockAnalytics.weeklyGrowth}%</div>
+                    </motion.div>
+
+                    <motion.div
+                      className="bg-white/10 rounded-xl p-4 border border-white/10"
+                      animate={demoStep >= 3 ? { scale: [1, 1.05, 1], borderColor: ['rgba(255,255,255,0.1)', 'rgba(173,255,47,0.5)', 'rgba(255,255,255,0.1)'] } : {}}
+                      transition={{ duration: 0.5, delay: 0.4 }}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <MessageSquare className="w-4 h-4 text-purple-400" />
+                        <span className="text-white/70 text-xs">Citations</span>
+                      </div>
+                      <div className="text-2xl font-bold text-white">{mockAnalytics.totalCitations.toLocaleString()}</div>
+                      <div className="text-xs text-green-400">+156 today</div>
+                    </motion.div>
+
+                    <motion.div
+                      className="bg-white/10 rounded-xl p-4 border border-white/10"
+                      animate={demoStep >= 0 ? { scale: [1, 1.05, 1], borderColor: ['rgba(255,255,255,0.1)', 'rgba(173,255,47,0.5)', 'rgba(255,255,255,0.1)'] } : {}}
+                      transition={{ duration: 0.5, delay: 0.6 }}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendUp className="w-4 h-4 text-orange-400" />
+                        <span className="text-white/70 text-xs">Growth</span>
+                      </div>
+                      <div className="text-2xl font-bold text-white">+{mockAnalytics.weeklyGrowth}%</div>
+                      <div className="text-xs text-green-400">vs last week</div>
+                    </motion.div>
+                  </div>
+
+                  {/* Keywords Table */}
+                  <motion.div
+                    className="bg-white/5 rounded-xl border border-white/10 overflow-hidden"
+                    animate={demoStep >= 1 ? { opacity: [0.5, 1] } : { opacity: 0.5 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="p-4 border-b border-white/10">
+                      <h3 className="text-white font-semibold">Top Keywords</h3>
+                    </div>
+                    <div className="divide-y divide-white/10">
+                      {mockKeywords.map((keyword, index) => (
+                        <motion.div
+                          key={index}
+                          className="p-4 flex items-center justify-between"
+                          animate={demoStep >= 2 && index < 3 ? { backgroundColor: ['rgba(255,255,255,0)', 'rgba(173,255,47,0.1)', 'rgba(255,255,255,0)'] } : {}}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                        >
+                          <div className="flex-1">
+                            <div className="text-white text-sm font-medium">{keyword.keyword}</div>
+                            <div className="text-white/50 text-xs">{keyword.citations} citations</div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <div className="text-white font-semibold">{keyword.score}%</div>
+                              <div className={`text-xs flex items-center gap-1 ${keyword.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+                                {keyword.trend === 'up' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                                {keyword.trend === 'up' ? '+' : '-'}{Math.floor(Math.random() * 10) + 1}%
+                              </div>
+                            </div>
+                            <div className="w-16 h-8 bg-white/10 rounded flex items-end justify-center space-x-0.5 p-1">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <div
+                                  key={i}
+                                  className="w-1 bg-green-400 rounded-full"
+                                  style={{ height: `${Math.random() * 100}%` }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Sidebar */}
+                <div className="space-y-6">
+                  {/* AI Search Engines */}
+                  <motion.div
+                    className="bg-white/5 rounded-xl border border-white/10 p-4"
+                    animate={demoStep >= 3 ? { opacity: [0.5, 1] } : { opacity: 0.5 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <h3 className="text-white font-semibold mb-4">AI Engines Tracked</h3>
+                    <div className="space-y-3">
+                      {[
+                        { name: 'ChatGPT', status: 'active', coverage: 95 },
+                        { name: 'Claude', status: 'active', coverage: 87 },
+                        { name: 'Perplexity', status: 'active', coverage: 92 },
+                        { name: 'Gemini', status: 'active', coverage: 78 }
+                      ].map((engine, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span className="text-white/80 text-sm">{engine.name}</span>
+                          </div>
+                          <span className="text-white/60 text-xs">{engine.coverage}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* Recent Activity */}
+                  <motion.div
+                    className="bg-white/5 rounded-xl border border-white/10 p-4"
+                    animate={demoStep >= 0 ? { opacity: [0.5, 1] } : { opacity: 0.5 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <h3 className="text-white font-semibold mb-4">Recent Activity</h3>
+                    <div className="space-y-3">
+                      {[
+                        { action: 'New citation found', time: '2m ago', type: 'success' },
+                        { action: 'Keyword rank improved', time: '15m ago', type: 'success' },
+                        { action: 'Crawl completed', time: '1h ago', type: 'info' },
+                        { action: 'Alert triggered', time: '2h ago', type: 'warning' }
+                      ].map((activity, index) => (
+                        <div key={index} className="flex items-start gap-3">
+                          <div className={`w-2 h-2 rounded-full mt-2 ${
+                            activity.type === 'success' ? 'bg-green-400' :
+                            activity.type === 'warning' ? 'bg-yellow-400' : 'bg-blue-400'
+                          }`}></div>
+                          <div className="flex-1">
+                            <div className="text-white/80 text-sm">{activity.action}</div>
+                            <div className="text-white/50 text-xs">{activity.time}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.section>
+
+        {/* Features Section */}
+        <motion.section
+          id="features"
+          className="mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0, duration: 0.8 }}
+        >
+          <div className="text-center mb-12">
+            <motion.h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+              }}
+            >
+              Powerful features for AI visibility
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-300 max-w-2xl mx-auto"
+              style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}
+            >
+              Everything you need to dominate AI search results and track your brand's digital presence
+            </motion.p>
+          </div>
+          
+          <FeaturesGrid />
+        </motion.section>
+
+        {/* Content Analyzer Section */}
+        <motion.section
+          id="content-analyzer"
+          className="mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1, duration: 0.8 }}
+        >
+          <ContentAnalyzerSection />
+        </motion.section>
+
+        {/* Keyword Research Section */}
+        <motion.section
+          id="keyword-research"
+          className="mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
+        >
+          <KeywordResearchSection />
+        </motion.section>
+
+        {/* API Docs Section */}
+        <motion.section
+          id="api-docs"
+          className="mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.3, duration: 0.8 }}
+        >
+          <ApiDocsSection />
+        </motion.section>
+
+        {/* Blog Section */}
+        <motion.section
+          id="blog"
+          className="mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.4, duration: 0.8 }}
+        >
+          <BlogSection />
+        </motion.section>
 
         {/* Testimonials Section */}
         <motion.section
@@ -808,10 +1178,10 @@ export default function Dashboard() {
             <a href="#features" className="text-white/70 hover:text-green-300 transition">Features</a>
             <a href="#testimonials" className="text-white/70 hover:text-green-300 transition">Testimonials</a>
             <a href="#pricing" className="text-white/70 hover:text-green-300 transition">Pricing</a>
-            <a href="#" className="text-white/70 hover:text-green-300 transition">Content Analyzer</a>
-            <a href="#" className="text-white/70 hover:text-green-300 transition">Keyword Research</a>
-            <a href="#" className="text-white/70 hover:text-green-300 transition">API Docs</a>
-            <a href="#" className="text-white/70 hover:text-green-300 transition">Blog</a>
+            <a href="#content-analyzer" className="text-white/70 hover:text-green-300 transition">Content Analyzer</a>
+            <a href="#keyword-research" className="text-white/70 hover:text-green-300 transition">Keyword Research</a>
+            <a href="#api-docs" className="text-white/70 hover:text-green-300 transition">API Docs</a>
+            <a href="#blog" className="text-white/70 hover:text-green-300 transition">Blog</a>
           </nav>
 
           {/* Divider */}
@@ -896,6 +1266,437 @@ function ConveyorBelt({ logos }: { logos: { src: string; alt: string }[] }) {
             />
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Features Grid Component
+function FeaturesGrid() {
+  const features = [
+    {
+      icon: <Brain className="w-8 h-8" />,
+      title: "AI Engine Tracking",
+      description: "Monitor your brand across ChatGPT, Claude, Perplexity, and more",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: <Search className="w-8 h-8" />,
+      title: "Keyword Intelligence",
+      description: "Track thousands of keywords and their AI search performance",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: <BarChart3 className="w-8 h-8" />,
+      title: "Real-time Analytics",
+      description: "Get instant insights into your AI visibility metrics",
+      color: "from-green-500 to-emerald-500"
+    },
+    {
+      icon: <Target className="w-8 h-8" />,
+      title: "Competitor Analysis",
+      description: "See how you stack up against competitors in AI responses",
+      color: "from-orange-500 to-red-500"
+    },
+    {
+      icon: <Zap className="w-8 h-8" />,
+      title: "Smart Alerts",
+      description: "Get notified when your visibility changes significantly",
+      color: "from-yellow-500 to-orange-500"
+    },
+    {
+      icon: <Globe className="w-8 h-8" />,
+      title: "Global Coverage",
+      description: "Track your brand visibility across different regions",
+      color: "from-indigo-500 to-purple-500"
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {features.map((feature, index) => (
+        <motion.div
+          key={index}
+          className="relative group"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 h-full">
+            <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 text-white`}>
+              {feature.icon}
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+            <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// Content Analyzer Section
+function ContentAnalyzerSection() {
+  return (
+    <div className="text-center">
+      <motion.h2
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+        style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+        }}
+      >
+        Content Analyzer
+      </motion.h2>
+      <motion.p
+        className="text-lg text-gray-300 max-w-2xl mx-auto mb-12"
+        style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}
+      >
+        Optimize your content for AI search engines with our advanced analysis tools
+      </motion.p>
+
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8"
+          whileHover={{ scale: 1.01 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <FileText className="w-6 h-6 text-blue-400" />
+                <h3 className="text-xl font-semibold text-white">AI-Optimized Content</h3>
+              </div>
+              <p className="text-gray-300">
+                Analyze your content to see how well it performs in AI search results. Get recommendations for improvement.
+              </p>
+              <ul className="space-y-2">
+                {[
+                  "Content structure analysis",
+                  "AI citation potential scoring",
+                  "Keyword density optimization",
+                  "Readability improvements"
+                ].map((item, index) => (
+                  <li key={index} className="flex items-center gap-2 text-gray-300">
+                    <Check className="w-4 h-4 text-green-400" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <motion.button
+                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-xl font-semibold"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Try Content Analyzer
+              </motion.button>
+            </div>
+            <div className="bg-white/10 rounded-xl p-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-white/80">AI Citation Score</span>
+                  <span className="text-green-400 font-bold">87/100</span>
+                </div>
+                <div className="w-full bg-white/20 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full" style={{ width: '87%' }}></div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Structure</span>
+                    <span className="text-green-400">Excellent</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Keywords</span>
+                    <span className="text-yellow-400">Good</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Readability</span>
+                    <span className="text-green-400">Excellent</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+// Keyword Research Section
+function KeywordResearchSection() {
+  return (
+    <div className="text-center">
+      <motion.h2
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+        style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+        }}
+      >
+        Keyword Research
+      </motion.h2>
+      <motion.p
+        className="text-lg text-gray-300 max-w-2xl mx-auto mb-12"
+        style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}
+      >
+        Discover high-impact keywords that perform well in AI search engines
+      </motion.p>
+
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8"
+          whileHover={{ scale: 1.01 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <Search className="w-6 h-6 text-green-400" />
+                  <h3 className="text-xl font-semibold text-white">AI Keyword Discovery</h3>
+                </div>
+                <p className="text-gray-300">
+                  Find keywords that AI engines love. Our research tool analyzes millions of AI responses to identify trending topics.
+                </p>
+                
+                {/* Mock keyword suggestions */}
+                <div className="space-y-3">
+                  {[
+                    { keyword: "best project management software", difficulty: "Medium", volume: "12K", aiScore: 92 },
+                    { keyword: "AI writing tools comparison", difficulty: "High", volume: "8.5K", aiScore: 88 },
+                    { keyword: "cloud hosting providers", difficulty: "Low", volume: "15K", aiScore: 85 }
+                  ].map((item, index) => (
+                    <div key={index} className="bg-white/10 rounded-lg p-4 flex items-center justify-between">
+                      <div>
+                        <div className="text-white font-medium">{item.keyword}</div>
+                        <div className="text-white/60 text-sm">Volume: {item.volume} • Difficulty: {item.difficulty}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-green-400 font-bold">{item.aiScore}</div>
+                        <div className="text-white/60 text-xs">AI Score</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="bg-white/10 rounded-xl p-6">
+                <h4 className="text-white font-semibold mb-4">Research Features</h4>
+                <ul className="space-y-3">
+                  {[
+                    "AI trend analysis",
+                    "Competitor keyword gaps",
+                    "Search volume predictions",
+                    "Citation opportunity scoring"
+                  ].map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2 text-gray-300">
+                      <Lightbulb className="w-4 h-4 text-yellow-400" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <motion.button
+                className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-xl font-semibold"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Start Research
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+// API Docs Section
+function ApiDocsSection() {
+  return (
+    <div className="text-center">
+      <motion.h2
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+        style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+        }}
+      >
+        API Documentation
+      </motion.h2>
+      <motion.p
+        className="text-lg text-gray-300 max-w-2xl mx-auto mb-12"
+        style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}
+      >
+        Integrate AI visibility data into your applications with our powerful API
+      </motion.p>
+
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8"
+          whileHover={{ scale: 1.01 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <Code className="w-6 h-6 text-purple-400" />
+                <h3 className="text-xl font-semibold text-white">Developer-First API</h3>
+              </div>
+              <p className="text-gray-300">
+                RESTful API with comprehensive documentation, SDKs, and real-time webhooks for seamless integration.
+              </p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { title: "Endpoints", value: "50+" },
+                  { title: "Rate Limit", value: "10K/hour" },
+                  { title: "Uptime", value: "99.9%" },
+                  { title: "Response Time", value: "<100ms" }
+                ].map((stat, index) => (
+                  <div key={index} className="bg-white/10 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-white">{stat.value}</div>
+                    <div className="text-white/60 text-sm">{stat.title}</div>
+                  </div>
+                ))}
+              </div>
+              
+              <motion.button
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                View Documentation
+                <ExternalLink className="w-4 h-4" />
+              </motion.button>
+            </div>
+            
+            <div className="bg-gray-900/50 rounded-xl p-6 font-mono text-sm">
+              <div className="text-green-400 mb-2">// Get keyword visibility data</div>
+              <div className="text-white">
+                <span className="text-blue-400">GET</span> /api/v1/keywords/visibility
+              </div>
+              <div className="text-gray-400 mt-4">
+                {`{
+  "keyword": "best CRM software",
+  "visibility_score": 85,
+  "citations": 12,
+  "trend": "up",
+  "engines": {
+    "chatgpt": 92,
+    "claude": 78,
+    "perplexity": 89
+  }
+}`}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+// Blog Section
+function BlogSection() {
+  const blogPosts = [
+    {
+      title: "The Future of AI Search: What Marketers Need to Know",
+      excerpt: "Explore how AI search engines are changing the digital marketing landscape and what you can do to stay ahead.",
+      date: "Dec 15, 2024",
+      readTime: "5 min read",
+      category: "Strategy"
+    },
+    {
+      title: "Optimizing Content for AI Citations: A Complete Guide",
+      excerpt: "Learn the best practices for creating content that AI engines love to cite and reference.",
+      date: "Dec 12, 2024",
+      readTime: "8 min read",
+      category: "Tutorial"
+    },
+    {
+      title: "Case Study: How TechCorp Increased AI Visibility by 300%",
+      excerpt: "A deep dive into the strategies that helped TechCorp dominate AI search results in their industry.",
+      date: "Dec 10, 2024",
+      readTime: "6 min read",
+      category: "Case Study"
+    }
+  ];
+
+  return (
+    <div className="text-center">
+      <motion.h2
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+        style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+        }}
+      >
+        Latest Insights
+      </motion.h2>
+      <motion.p
+        className="text-lg text-gray-300 max-w-2xl mx-auto mb-12"
+        style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.2)' }}
+      >
+        Stay updated with the latest trends and strategies in AI search optimization
+      </motion.p>
+
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {blogPosts.map((post, index) => (
+            <motion.div
+              key={index}
+              className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 text-left"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <BookOpen className="w-4 h-4 text-blue-400" />
+                <span className="text-blue-400 text-sm font-medium">{post.category}</span>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2">{post.title}</h3>
+              <p className="text-gray-300 mb-4 line-clamp-3">{post.excerpt}</p>
+              <div className="flex items-center justify-between text-sm text-white/60">
+                <span>{post.date}</span>
+                <span>{post.readTime}</span>
+              </div>
+              <motion.button
+                className="mt-4 text-green-400 font-medium flex items-center gap-1 hover:gap-2 transition-all"
+                whileHover={{ x: 5 }}
+              >
+                Read more
+                <ChevronRight className="w-4 h-4" />
+              </motion.button>
+            </motion.div>
+          ))}
+        </div>
+        
+        <motion.button
+          className="mt-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-3 rounded-xl font-semibold"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          View All Posts
+        </motion.button>
       </div>
     </div>
   );
@@ -1173,6 +1974,20 @@ style.innerHTML = `
 .animate-float-delayed {
   animation: float 3s ease-in-out infinite;
   animation-delay: 1.5s;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 `;
 

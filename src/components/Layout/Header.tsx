@@ -47,10 +47,10 @@ export default function Header() {
     { label: 'Features', icon: <Star className="h-5 w-5 inline-block mr-1" />, href: '#features', onClick: () => smoothScrollTo('features') },
     { label: 'Testimonials', icon: <User className="h-5 w-5 inline-block mr-1" />, href: '#testimonials', onClick: () => smoothScrollTo('testimonials') },
     { label: 'Pricing', icon: <DollarSign className="h-5 w-5 inline-block mr-1" />, href: '#pricing', onClick: () => smoothScrollTo('pricing') },
-    { label: 'Content Analyzer', icon: <FileText className="h-5 w-5 inline-block mr-1" />, href: '#' },
-    { label: 'Keyword Research', icon: <Search className="h-5 w-5 inline-block mr-1" />, href: '#' },
-    { label: 'API Docs', icon: <Code className="h-5 w-5 inline-block mr-1" />, href: '#' },
-    { label: 'Blog', icon: <BookOpen className="h-5 w-5 inline-block mr-1" />, href: '#' },
+    { label: 'Content Analyzer', icon: <FileText className="h-5 w-5 inline-block mr-1" />, href: '#content-analyzer', onClick: () => smoothScrollTo('content-analyzer') },
+    { label: 'Keyword Research', icon: <Search className="h-5 w-5 inline-block mr-1" />, href: '#keyword-research', onClick: () => smoothScrollTo('keyword-research') },
+    { label: 'API Docs', icon: <Code className="h-5 w-5 inline-block mr-1" />, href: '#api-docs', onClick: () => smoothScrollTo('api-docs') },
+    { label: 'Blog', icon: <BookOpen className="h-5 w-5 inline-block mr-1" />, href: '#blog', onClick: () => smoothScrollTo('blog') },
   ];
 
   return (
