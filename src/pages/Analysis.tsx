@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAnalysis } from '../contexts/AnalysisContext';
 import AssetDiscoveryForm from '../components/Analysis/AssetDiscoveryForm';
 import CrawlProgress from '../components/Analysis/CrawlProgress';
 import LiveAssetFeed from '../components/Analysis/LiveAssetFeed';
@@ -23,17 +24,49 @@ interface Asset {
 
 const Analysis: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialDomain = searchParams.get('domain') || '';
+  const { assets, setAssets, getCachedAssets, setCachedAssets, clearCache } = useAnalysis();
   
   const [analysisQuery, setAnalysisQuery] = useState(initialDomain);
   const [crawlProgress, setCrawlProgress] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [assets, setAssets] = useState<Asset[]>([]);
   const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
   const [filterOptions, setFilterOptions] = useState({
     type: 'all' as 'all' | Asset['type'],
     source: 'all' as string
   });
+
+  // Handle domain changes
+  useEffect(() => {
+    if (initialDomain && initialDomain !== analysisQuery) {
+      // Clear previous domain's cache and state
+      clearCache(analysisQuery);
+      setAnalysisQuery(initialDomain);
+      setCrawlProgress(0);
+      setIsAnalyzing(false);
+      setAssets([]);
+    }
+  }, [initialDomain, analysisQuery, clearCache, setAssets]);
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const domain = searchParams.get('domain');
+      if (domain) {
+        const cachedAssets = getCachedAssets(domain);
+        if (cachedAssets) {
+          setAssets(cachedAssets);
+        } else {
+          // If no cache exists, start a new analysis
+          handleAnalysisSubmit(domain);
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [searchParams, getCachedAssets, setAssets]);
 
   // Auto-start analysis if domain is provided in URL
   useEffect(() => {
@@ -44,6 +77,15 @@ const Analysis: React.FC = () => {
 
   const handleAnalysisSubmit = async (query: string) => {
     setAnalysisQuery(query);
+    
+    // Check cache first
+    const cachedAssets = getCachedAssets(query);
+    if (cachedAssets) {
+      setAssets(cachedAssets);
+      return;
+    }
+
+    // Clear any existing analysis state
     setIsAnalyzing(true);
     setCrawlProgress(0);
     setAssets([]);
@@ -55,7 +97,9 @@ const Analysis: React.FC = () => {
           clearInterval(progressInterval);
           setIsAnalyzing(false);
           // Generate mock assets
-          generateMockAssets(query);
+          const mockAssets = generateMockAssets(query);
+          setAssets(mockAssets);
+          setCachedAssets(query, mockAssets);
           return 100;
         }
         return prev + Math.random() * 15;
@@ -120,9 +164,10 @@ const Analysis: React.FC = () => {
         createdAt: new Date('2024-01-14')
       }
     ];
-    setAssets(mockAssets);
+    return mockAssets;
   };
 
+  // Filter assets based on selected options
   const filteredAssets = assets.filter(asset => {
     if (filterOptions.type !== 'all' && asset.type !== filterOptions.type) return false;
     if (filterOptions.source !== 'all' && asset.sourceDomain !== filterOptions.source) return false;
