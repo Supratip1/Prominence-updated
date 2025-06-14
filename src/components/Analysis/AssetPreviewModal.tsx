@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface Asset {
   id: string;
-  type: 'video' | 'screenshot' | 'webpage';
+  type: 'video' | 'screenshot' | 'webpage' | 'image' | 'og' | 'twitter' | 'schema' | 'robots' | 'sitemap' | 'meta' | 'paragraph' | 'title' | 'canonical' | 'heading' | 'link';
   title: string;
   url: string;
   sourceDomain: string;
@@ -27,6 +27,30 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
         return <Camera className="w-5 h-5" />;
       case 'webpage':
         return <FileText className="w-5 h-5" />;
+      case 'image':
+        return <img src={asset.url} alt={asset.title} className="w-5 h-5" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />;
+      case 'og':
+        return <img src={asset.url} alt={asset.title} className="w-5 h-5" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />;
+      case 'twitter':
+        return <img src={asset.url} alt={asset.title} className="w-5 h-5" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />;
+      case 'schema':
+        return <FileText className="w-5 h-5" />;
+      case 'robots':
+        return <FileText className="w-5 h-5" />;
+      case 'sitemap':
+        return <FileText className="w-5 h-5" />;
+      case 'meta':
+        return <FileText className="w-5 h-5" />;
+      case 'paragraph':
+        return <FileText className="w-5 h-5" />;
+      case 'title':
+        return <FileText className="w-5 h-5" />;
+      case 'canonical':
+        return <FileText className="w-5 h-5" />;
+      case 'heading':
+        return <FileText className="w-5 h-5" />;
+      case 'link':
+        return <FileText className="w-5 h-5" />;
       default:
         return <FileText className="w-5 h-5" />;
     }
@@ -40,6 +64,30 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
         return 'text-green-400 bg-green-400/10 border-green-400/20';
       case 'webpage':
         return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+      case 'image':
+        return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
+      case 'og':
+        return 'text-pink-400 bg-pink-400/10 border-pink-400/20';
+      case 'twitter':
+        return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+      case 'schema':
+        return 'text-green-400 bg-green-400/10 border-green-400/20';
+      case 'robots':
+        return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+      case 'sitemap':
+        return 'text-orange-400 bg-orange-400/10 border-orange-400/20';
+      case 'meta':
+        return 'text-teal-400 bg-teal-400/10 border-teal-400/20';
+      case 'paragraph':
+        return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+      case 'title':
+        return 'text-red-400 bg-red-400/10 border-red-400/20';
+      case 'canonical':
+        return 'text-green-400 bg-green-400/10 border-green-400/20';
+      case 'heading':
+        return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+      case 'link':
+        return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
       default:
         return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
@@ -87,16 +135,18 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
             {/* Preview */}
             <div className="aspect-video bg-gray-800/50 rounded-xl mb-6 flex items-center justify-center overflow-hidden border border-white/10">
-              {asset.thumbnail ? (
-                <img 
-                  src={asset.thumbnail} 
-                  alt={asset.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className={`p-12 rounded-xl ${getTypeColor(asset.type)}`}>
-                  {getIcon(asset.type)}
-                </div>
+              {/* Dynamic preview logic for all asset types */}
+              {['image','og','twitter'].includes(asset.type) && (
+                <img src={asset.url} alt={asset.title ?? ''} className="w-full h-full object-cover" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />
+              )}
+              {asset.type==='video' && (
+                <video src={asset.url} controls className="w-full h-full object-cover"/>
+              )}
+              {['schema','robots','sitemap'].includes(asset.type) && (
+                <pre className="p-6 overflow-auto text-sm w-full h-full">{asset.description}</pre>
+              )}
+              {['meta','paragraph','title','canonical','heading','link'].includes(asset.type) && (
+                <div className="p-6 text-sm whitespace-pre-wrap w-full h-full">{asset.description || (asset.title ?? '')}</div>
               )}
             </div>
 

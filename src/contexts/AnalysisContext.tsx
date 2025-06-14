@@ -1,15 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
+import type { Asset as AEOAsset } from '../utils/aeoCrawler';
 
-interface Asset {
-  id: string;
-  type: 'video' | 'screenshot' | 'webpage';
-  title: string;
-  url: string;
-  sourceDomain: string;
-  thumbnail?: string;
-  description?: string;
-  createdAt: Date;
-}
+export type Asset = AEOAsset;
 
 interface AnalysisContextType {
   assets: Asset[];

@@ -11,22 +11,23 @@ import AssetPreviewModal from '../components/Analysis/AssetPreviewModal';
 import ExportCSVButton from '../components/Analysis/ExportCSVButton';
 import SendToOptimizationButton from '../components/Analysis/SendToOptimizationButton';
 import debounce from 'lodash/debounce';
+import { fetchAEOAssets, Asset } from '../utils/aeoCrawler';
 
-interface Asset {
-  id: string;
-  type: 'video' | 'screenshot' | 'webpage';
-  title: string;
-  url: string;
-  sourceDomain: string;
-  thumbnail?: string;
-  description?: string;
-  createdAt: Date;
+function normalizeDomain(raw: string): string {
+  try {
+    const withProto = raw.match(/^https?:\/\//) ? raw : `https://${raw}`;
+    return new URL(withProto).host;
+  } catch {
+    return raw.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  }
 }
 
 const Analysis: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const initialDomain = searchParams.get('domain') || '';
+  // always strip protocol + trailing slash right away
+  const rawParam = searchParams.get('domain') || '';
+  const initialDomain = normalizeDomain(rawParam);
   const { assets, setAssets, getCachedAssets, setCachedAssets, clearCache } = useAnalysis();
   
   const [analysisQuery, setAnalysisQuery] = useState(initialDomain);
@@ -40,6 +41,7 @@ const Analysis: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
+  const [lastDomain, setLastDomain] = useState<string|null>(null);
 
   // Debounced validation
   const debouncedValidate = React.useMemo(
@@ -88,13 +90,21 @@ const Analysis: React.FC = () => {
     setInputValue(initialDomain);
   }, [initialDomain]);
 
+  // Clear old cache and auto-run analysis when normalized domain changes
+  useEffect(() => {
+    if (!initialDomain || initialDomain === lastDomain) return;
+    if (lastDomain) {
+      clearCache(lastDomain);
+    }
+    setLastDomain(initialDomain);
+    handleAnalysisSubmit(initialDomain);
+  }, [initialDomain]);
+
   const validateDomain = async (url: string): Promise<boolean> => {
     setIsValidating(true);
     setError(null);
-    const tryUrl = (prefix: 'https://' | 'http://') => {
-      const full = url.startsWith('http') ? url : prefix + url;
-      return fetch(full, { method: 'HEAD', mode: 'no-cors', cache: 'no-cache' });
-    };
+    const domain = normalizeDomain(url);
+    const tryUrl = (prefix: 'https://' | 'http://') => `${prefix}${domain}`;
     try {
       await tryUrl('https://');
       setIsValidating(false);
@@ -112,100 +122,61 @@ const Analysis: React.FC = () => {
     }
   };
 
-  const handleAnalysisSubmit = async (query: string) => {
-    navigate(`/analysis?domain=${encodeURIComponent(query)}`);
-    setAnalysisQuery(query);
-    setInputValue(query);
-
-    // Clear state and let React update the UI first
-    setIsAnalyzing(false);
+  const handleAnalysisSubmit = async (rawInput: string) => {
+    const domain = normalizeDomain(rawInput);
+    setAnalysisQuery(domain); // so progress bar and UI are correct
+    clearCache(domain); // drop any old results
+    navigate(`/analysis?domain=${encodeURIComponent(domain)}`); // update the URL to exactly your host
+    setIsAnalyzing(true);
     setCrawlProgress(0);
     setAssets([]);
 
-    const cachedAssets = getCachedAssets(query);
+    // 1) cache?
+    const cached = getCachedAssets(domain);
+    if (cached) {
+      setAssets(cached);
+      setIsAnalyzing(false);
+      setCrawlProgress(100);
+      return;
+    }
 
-    // Use a timeout to ensure the UI updates before starting the animation
-    setTimeout(() => {
-      setIsAnalyzing(true);
+    // 2) show "fake" progress up to 95%
+    let progress = 0;
+    const progIv = setInterval(() => {
+      progress = Math.min(progress + Math.random() * 20, 95);
+      setCrawlProgress(progress);
+    }, 400);
 
-      const progressInterval = setInterval(() => {
-        setCrawlProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(progressInterval);
-            setIsAnalyzing(false);
-            if (cachedAssets) {
-              setAssets(cachedAssets);
-            } else {
-              const mockAssets = generateMockAssets(query);
-              setAssets(mockAssets);
-              setCachedAssets(query, mockAssets);
-            }
-            return 100;
-          }
-          return prev + Math.random() * 15;
-        });
-      }, 500);
-    }, 0);
-  };
+    try {
+      // actual fetch & parse
+      let scraped = await fetchAEOAssets(domain);
+      // Add a screenshot asset using Thum.io
+      const thumbUrl = `https://image.thum.io/get/width/800/crop/600/${encodeURIComponent('https://' + domain)}`;
+      scraped = [
+        {
+          id: 'screenshot-home',
+          type: 'screenshot',
+          title: 'Homepage Screenshot',
+          url: thumbUrl,
+          thumbnail: thumbUrl,
+          sourceDomain: domain,
+          createdAt: new Date()
+        },
+        ...scraped
+      ];
+      clearInterval(progIv);
 
-  const generateMockAssets = (domain: string) => {
-    const mockAssets: Asset[] = [
-      {
-        id: '1',
-        type: 'webpage',
-        title: `${domain} - Homepage`,
-        url: `https://${domain}`,
-        sourceDomain: domain,
-        description: 'Main landing page with company overview and services',
-        createdAt: new Date('2024-01-15')
-      },
-      {
-        id: '2',
-        type: 'webpage',
-        title: `About Us - ${domain}`,
-        url: `https://${domain}/about`,
-        sourceDomain: domain,
-        description: 'Company information and team details',
-        createdAt: new Date('2024-01-10')
-      },
-      {
-        id: '3',
-        type: 'screenshot',
-        title: 'Homepage Screenshot',
-        url: `https://${domain}/screenshots/homepage.png`,
-        sourceDomain: domain,
-        description: 'Visual capture of the main landing page',
-        createdAt: new Date('2024-01-05')
-      },
-      {
-        id: '4',
-        type: 'video',
-        title: 'Product Demo Video',
-        url: `https://${domain}/videos/demo.mp4`,
-        sourceDomain: domain,
-        description: 'Product demonstration and feature overview',
-        createdAt: new Date('2024-01-12')
-      },
-      {
-        id: '5',
-        type: 'webpage',
-        title: 'Product Documentation',
-        url: `https://${domain}/docs`,
-        sourceDomain: domain,
-        description: 'Technical documentation and specifications',
-        createdAt: new Date('2024-01-08')
-      },
-      {
-        id: '6',
-        type: 'screenshot',
-        title: 'Contact Page Screenshot',
-        url: `https://${domain}/screenshots/contact.png`,
-        sourceDomain: domain,
-        description: 'Visual capture of the contact page',
-        createdAt: new Date('2024-01-14')
-      }
-    ];
-    return mockAssets;
+      // finalize
+      setCrawlProgress(100);
+      setAssets(scraped);
+      setCachedAssets(domain, scraped);
+    } catch (err) {
+      clearInterval(progIv);
+      setError('Failed to fetch or parse site.');
+      setAssets([]);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   // Filter assets based on selected options
@@ -334,7 +305,7 @@ const Analysis: React.FC = () => {
               {/* Filter Bar */}
               <motion.div variants={itemVariants}>
                 <AssetFilterBar 
-                  filters={['all', 'video', 'screenshot', 'webpage']}
+                  filters={['all', 'video', 'screenshot', 'webpage', 'heading', 'meta', 'schema', 'image', 'link']}
                   sources={Array.from(new Set(assets.map(a => a.sourceDomain)))}
                   onFilterChange={setFilterOptions}
                 />

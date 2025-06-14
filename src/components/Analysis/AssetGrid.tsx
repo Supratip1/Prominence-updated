@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 interface Asset {
   id: string;
-  type: 'video' | 'screenshot' | 'webpage';
+  type: string;
   title: string;
   url: string;
   sourceDomain: string;
@@ -85,19 +85,34 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
             whileHover={{ scale: 1.02, y: -5 }}
             whileTap={{ scale: 0.98 }}
           >
-            {/* Asset Thumbnail */}
+            {/* Asset Preview */}
             <div className="aspect-video bg-gray-800/50 rounded-xl mb-4 flex items-center justify-center overflow-hidden border border-white/10">
-              {asset.thumbnail ? (
-                <img 
-                  src={asset.thumbnail} 
-                  alt={asset.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className={`p-6 rounded-xl ${getTypeColor(asset.type)}`}>
-                  {getIcon(asset.type)}
-                </div>
-              )}
+              {/* Dynamic preview logic for all asset types */}
+              {(() => {
+                switch(asset.type) {
+                  case 'image':
+                    return <img src={asset.url} className="object-cover w-full h-full" alt={asset.title ?? ''} onError={e => { e.currentTarget.src = '/no-preview.png'; }} />;
+                  case 'video':
+                    return <video src={asset.url} controls className="w-full h-full object-cover" />;
+                  case 'schema':
+                  case 'robots':
+                  case 'sitemap':
+                    return <pre className="p-4 text-xs overflow-auto w-full h-full">{asset.description}</pre>;
+                  case 'paragraph':
+                  case 'meta':
+                  case 'title':
+                  case 'canonical':
+                    return <p className="p-4 text-sm w-full h-full">{asset.description}</p>;
+                  case 'heading':
+                    return <h3 className="p-4 font-bold w-full h-full">{asset.title ?? ''}</h3>;
+                  case 'link':
+                  case 'og':
+                  case 'twitter':
+                    return <p className="p-4 text-sm w-full h-full"><a href={asset.url} target="_blank" rel="noopener noreferrer" className="underline">{asset.title ?? ''}</a></p>;
+                  default:
+                    return <div className="p-4 w-full h-full">No preview</div>;
+                }
+              })()}
             </div>
 
             {/* Asset Info */}

@@ -107,50 +107,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
                   src={asset.thumbnail} 
                   alt={asset.title}
                   className="w-full h-full object-cover"
+                  onError={e => { e.currentTarget.src = '/no-preview.png'; }}
                 />
               ) : (
-                <div className={`p-4 sm:p-6 rounded-xl ${getTypeColor(asset.type)}`}>
-                  {getIcon(asset.type)}
-                </div>
-              )}
-              <div className="absolute top-2 right-2">
-                <div className={`w-3 h-3 rounded-full ${getStatusColor(asset.status)}`} />
-              </div>
-            </div>
-
-            {/* Asset Info */}
-            <div className="space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <h4 className="text-white font-semibold text-sm sm:text-base line-clamp-2 flex-1">
-                  {asset.title}
-                </h4>
-                <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#adff2f] transition-colors flex-shrink-0" />
-              </div>
-              
-              <p className="text-gray-400 text-xs sm:text-sm line-clamp-2">
-                {asset.description || asset.url}
-              </p>
-              
-              <div className="flex items-center justify-between">
-                <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${getTypeColor(asset.type)}`}>
-                  {asset.type}
-                </span>
-                <div className="flex items-center gap-2 text-gray-500 text-xs">
-                  <Calendar className="w-3 h-3" />
-                  {asset.createdAt.toLocaleDateString()}
-                </div>
-              </div>
-
-              {asset.size && (
-                <div className="flex items-center gap-2 text-gray-500 text-xs">
-                  <Activity className="w-3 h-3" />
-                  {asset.size}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  );
-} 
+                <div className={`
