@@ -1,28 +1,14 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
-import { validateUrl, extractDomain } from '../utils/validation';
-
-// Lazy load components for better performance
-const AssetDiscoveryForm = lazy(() => import('../components/Analysis/AssetDiscoveryForm'));
-const CrawlProgress = lazy(() => import('../components/Analysis/CrawlProgress'));
-const LiveAssetFeed = lazy(() => import('../components/Analysis/LiveAssetFeed'));
-const AssetFilterBar = lazy(() => import('../components/Analysis/AssetFilterBar'));
-const AssetGrid = lazy(() => import('../components/Analysis/AssetGrid'));
-const AssetPreviewModal = lazy(() => import('../components/Analysis/AssetPreviewModal'));
-const ExportCSVButton = lazy(() => import('../components/Analysis/ExportCSVButton'));
-const SendToOptimizationButton = lazy(() => import('../components/Analysis/SendToOptimizationButton'));
-
-// Loading component
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center py-8">
-    <motion.div
-      animate={{ rotate: 360 }}
-      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-      className="w-8 h-8 border-2 border-[#adff2f] border-t-transparent rounded-full"
-    />
-  </div>
-);
+import AssetDiscoveryForm from '../components/Analysis/AssetDiscoveryForm';
+import CrawlProgress from '../components/Analysis/CrawlProgress';
+import LiveAssetFeed from '../components/Analysis/LiveAssetFeed';
+import AssetFilterBar from '../components/Analysis/AssetFilterBar';
+import AssetGrid from '../components/Analysis/AssetGrid';
+import AssetPreviewModal from '../components/Analysis/AssetPreviewModal';
+import ExportCSVButton from '../components/Analysis/ExportCSVButton';
+import SendToOptimizationButton from '../components/Analysis/SendToOptimizationButton';
 
 interface Asset {
   id: string;
@@ -36,9 +22,8 @@ interface Asset {
 }
 
 const Analysis: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const initialDomain = searchParams.get('domain') || '';
-  const isDemo = searchParams.get('demo') === 'true';
   
   const [analysisQuery, setAnalysisQuery] = useState(initialDomain);
   const [crawlProgress, setCrawlProgress] = useState(0);
@@ -49,68 +34,37 @@ const Analysis: React.FC = () => {
     type: 'all' as 'all' | Asset['type'],
     source: 'all' as string
   });
-  const [error, setError] = useState<string | null>(null);
 
-  // Auto-start analysis if domain is provided in URL or demo mode
+  // Auto-start analysis if domain is provided in URL
   useEffect(() => {
-    if ((initialDomain || isDemo) && !isAnalyzing && assets.length === 0) {
-      const domain = isDemo ? 'example.com' : initialDomain;
-      handleAnalysisSubmit(domain);
+    if (initialDomain && !isAnalyzing && assets.length === 0) {
+      handleAnalysisSubmit(initialDomain);
     }
-  }, [initialDomain, isDemo]);
+  }, [initialDomain]);
 
-  const handleAnalysisSubmit = async (query: string = analysisQuery) => {
-    if (!query.trim()) return;
-
-    // Validate URL
-    if (!validateUrl(query)) {
-      setError('Please enter a valid domain name or URL');
-      return;
-    }
-
-    setError(null);
+  const handleAnalysisSubmit = async (query: string) => {
     setAnalysisQuery(query);
     setIsAnalyzing(true);
     setCrawlProgress(0);
     setAssets([]);
 
-    // Update URL params
-    const domain = extractDomain(query);
-    setSearchParams({ domain });
-
-    try {
-      // Simulate crawling progress with realistic timing
-      const progressSteps = [10, 25, 40, 55, 70, 85, 100];
-      const messages = [
-        'Initializing analysis...',
-        'Discovering web pages...',
-        'Scanning media files...',
-        'Analyzing documents...',
-        'Processing social content...',
-        'Finalizing results...',
-        'Analysis complete!'
-      ];
-
-      for (let i = 0; i < progressSteps.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 400));
-        setCrawlProgress(progressSteps[i]);
-        
-        // Add assets progressively
-        if (i > 1) {
-          generateMockAssets(domain, Math.floor((i - 1) * 2));
+    // Simulate crawling progress
+    const progressInterval = setInterval(() => {
+      setCrawlProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setIsAnalyzing(false);
+          // Generate mock assets
+          generateMockAssets(query);
+          return 100;
         }
-      }
-
-      setIsAnalyzing(false);
-      generateMockAssets(domain); // Generate all assets
-    } catch (err) {
-      setError('Failed to analyze the domain. Please try again.');
-      setIsAnalyzing(false);
-    }
+        return prev + Math.random() * 15;
+      });
+    }, 500);
   };
 
-  const generateMockAssets = (domain: string, count?: number) => {
-    const allAssets: Asset[] = [
+  const generateMockAssets = (domain: string) => {
+    const mockAssets: Asset[] = [
       {
         id: '1',
         type: 'webpage',
@@ -136,8 +90,7 @@ const Analysis: React.FC = () => {
         url: `https://${domain}/screenshots/homepage.png`,
         sourceDomain: domain,
         description: 'Visual capture of the main landing page',
-        createdAt: new Date('2024-01-05'),
-        thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop'
+        createdAt: new Date('2024-01-05')
       },
       {
         id: '4',
@@ -146,8 +99,7 @@ const Analysis: React.FC = () => {
         url: `https://${domain}/videos/demo.mp4`,
         sourceDomain: domain,
         description: 'Product demonstration and feature overview',
-        createdAt: new Date('2024-01-12'),
-        thumbnail: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=300&fit=crop'
+        createdAt: new Date('2024-01-12')
       },
       {
         id: '5',
@@ -165,32 +117,10 @@ const Analysis: React.FC = () => {
         url: `https://${domain}/screenshots/contact.png`,
         sourceDomain: domain,
         description: 'Visual capture of the contact page',
-        createdAt: new Date('2024-01-14'),
-        thumbnail: 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=400&h=300&fit=crop'
-      },
-      {
-        id: '7',
-        type: 'video',
-        title: 'Customer Testimonials',
-        url: `https://${domain}/videos/testimonials.mp4`,
-        sourceDomain: domain,
-        description: 'Customer success stories and testimonials',
-        createdAt: new Date('2024-01-20'),
-        thumbnail: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop'
-      },
-      {
-        id: '8',
-        type: 'webpage',
-        title: 'Blog Articles',
-        url: `https://${domain}/blog`,
-        sourceDomain: domain,
-        description: 'Latest blog posts and industry insights',
-        createdAt: new Date('2024-01-18')
+        createdAt: new Date('2024-01-14')
       }
     ];
-
-    const assetsToShow = count !== undefined ? allAssets.slice(0, count) : allAssets;
-    setAssets(assetsToShow);
+    setAssets(mockAssets);
   };
 
   const filteredAssets = assets.filter(asset => {
@@ -218,7 +148,7 @@ const Analysis: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       {/* Premium Header */}
       <motion.div 
-        className="relative py-16 sm:py-20 overflow-hidden"
+        className="relative py-20 overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -238,7 +168,7 @@ const Analysis: React.FC = () => {
             animate="visible"
           >
             <motion.h1 
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
+              className="text-5xl md:text-7xl font-bold mb-6"
               variants={itemVariants}
               style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #adff2f 50%, #7cfc00 100%)',
@@ -250,7 +180,7 @@ const Analysis: React.FC = () => {
               Asset Discovery & Analysis
             </motion.h1>
             <motion.p 
-              className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
+              className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
               variants={itemVariants}
             >
               Comprehensive analysis of your digital presence across all platforms and channels
@@ -267,47 +197,30 @@ const Analysis: React.FC = () => {
           initial="hidden"
           animate="visible"
         >
-          {/* Error Display */}
-          {error && (
-            <motion.div 
-              className="max-w-2xl mx-auto p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-center"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              {error}
-            </motion.div>
-          )}
-
           {/* Asset Discovery Form */}
           <motion.div variants={itemVariants}>
-            <Suspense fallback={<LoadingSpinner />}>
-              <AssetDiscoveryForm 
-                value={analysisQuery}
-                onChange={setAnalysisQuery}
-                onSubmit={() => handleAnalysisSubmit()}
-                disabled={isAnalyzing}
-              />
-            </Suspense>
+            <AssetDiscoveryForm 
+              value={analysisQuery}
+              onChange={setAnalysisQuery}
+              onSubmit={() => handleAnalysisSubmit(analysisQuery)}
+              disabled={isAnalyzing}
+            />
           </motion.div>
 
           {/* Crawl Progress */}
           {isAnalyzing && (
             <motion.div variants={itemVariants}>
-              <Suspense fallback={<LoadingSpinner />}>
-                <CrawlProgress 
-                  percent={crawlProgress} 
-                  message="Discovering digital assets..." 
-                />
-              </Suspense>
+              <CrawlProgress 
+                percent={crawlProgress} 
+                message="Discovering digital assets..." 
+              />
             </motion.div>
           )}
 
           {/* Live Asset Feed */}
-          {isAnalyzing && assets.length > 0 && (
+          {isAnalyzing && (
             <motion.div variants={itemVariants}>
-              <Suspense fallback={<LoadingSpinner />}>
-                <LiveAssetFeed assets={assets} />
-              </Suspense>
+              <LiveAssetFeed assets={assets.slice(0, Math.floor(crawlProgress / 20))} />
             </motion.div>
           )}
 
@@ -316,23 +229,19 @@ const Analysis: React.FC = () => {
             <>
               {/* Filter Bar */}
               <motion.div variants={itemVariants}>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <AssetFilterBar 
-                    filters={['all', 'video', 'screenshot', 'webpage']}
-                    sources={Array.from(new Set(assets.map(a => a.sourceDomain)))}
-                    onFilterChange={setFilterOptions}
-                  />
-                </Suspense>
+                <AssetFilterBar 
+                  filters={['all', 'video', 'screenshot', 'webpage']}
+                  sources={Array.from(new Set(assets.map(a => a.sourceDomain)))}
+                  onFilterChange={setFilterOptions}
+                />
               </motion.div>
 
               {/* Asset Grid */}
               <motion.div variants={itemVariants}>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <AssetGrid 
-                    assets={filteredAssets}
-                    onCardClick={setPreviewAsset}
-                  />
-                </Suspense>
+                <AssetGrid 
+                  assets={filteredAssets}
+                  onCardClick={setPreviewAsset}
+                />
               </motion.div>
 
               {/* Action Buttons */}
@@ -340,10 +249,8 @@ const Analysis: React.FC = () => {
                 className="flex flex-col sm:flex-row gap-4 justify-center"
                 variants={itemVariants}
               >
-                <Suspense fallback={<LoadingSpinner />}>
-                  <ExportCSVButton assets={filteredAssets} />
-                  <SendToOptimizationButton assets={filteredAssets} />
-                </Suspense>
+                <ExportCSVButton assets={filteredAssets} />
+                <SendToOptimizationButton assets={filteredAssets} />
               </motion.div>
             </>
           )}
@@ -352,15 +259,13 @@ const Analysis: React.FC = () => {
 
       {/* Asset Preview Modal */}
       {previewAsset && (
-        <Suspense fallback={<LoadingSpinner />}>
-          <AssetPreviewModal 
-            asset={previewAsset}
-            onClose={() => setPreviewAsset(null)}
-          />
-        </Suspense>
+        <AssetPreviewModal 
+          asset={previewAsset}
+          onClose={() => setPreviewAsset(null)}
+        />
       )}
     </div>
   );
 };
 
-export default Analysis;
+export default Analysis; 

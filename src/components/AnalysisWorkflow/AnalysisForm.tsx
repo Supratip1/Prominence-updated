@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Search, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import React from 'react';
+import { Search, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { validateUrl } from '../../utils/validation';
 
 interface AnalysisFormProps {
   value: string;
@@ -11,49 +10,11 @@ interface AnalysisFormProps {
 }
 
 export default function AnalysisForm({ value, onChange, onSubmit, disabled }: AnalysisFormProps) {
-  const [isValidUrl, setIsValidUrl] = useState(true);
-  const [isValidating, setIsValidating] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!value.trim() || disabled) return;
-
-    const isValid = validateUrl(value);
-    setIsValidUrl(isValid);
-
-    if (!isValid) return;
-
-    setIsValidating(true);
-    
-    // Simulate URL validation
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    setIsValidating(false);
-    onSubmit();
-  };
-
-  const handleInputChange = (newValue: string) => {
-    onChange(newValue);
-    if (!isValidUrl && newValue.trim()) {
-      setIsValidUrl(validateUrl(newValue));
+    if (value.trim() && !disabled) {
+      onSubmit();
     }
-  };
-
-  const getValidationIcon = () => {
-    if (!value.trim()) return null;
-    if (isValidating) {
-      return (
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full"
-        />
-      );
-    }
-    if (isValidUrl) {
-      return <CheckCircle className="w-5 h-5 text-green-400" />;
-    }
-    return <AlertCircle className="w-5 h-5 text-red-400" />;
   };
 
   return (
@@ -106,49 +67,18 @@ export default function AnalysisForm({ value, onChange, onSubmit, disabled }: An
                   <input
                     type="text"
                     value={value}
-                    onChange={(e) => handleInputChange(e.target.value)}
+                    onChange={(e) => onChange(e.target.value)}
                     placeholder="Enter domain or URL (e.g., yourcompany.com)"
-                    disabled={disabled || isValidating}
-                    className={`w-full h-12 sm:h-16 pl-12 sm:pl-14 pr-12 rounded-xl bg-white/10 backdrop-blur-sm border text-white placeholder-white/50 focus:outline-none focus:ring-2 text-lg transition-all ${
-                      !isValidUrl && value.trim() 
-                        ? 'border-red-400/50 focus:border-red-400/50 focus:ring-red-400/50' 
-                        : 'border-white/30 focus:border-[#adff2f]/50 focus:ring-[#adff2f]/50'
-                    }`}
+                    disabled={disabled}
+                    className="w-full h-12 sm:h-16 pl-12 sm:pl-14 pr-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#adff2f]/50 focus:border-[#adff2f]/50 text-lg"
                   />
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    {getValidationIcon()}
-                  </div>
-                  {!isValidUrl && value.trim() && (
-                    <motion.p 
-                      className="absolute -bottom-6 left-0 text-red-400 text-sm flex items-center gap-2"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <AlertCircle className="w-4 h-4" />
-                      Please enter a valid domain name
-                    </motion.p>
-                  )}
                 </div>
                 <button
                   type="submit"
-                  disabled={disabled || isValidating || !value.trim() || !isValidUrl}
-                  className="h-12 sm:h-16 px-6 bg-gradient-to-r from-[#adff2f] to-[#7cfc00] text-black font-bold rounded-lg transition-all shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  disabled={disabled}
+                  className="h-12 sm:h-16 px-6 bg-gradient-to-r from-[#adff2f] to-[#7cfc00] text-black font-bold rounded-lg transition-all shadow-lg shadow-green-500/30 w-full sm:w-auto mt-2 sm:mt-0"
                 >
-                  {isValidating ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full"
-                      />
-                      <span className="hidden sm:inline">Validating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="hidden sm:inline">Analyze</span>
-                      <span className="sm:hidden">Go</span>
-                    </>
-                  )}
+                  Analyze
                 </button>
               </div>
               
@@ -177,4 +107,4 @@ export default function AnalysisForm({ value, onChange, onSubmit, disabled }: An
       </div>
     </motion.section>
   );
-}
+} 
