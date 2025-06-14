@@ -74,12 +74,14 @@ export default function Header() {
       <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? 'bg-black/20 backdrop-blur-sm' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
+            {/* Replace logo image with bold "Prominance.ai" */}
             <div className="flex items-center">
-              <img
-                src="/logos/Navbar.jpg"
-                alt="GEO Analytics"
-                className="h-12 w-auto object-contain"
-              />
+              <button
+                onClick={() => goToSection('hero')}
+                className="text-white font-bold text-xl md:text-2xl hover:opacity-90 transition-opacity"
+              >
+                Prominance.ai
+              </button>
             </div>
 
             {/* Desktop Navigation */}

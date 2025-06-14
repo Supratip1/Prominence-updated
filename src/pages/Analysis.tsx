@@ -6,7 +6,7 @@ import AssetDiscoveryForm from '../components/Analysis/AssetDiscoveryForm';
 import CrawlProgress from '../components/Analysis/CrawlProgress';
 import LiveAssetFeed from '../components/Analysis/LiveAssetFeed';
 import AssetFilterBar from '../components/Analysis/AssetFilterBar';
-import AssetGrid from '../components/Analysis/AssetGrid';
+import AssetTable from '../components/Analysis/AssetTable';
 import AssetPreviewModal from '../components/Analysis/AssetPreviewModal';
 import ExportCSVButton from '../components/Analysis/ExportCSVButton';
 import SendToOptimizationButton from '../components/Analysis/SendToOptimizationButton';
@@ -236,26 +236,10 @@ const Analysis: React.FC = () => {
             >
               Asset Discovery & Analysis
             </motion.h1>
-            <motion.p 
-              className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
-              variants={itemVariants}
-            >
-              Comprehensive analysis of your digital presence across all platforms and channels
-            </motion.p>
           </motion.div>
-        </div>
-      </motion.div>
 
-      {/* Analysis Interface */}
-      <div className="container mx-auto px-4 pb-20">
-        <motion.div
-          className="space-y-8"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Asset Discovery Form */}
-          <motion.div variants={itemVariants}>
+          {/* Move AssetDiscoveryForm here, under the header and subtext */}
+          <motion.div variants={itemVariants} className="max-w-2xl mx-auto">
             <AssetDiscoveryForm 
               value={inputValue}
               onChange={(val) => {
@@ -281,12 +265,22 @@ const Analysis: React.FC = () => {
               <div className="text-sm text-red-400 mt-2">{error}</div>
             )}
           </motion.div>
+        </div>
+      </motion.div>
 
+      {/* Analysis Interface */}
+      <div className="container mx-auto px-4 pb-20">
+        <motion.div
+          className="space-y-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {/* Crawl Progress */}
           {isAnalyzing && (
             <motion.div variants={itemVariants}>
               <CrawlProgress 
-                percent={crawlProgress} 
+                percent={Math.round(crawlProgress)} 
                 message={`Analyzing ${analysisQuery} - Fetching assets relevant to ${analysisQuery}...`} 
               />
             </motion.div>
@@ -313,9 +307,9 @@ const Analysis: React.FC = () => {
 
               {/* Asset Grid */}
               <motion.div variants={itemVariants}>
-                <AssetGrid 
+                <AssetTable
                   assets={filteredAssets}
-                  onCardClick={setPreviewAsset}
+                  onNameClick={setPreviewAsset}
                 />
               </motion.div>
 

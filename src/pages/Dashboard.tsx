@@ -1048,6 +1048,10 @@ export default function Dashboard() {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <div className="container mx-auto px-4">
+            {/* Bold white line above video mock */}
+            <div className="text-2xl font-bold text-white text-center mb-8">
+              Watch us leapfrog the market's biggest names—site after site—inside ChatGPT & Perplexity
+            </div>
             {/* Premium Video Container */}
             <motion.div
               className="relative max-w-6xl mx-auto"
@@ -1093,32 +1097,8 @@ export default function Dashboard() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/20 pointer-events-none" />
                 </div>
 
-                {/* Video Stats/Features */}
-                <div className="mt-8 overflow-x-auto sm:overflow-visible">
-                  <div className="flex sm:grid sm:grid-cols-3 gap-4 sm:gap-6 min-w-[600px] sm:min-w-0">
-                    <motion.div 
-                      className="flex-1 min-w-[200px] text-center p-4 bg-white/5 rounded-xl border border-white/10"
-                      whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                    >
-                      <div className="text-2xl font-bold text-[#adff2f] mb-2">300%</div>
-                      <div className="text-white text-sm">Average Visibility Increase</div>
-                    </motion.div>
-                    <motion.div 
-                      className="flex-1 min-w-[200px] text-center p-4 bg-white/5 rounded-xl border border-white/10"
-                      whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                    >
-                      <div className="text-2xl font-bold text-[#adff2f] mb-2">24/7</div>
-                      <div className="text-white text-sm">Real-time Monitoring</div>
-                    </motion.div>
-                    <motion.div 
-                      className="flex-1 min-w-[200px] text-center p-4 bg-white/5 rounded-xl border border-white/10"
-                      whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-                    >
-                      <div className="text-2xl font-bold text-[#adff2f] mb-2">5min</div>
-                      <div className="text-white text-sm">Setup Time</div>
-                    </motion.div>
-                  </div>
-                </div>
+                {/* Footer below video: keep small and blank */}
+                <div className="mt-8" />
               </div>
             </motion.div>
           </div>
