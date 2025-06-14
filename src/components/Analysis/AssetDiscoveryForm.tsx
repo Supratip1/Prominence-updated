@@ -1,20 +1,25 @@
 import React from 'react';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface AssetDiscoveryFormProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-  disabled?: boolean;
+  disableSubmit?: boolean;
+  isAnalyzing?: boolean;
 }
 
-export default function AssetDiscoveryForm({ value, onChange, onSubmit, disabled }: AssetDiscoveryFormProps) {
+export default function AssetDiscoveryForm({ value, onChange, onSubmit, disableSubmit, isAnalyzing }: AssetDiscoveryFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (value.trim() && !disabled) {
+    if (value.trim() && !disableSubmit) {
       onSubmit();
     }
+  };
+
+  const handleClear = () => {
+    onChange('');
   };
 
   return (
@@ -61,16 +66,24 @@ export default function AssetDiscoveryForm({ value, onChange, onSubmit, disabled
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="Enter domain or URL (e.g., example.com)"
-                disabled={disabled}
-                className="w-full h-16 pl-14 pr-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#adff2f]/50 focus:border-[#adff2f]/50 disabled:opacity-50 text-lg"
+                className="w-full h-16 pl-14 pr-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#adff2f]/50 focus:border-[#adff2f]/50 disabled:opacity-50 text-lg"
               />
+              {value && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </div>
             <button
               type="submit"
-              disabled={disabled || !value.trim()}
+              disabled={disableSubmit}
               className="h-12 sm:h-16 px-8 bg-gradient-to-r from-[#adff2f] to-[#7cfc00] text-black font-bold rounded-lg transition-all disabled:bg-gray-600 disabled:cursor-not-allowed shadow-lg shadow-green-500/30 w-full sm:w-auto mt-2 sm:mt-0"
             >
-              Analyze
+              {isAnalyzing ? 'Analyzing…' : 'Analyze'}
             </button>
           </div>
         </motion.form>

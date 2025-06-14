@@ -10,6 +10,7 @@ import AssetGrid from '../components/Analysis/AssetGrid';
 import AssetPreviewModal from '../components/Analysis/AssetPreviewModal';
 import ExportCSVButton from '../components/Analysis/ExportCSVButton';
 import SendToOptimizationButton from '../components/Analysis/SendToOptimizationButton';
+import debounce from 'lodash/debounce';
 
 interface Asset {
   id: string;
@@ -29,6 +30,7 @@ const Analysis: React.FC = () => {
   const { assets, setAssets, getCachedAssets, setCachedAssets, clearCache } = useAnalysis();
   
   const [analysisQuery, setAnalysisQuery] = useState(initialDomain);
+  const [inputValue, setInputValue] = useState(initialDomain);
   const [crawlProgress, setCrawlProgress] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
@@ -36,18 +38,24 @@ const Analysis: React.FC = () => {
     type: 'all' as 'all' | Asset['type'],
     source: 'all' as string
   });
+  const [error, setError] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
 
-  // Handle domain changes
-  useEffect(() => {
-    if (initialDomain && initialDomain !== analysisQuery) {
-      // Clear previous domain's cache and state
-      clearCache(analysisQuery);
-      setAnalysisQuery(initialDomain);
-      setCrawlProgress(0);
-      setIsAnalyzing(false);
-      setAssets([]);
-    }
-  }, [initialDomain, analysisQuery, clearCache, setAssets]);
+  // Debounced validation
+  const debouncedValidate = React.useMemo(
+    () => debounce((val: string) => {
+      if (val) validateDomain(val);
+    }, 2000),
+    []
+  );
+
+  const handleClearAnalysis = () => {
+    setAnalysisQuery('');
+    setAssets([]);
+    setCrawlProgress(0);
+    setIsAnalyzing(false);
+    clearCache(analysisQuery);
+  };
 
   // Handle browser back/forward navigation
   useEffect(() => {
@@ -75,36 +83,69 @@ const Analysis: React.FC = () => {
     }
   }, [initialDomain]);
 
-  const handleAnalysisSubmit = async (query: string) => {
-    setAnalysisQuery(query);
-    
-    // Check cache first
-    const cachedAssets = getCachedAssets(query);
-    if (cachedAssets) {
-      setAssets(cachedAssets);
-      return;
-    }
+  // Sync inputValue with initialDomain when URL changes
+  useEffect(() => {
+    setInputValue(initialDomain);
+  }, [initialDomain]);
 
-    // Clear any existing analysis state
-    setIsAnalyzing(true);
+  const validateDomain = async (url: string): Promise<boolean> => {
+    setIsValidating(true);
+    setError(null);
+    const tryUrl = (prefix: 'https://' | 'http://') => {
+      const full = url.startsWith('http') ? url : prefix + url;
+      return fetch(full, { method: 'HEAD', mode: 'no-cors', cache: 'no-cache' });
+    };
+    try {
+      await tryUrl('https://');
+      setIsValidating(false);
+      return true;
+    } catch {
+      try {
+        await tryUrl('http://');
+        setIsValidating(false);
+        return true;
+      } catch {
+        setIsValidating(false);
+        setError('Unable to reach this domain. Please check the URL and try again.');
+        return false;
+      }
+    }
+  };
+
+  const handleAnalysisSubmit = async (query: string) => {
+    navigate(`/analysis?domain=${encodeURIComponent(query)}`);
+    setAnalysisQuery(query);
+    setInputValue(query);
+
+    // Clear state and let React update the UI first
+    setIsAnalyzing(false);
     setCrawlProgress(0);
     setAssets([]);
 
-    // Simulate crawling progress
-    const progressInterval = setInterval(() => {
-      setCrawlProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          setIsAnalyzing(false);
-          // Generate mock assets
-          const mockAssets = generateMockAssets(query);
-          setAssets(mockAssets);
-          setCachedAssets(query, mockAssets);
-          return 100;
-        }
-        return prev + Math.random() * 15;
-      });
-    }, 500);
+    const cachedAssets = getCachedAssets(query);
+
+    // Use a timeout to ensure the UI updates before starting the animation
+    setTimeout(() => {
+      setIsAnalyzing(true);
+
+      const progressInterval = setInterval(() => {
+        setCrawlProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(progressInterval);
+            setIsAnalyzing(false);
+            if (cachedAssets) {
+              setAssets(cachedAssets);
+            } else {
+              const mockAssets = generateMockAssets(query);
+              setAssets(mockAssets);
+              setCachedAssets(query, mockAssets);
+            }
+            return 100;
+          }
+          return prev + Math.random() * 15;
+        });
+      }, 500);
+    }, 0);
   };
 
   const generateMockAssets = (domain: string) => {
@@ -245,11 +286,29 @@ const Analysis: React.FC = () => {
           {/* Asset Discovery Form */}
           <motion.div variants={itemVariants}>
             <AssetDiscoveryForm 
-              value={analysisQuery}
-              onChange={setAnalysisQuery}
-              onSubmit={() => handleAnalysisSubmit(analysisQuery)}
-              disabled={isAnalyzing}
+              value={inputValue}
+              onChange={(val) => {
+                setInputValue(val);
+                setError(null);
+                debouncedValidate(val);
+              }}
+              onSubmit={async () => {
+                const isValid = await validateDomain(inputValue);
+                if (!isValid) return;
+                handleAnalysisSubmit(inputValue);
+              }}
+              disableSubmit={isAnalyzing || isValidating || !inputValue.trim()}
+              isAnalyzing={isAnalyzing}
             />
+            {isValidating && (
+              <div className="flex items-center mt-2 text-sm text-gray-400">
+                <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></span>
+                Validating URL...
+              </div>
+            )}
+            {error && (
+              <div className="text-sm text-red-400 mt-2">{error}</div>
+            )}
           </motion.div>
 
           {/* Crawl Progress */}
@@ -257,7 +316,7 @@ const Analysis: React.FC = () => {
             <motion.div variants={itemVariants}>
               <CrawlProgress 
                 percent={crawlProgress} 
-                message="Discovering digital assets..." 
+                message={`Analyzing ${analysisQuery} - Fetching assets relevant to ${analysisQuery}...`} 
               />
             </motion.div>
           )}

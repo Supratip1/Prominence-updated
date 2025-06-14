@@ -118,7 +118,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
                   {asset.type}
                 </span>
                 <span className="text-gray-500 text-xs">
-                  {asset.createdAt.toLocaleDateString()}
+                  {new Date(asset.createdAt).toLocaleDateString()}
                 </span>
               </div>
             </div>
