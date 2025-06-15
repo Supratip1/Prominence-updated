@@ -1,0 +1,12 @@
+Content-Length: 230
+Location: https://www.google.com/robots.txt
+Cross-Origin-Resource-Policy: cross-origin
+X-Content-Type-Options: nosniff
+Server: sffe
+X-Xss-Protection: 0
+Date: Sun, 15 Jun 2025 09:45:47 GMT
+Expires: Sun, 15 Jun 2025 10:15:47 GMT
+Cache-Control: public, max-age=1800
+Content-Type: text/html; charset=UTF-8
+Age: 1594
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

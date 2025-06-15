@@ -1,0 +1,24 @@
+Date: Sun, 15 Jun 2025 10:01:35 GMT
+Content-Type: text/html; charset=UTF-8
+Accept-Ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+Cf-Mitigated: challenge
+Critical-Ch: Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA
+Cross-Origin-Embedder-Policy: require-corp
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Permissions-Policy: accelerometer=(),autoplay=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=()
+Server-Timing: chlray;desc="95013a1be8e1b2a0"
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+Cache-Control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Expires: Thu, 01 Jan 1970 00:00:01 GMT
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=JRHxlaRkpz2viLJhOfuMZDUcv428NsMAKl2zJAlzg5Imp02eKZ0MJ%2FD1M9retCXD8o9JAudAZHcX9%2B5jTMohNCJh709zPfgxK%2BZknZi9Mr4ShZTAVgyb4FdLFTBO"}],"group":"cf-nel","max_age":604800}
+Nel: {"success_fraction":0.01,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Cross-Origin-Opener-Policy: same-origin-allow-popups
+Referrer-Policy: strict-origin-when-cross-origin
+X-Robots-Tag: nofollow
+Server: cloudflare
+Cf-Ray: 95013a1be8e1b2a0-MAA
+Content-Encoding: gzip

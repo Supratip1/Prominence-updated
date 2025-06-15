@@ -1,0 +1,20 @@
+Date: Sun, 15 Jun 2025 09:54:41 GMT
+Content-Type: text/html; charset=utf-8
+Age: 156241
+Cache-Control: public,max-age=0,must-revalidate
+Cache-Status: "Netlify Durable"; hit; ttl=31379760
+Cache-Status: "Next.js"; hit
+Cache-Status: "Netlify Edge"; fwd=miss
+Netlify-Vary: query=__nextDataReq|_rsc,header=x-nextjs-data|x-next-debug-logging|next-router-prefetch|next-router-segment-prefetch|next-router-state-tree|next-url|rsc|accept-encoding,cookie=__prerender_bypass|__next_preview_data
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Vary: RSC,Next-Router-State-Tree,Next-Router-Prefetch,Accept-Encoding
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Nextjs-Date: Fri, 13 Jun 2025 14:38:37 GMT
+X-Nf-Request-Id: 01JXSG6EJ94XJ403HRZCZY7ZYE
+X-Powered-By: Next.js
+Via: 1.1 google
+Cf-Cache-Status: DYNAMIC
+Server: cloudflare
+Cf-Ray: 95012ffcfdad7f5b-MAA
+Content-Encoding: gzip

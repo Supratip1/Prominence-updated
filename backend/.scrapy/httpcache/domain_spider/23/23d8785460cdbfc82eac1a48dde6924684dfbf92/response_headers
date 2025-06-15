@@ -1,0 +1,17 @@
+Content-Length: 65737
+Content-Type: text/html; charset=utf-8
+Date: Sun, 15 Jun 2025 09:55:27 GMT
+X-Amzn-Requestid: eda0e34b-d534-4452-9f4b-6e94bd5c445a
+Content-Encoding: gzip
+X-Frame-Options: SAMEORIGIN
+X-Amzn-Remapped-Connection: keep-alive
+Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate
+Vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Accept-Encoding
+X-Powered-By: Next.js
+Link: <https://files.manuscdn.com/webapp/_next/static/media/indexVideo.d4cf4280.webp>; rel=preload; as="image", <https://files.manuscdn.com/assets/icon/session/online-learning-book-open.svg>; rel=preload; as="image", <https://files.manuscdn.com/webapp/_next/static/media/playIcon.8f86dad6.png>; rel=preload; as="image", <https://files.manuscdn.com/webapp/_next/static/media/img24.fad57c99.webp>; rel=preload; as="image", <https://files.manuscdn.com/assets/icon/session/artificial-intelligence-set.svg>; rel=preload; as="image"
+X-Amzn-Trace-Id: Root=1-684e988f-127dd8603714312905e89818;Parent=4cc63e637c360eb2;Sampled=0;Lineage=1:f63acb67:0
+X-Amzn-Remapped-Date: Sun, 15 Jun 2025 09:55:27 GMT
+X-Cache: Miss from cloudfront
+Via: 1.1 ce3baca0b6c9126607602f8e13f57b20.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: BLR50-P1
+X-Amz-Cf-Id: cRhwrqP_J8tnOQ_pxBJuFtAvVbcMC87SSyzRzD5Isa6GKryWTLbo0w==

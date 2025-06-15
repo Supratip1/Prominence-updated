@@ -1,0 +1,14 @@
+Content-Length: 0
+Date: Sun, 15 Jun 2025 10:02:29 GMT
+Cf-Ray: 95013b6fccfee14a-MAA
+Location: https://support.cluely.com
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=zIzb4PBuW8J3lTlFmjP8SZcqFKS54nsdUX%2BRZquO%2F0CQjjD4doL41P9WVr4KRLxyOW1qHx%2B7m7Q8%2FCQa0ue5NvzC7ksknV6IU7s%2FZyvgfv67cktL6ixJDuqU3mWi"}],"group":"cf-nel","max_age":604800}
+Nel: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Cf-Cache-Status: DYNAMIC
+Server-Timing: cfCacheStatus;desc="DYNAMIC"
+Server-Timing: cfOrigin;dur=5,cfEdge;dur=6
+Server-Timing: cfL4;desc="?proto=TCP&rtt=12494&min_rtt=11247&rtt_var=2718&sent=24&recv=13&lost=0&retrans=0&sent_bytes=19614&recv_bytes=2454&delivery_rate=1035309&cwnd=257&unsent_bytes=0&cid=db5bc771a3c716e2&ts=1998&x=0"
+Speculation-Rules: "/cdn-cgi/speculation"
+Server: cloudflare
+Alt-Svc: h3=":443"; ma=86400

@@ -1,0 +1,19 @@
+Date: Sun, 15 Jun 2025 10:01:34 GMT
+Content-Type: text/plain; charset=UTF-8
+Cache-Control: public, max-age=0
+Last-Modified: Fri, 13 Jun 2025 22:42:10 GMT
+Etag: W/"4fc-1976b7529d0"
+Cf-Cache-Status: HIT
+Set-Cookie: __cf_bm=5FSgDNibcDaslkkmyOiZ0ezewWO8PX.tCmNzMYWWGmE-1749981694-1.0.1.1-ImDWYsW5KrGb1SdqgzKrqlfQAzYc11Jqys.1cPUSiAhszcQq1wSVWDsjls5leMf_zSFPYQjN7K7gyAuwufp32cSm7BMXP2uFtQRD7cG.ZrI; path=/; expires=Sun, 15-Jun-25 10:31:34 GMT; domain=.chatgpt.com; HttpOnly; Secure; SameSite=None
+Set-Cookie: __cflb=04dTofELUVCxHqRn2XjG5uag6Te7DSjTU7zD4eDB63; SameSite=None; Secure; path=/; expires=Sun, 15-Jun-25 11:01:34 GMT; HttpOnly
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=AV1llVpA5fOVfgFW%2FqPTyln058Rz9ZoKngYsDwDjzKLUW6qcfV11%2B8gP9Q0w7Gqmu3WNvJ6ZtdL8TkAgdnVtOF09vTC5eeqOrjCB3Pxij7q4dE19ukXZWJGwXW0j"}],"group":"cf-nel","max_age":604800}
+Nel: {"success_fraction":0.01,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+X-Content-Type-Options: nosniff
+Cross-Origin-Opener-Policy: same-origin-allow-popups
+Referrer-Policy: strict-origin-when-cross-origin
+X-Robots-Tag: nofollow
+Server: cloudflare
+Cf-Ray: 95013a15ebb5b2a0-MAA
+Content-Encoding: gzip

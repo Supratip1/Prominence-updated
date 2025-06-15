@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
-import { Asset } from '../../utils/aeoCrawler';
+import type { FrontendAsset } from '../../pages/Analysis';
 
 type SortKey = 'title' | 'type' | 'sourceDomain' | 'createdAt' | 'url';
 type Direction = 'asc' | 'desc';
 
 interface AssetTableProps {
-  assets: Asset[];
-  onNameClick: (asset: Asset) => void;
+  assets: FrontendAsset[];
+  onNameClick: (asset: FrontendAsset) => void;
 }
 
 export default function AssetTable({ assets, onNameClick }: AssetTableProps) {

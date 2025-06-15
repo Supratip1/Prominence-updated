@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
-import type { Asset as AEOAsset } from '../utils/aeoCrawler';
+import type { FrontendAsset } from '../pages/Analysis';
 
-export type Asset = AEOAsset;
+export type Asset = FrontendAsset;
 
 interface AnalysisContextType {
   assets: Asset[];

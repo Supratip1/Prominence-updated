@@ -1,24 +1,14 @@
 import React from 'react';
 import { FileText, Video, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Asset {
-  id: string;
-  type: 'video' | 'screenshot' | 'webpage';
-  title: string;
-  url: string;
-  sourceDomain: string;
-  thumbnail?: string;
-  description?: string;
-  createdAt: Date;
-}
+import type { FrontendAsset } from '../../pages/Analysis';
 
 interface LiveAssetFeedProps {
-  assets: Asset[];
+  assets: FrontendAsset[];
 }
 
 export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
-  const getIcon = (type: Asset['type']) => {
+  const getIcon = (type: FrontendAsset['type']) => {
     switch (type) {
       case 'video':
         return <Video className="w-4 h-4" />;
@@ -31,7 +21,7 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
     }
   };
 
-  const getTypeColor = (type: Asset['type']) => {
+  const getTypeColor = (type: FrontendAsset['type']) => {
     switch (type) {
       case 'video':
         return 'text-red-400 bg-red-400/10 border-red-400/20';

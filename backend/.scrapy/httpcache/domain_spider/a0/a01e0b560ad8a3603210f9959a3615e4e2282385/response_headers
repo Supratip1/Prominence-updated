@@ -1,0 +1,36 @@
+Accept-Ch: Sec-CH-Prefers-Color-Scheme
+Access-Control-Allow-Origin: *
+Age: 130186
+Cache-Control: public, max-age=0, must-revalidate
+Content-Disposition: inline
+Content-Encoding: gzip
+Content-Security-Policy: default-src 'self' vercel.com *.vercel.com *.vercel.sh vercel.live wss://*.vercel.com *.codesandbox.io localhost:* chrome-extension://* https://www.youtube-nocookie.com *.chilipiper.com https://risk.clearbit.com https://react-tweet.vercel.app/*;script-src 'self' 'unsafe-eval' 'unsafe-inline' 'inline-speculation-rules' https://cdn.heapanalytics.com *.heapanalytics.com https://www.googletagmanager.com https://www.google-analytics.com https://snap.licdn.com https://www.youtube.com *.doubleclick.net cdn.vercel-insights.com va.vercel-scripts.com vercel.com *.vercel.com *.vercel.sh vercel.live wss://*.vercel.com *.codesandbox.io localhost:* chrome-extension://* https://www.youtube-nocookie.com *.chilipiper.com https://risk.clearbit.com https://react-tweet.vercel.app/*;style-src 'self' 'unsafe-inline' vercel.com *.vercel.com *.vercel.sh vercel.live wss://*.vercel.com *.codesandbox.io localhost:* chrome-extension://* https://www.youtube-nocookie.com *.chilipiper.com https://risk.clearbit.com https://react-tweet.vercel.app/*;img-src 'self' blob: data: *.github.io avatars.githubusercontent.com user-images.githubusercontent.com vercel.com vercel.live *.vercel.sh assets.vercel.com cdn.raster.app https://images.ctfassets.net https://heapanalytics.com https://*.ads.linkedin.com https://www.google.com https://i.ytimg.com https://s3.amazonaws.com pbs.twimg.com https://www.gravatar.com;media-src 'self' blob: data: vercel.com *.vercel.com *.vercel.sh vercel.live wss://*.vercel.com *.codesandbox.io localhost:* chrome-extension://* https://www.youtube-nocookie.com *.chilipiper.com https://risk.clearbit.com https://react-tweet.vercel.app/*;connect-src 'self' data: *.chilipiper.com *.ingest.sentry.io *.ingest.us.sentry.io wss://ws-us3.pusher.com sockjs-use3.pusher.com https://api.getkoala.com https://analytics.google.com https://www.google-analytics.com *.ads.linkedin.com *.doubleclick.net react-tweet.vercel.app vercel.com *.vercel.com *.vercel.sh vercel.live wss://*.vercel.com *.codesandbox.io localhost:* chrome-extension://* https://www.youtube-nocookie.com *.chilipiper.com https://risk.clearbit.com https://react-tweet.vercel.app/*;font-src 'self' vercel.com assets.vercel.com vercel.live fonts.gstatic.com *.vercel.sh;frame-ancestors  'self'  https://vercel.com
+Content-Type: text/html; charset=utf-8
+Critical-Ch: Sec-CH-Prefers-Color-Scheme
+Date: Sun, 15 Jun 2025 10:04:15 GMT
+Etag: W/"5777bb514d44f2c7c3b5715868e69a51"
+Feature-Policy: fullscreen 'self'; camera 'none'
+Referrer-Policy: origin-when-cross-origin
+Server: Vercel
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+X-Content-Type-Options: nosniff
+X-Dns-Prefetch-Control: on
+X-Download-Options: noopen
+X-Frame-Options: DENY
+X-Matched-Path: /products/rendering
+X-Nextjs-Prerender: 1
+X-Nextjs-Stale-Time: 300
+X-Powered-By: Next.js, Payload
+X-Vercel-Cache: HIT
+X-Vercel-Id: bom1::qgm7t-1749981855425-b588cf14d6fb
+X-Vercel-Ip-As-Number: 132559
+X-Vercel-Ip-City: Bengaluru
+X-Vercel-Ip-Continent: AS
+X-Vercel-Ip-Country: IN
+X-Vercel-Ip-Country-Region: KA
+X-Vercel-Ip-Latitude: 12.9753
+X-Vercel-Ip-Longitude: 77.591
+X-Vercel-Ip-Postal-Code: 560068
+X-Vercel-Ip-Timezone: Asia/Kolkata
+X-Xss-Protection: 0

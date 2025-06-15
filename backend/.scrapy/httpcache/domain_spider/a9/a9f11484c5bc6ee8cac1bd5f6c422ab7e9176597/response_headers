@@ -1,0 +1,17 @@
+Content-Length: 1289
+Server: Server
+Content-Type: text/plain
+X-Amz-Rid: DQSYECK2J1YTHNC60W8F
+X-Amz-Request-Id: 5TANBZK64Z6V3NN0
+Last-Modified: Fri, 22 Nov 2024 04:35:29 GMT
+Etag: "f4b6f5aa6023422671807bceac9b13b8"
+X-Amz-Server-Side-Encryption: AES256
+Accept-Ranges: bytes
+Strict-Transport-Security: max-age=47474747; includeSubDomains; preload
+Vary: Content-Type,Accept-Encoding,User-Agent
+X-Frame-Options: SAMEORIGIN
+Content-Encoding: gzip
+Date: Sun, 15 Jun 2025 10:15:20 GMT
+Alt-Svc: h3=":443"; ma=93600
+X-Amzn-Cdn-Id: ak-0.1cd70b17.1749982520.59ba8ce
+X-Cache: NotCacheable from child

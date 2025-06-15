@@ -11,7 +11,54 @@ import AssetPreviewModal from '../components/Analysis/AssetPreviewModal';
 import ExportCSVButton from '../components/Analysis/ExportCSVButton';
 import SendToOptimizationButton from '../components/Analysis/SendToOptimizationButton';
 import debounce from 'lodash/debounce';
-import { fetchAEOAssets, Asset } from '../utils/aeoCrawler';
+
+// Types from backend
+interface ContentBlock {
+  id: number;
+  type: string;
+  content: string;
+  data: Record<string, any>;
+  parent_id?: number;
+  level?: number;
+}
+
+interface PageContent {
+  url: string;
+  title?: string;
+  blocks: ContentBlock[];
+  metadata: Record<string, any>;
+}
+
+interface ScrapeJob {
+  job_id: string;
+  domain: string;
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+  created_at: string;
+  completed_at?: string;
+  progress: {
+    pages_scraped: number;
+    max_pages: number;
+    percentage: number;
+  };
+  error_message?: string;
+}
+
+interface ScrapeResults {
+  job: ScrapeJob;
+  pages: PageContent[];
+  summary: Record<string, any>;
+}
+
+// Local asset type for frontend
+export interface FrontendAsset {
+  id: string;
+  type: string;
+  title: string;
+  description?: string;
+  url: string;
+  sourceDomain: string;
+  createdAt: Date;
+}
 
 function normalizeDomain(raw: string): string {
   try {
@@ -25,23 +72,29 @@ function normalizeDomain(raw: string): string {
 const Analysis: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  // always strip protocol + trailing slash right away
   const rawParam = searchParams.get('domain') || '';
   const initialDomain = normalizeDomain(rawParam);
-  const { assets, setAssets, getCachedAssets, setCachedAssets, clearCache } = useAnalysis();
+  const { assets, setAssets, getCachedAssets, setCachedAssets, clearCache } = useAnalysis() as {
+    assets: FrontendAsset[];
+    setAssets: (assets: FrontendAsset[]) => void;
+    getCachedAssets: (domain: string) => FrontendAsset[] | null;
+    setCachedAssets: (domain: string, assets: FrontendAsset[]) => void;
+    clearCache: (domain: string) => void;
+  };
   
   const [analysisQuery, setAnalysisQuery] = useState(initialDomain);
   const [inputValue, setInputValue] = useState(initialDomain);
   const [crawlProgress, setCrawlProgress] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
+  const [previewAsset, setPreviewAsset] = useState<FrontendAsset | null>(null);
   const [filterOptions, setFilterOptions] = useState({
-    type: 'all' as 'all' | Asset['type'],
+    type: 'all' as string,
     source: 'all' as string
   });
   const [error, setError] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [lastDomain, setLastDomain] = useState<string|null>(null);
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
 
   // Debounced validation
   const debouncedValidate = React.useMemo(
@@ -57,6 +110,7 @@ const Analysis: React.FC = () => {
     setCrawlProgress(0);
     setIsAnalyzing(false);
     clearCache(analysisQuery);
+    setCurrentJobId(null);
   };
 
   // Handle browser back/forward navigation
@@ -68,7 +122,6 @@ const Analysis: React.FC = () => {
         if (cachedAssets) {
           setAssets(cachedAssets);
         } else {
-          // If no cache exists, start a new analysis
           handleAnalysisSubmit(domain);
         }
       }
@@ -100,6 +153,98 @@ const Analysis: React.FC = () => {
     handleAnalysisSubmit(initialDomain);
   }, [initialDomain]);
 
+  // Poll job status
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const pollJobStatus = async () => {
+      if (!currentJobId || !isAnalyzing) return;
+
+      try {
+        const response = await fetch(`http://localhost:8000/status/${currentJobId}`);
+        const data: ScrapeJob = await response.json();
+
+        setCrawlProgress(data.progress.percentage);
+
+        if (data.status === 'completed') {
+          const resultsResponse = await fetch(`http://localhost:8000/results/${currentJobId}`);
+          const results: ScrapeResults = await resultsResponse.json();
+          
+          // Improved asset type classification
+          const convertedAssets = results.pages.flatMap(page =>
+            page.blocks.map(block => {
+              const src = block.data.src || page.url;
+              let type = block.type.toLowerCase();
+
+              // 1) keep any bucket we already know
+              const buckets = ['video','screenshot','webpage','heading','meta','schema','image','link'];
+              if (!buckets.includes(type)) {
+                // 2) classify via file extension
+                if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(src)
+                    || src.includes('youtube.com')
+                    || src.includes('vimeo.com')
+                ) {
+                  type = 'video';
+                }
+                else if (/\.(jpe?g|png|gif|svg)(\?.*)?$/i.test(src)) {
+                  type = 'image';
+                }
+                // 3) if it really is just a link to another page
+                else if (type === 'link') {
+                  type = 'link';
+                }
+                // 4) anything else that isn't exactly the same as the page URL, treat as link
+                else if (src !== page.url) {
+                  type = 'link';
+                }
+                // 5) everything left is just the page itself
+                else {
+                  type = 'webpage';
+                }
+              }
+
+              return {
+                id:           `${page.url}-${block.id}`,
+                type,
+                title:        block.content,
+                description: block.content,
+                url:          src,
+                sourceDomain: new URL(page.url).host,
+                createdAt:    new Date(page.metadata.timestamp || Date.now())
+              };
+            })
+          );
+
+          setAssets(convertedAssets);
+          setCachedAssets(initialDomain, convertedAssets);
+          setFilterOptions({ type: 'all', source: 'all' });
+
+          setIsAnalyzing(false);
+          clearInterval(intervalId);
+        } else if (data.status === 'failed') {
+          setError(data.error_message || 'Analysis failed');
+          setIsAnalyzing(false);
+          clearInterval(intervalId);
+        }
+      } catch (err) {
+        console.error('Error polling job status:', err);
+        setError('Failed to check analysis status');
+        setIsAnalyzing(false);
+        clearInterval(intervalId);
+      }
+    };
+
+    if (currentJobId && isAnalyzing) {
+      intervalId = setInterval(pollJobStatus, 2000);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [currentJobId, isAnalyzing, initialDomain, setAssets, setCachedAssets]);
+
   const validateDomain = async (url: string): Promise<boolean> => {
     setIsValidating(true);
     setError(null);
@@ -123,15 +268,18 @@ const Analysis: React.FC = () => {
   };
 
   const handleAnalysisSubmit = async (rawInput: string) => {
+    // Ensure we send a full URL to the backend
+    const fullUrl = rawInput.startsWith('http') ? rawInput : `https://${rawInput}`;
     const domain = normalizeDomain(rawInput);
-    setAnalysisQuery(domain); // so progress bar and UI are correct
-    clearCache(domain); // drop any old results
-    navigate(`/analysis?domain=${encodeURIComponent(domain)}`); // update the URL to exactly your host
+    setAnalysisQuery(domain);
+    clearCache(domain);
+    navigate(`/analysis?domain=${encodeURIComponent(domain)}`);
     setIsAnalyzing(true);
     setCrawlProgress(0);
     setAssets([]);
+    setError(null);
 
-    // 1) cache?
+    // Check cache first
     const cached = getCachedAssets(domain);
     if (cached) {
       setAssets(cached);
@@ -140,41 +288,32 @@ const Analysis: React.FC = () => {
       return;
     }
 
-    // 2) show "fake" progress up to 95%
-    let progress = 0;
-    const progIv = setInterval(() => {
-      progress = Math.min(progress + Math.random() * 20, 95);
-      setCrawlProgress(progress);
-    }, 400);
-
     try {
-      // actual fetch & parse
-      let scraped = await fetchAEOAssets(domain);
-      // Add a screenshot asset using Thum.io
-      const thumbUrl = `https://image.thum.io/get/width/800/crop/600/${encodeURIComponent('https://' + domain)}`;
-      scraped = [
-        {
-          id: 'screenshot-home',
-          type: 'screenshot',
-          title: 'Homepage Screenshot',
-          url: thumbUrl,
-          thumbnail: thumbUrl,
-          sourceDomain: domain,
-          createdAt: new Date()
+      // Start backend scraping with full URL
+      const response = await fetch('http://localhost:8000/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        ...scraped
-      ];
-      clearInterval(progIv);
+        body: JSON.stringify({
+          domain: fullUrl, // send full URL
+          max_pages: 50,
+          options: {
+            extract_media: true,
+            include_metadata: true
+          }
+        })
+      });
 
-      // finalize
-      setCrawlProgress(100);
-      setAssets(scraped);
-      setCachedAssets(domain, scraped);
+      if (!response.ok) {
+        throw new Error('Failed to start analysis');
+      }
+
+      const data = await response.json();
+      setCurrentJobId(data.job_id);
     } catch (err) {
-      clearInterval(progIv);
-      setError('Failed to fetch or parse site.');
-      setAssets([]);
-    } finally {
+      console.error('Error starting analysis:', err);
+      setError('Failed to start analysis');
       setIsAnalyzing(false);
     }
   };
@@ -238,7 +377,6 @@ const Analysis: React.FC = () => {
             </motion.h1>
           </motion.div>
 
-          {/* Move AssetDiscoveryForm here, under the header and subtext */}
           <motion.div variants={itemVariants} className="max-w-2xl mx-auto">
             <AssetDiscoveryForm 
               value={inputValue}

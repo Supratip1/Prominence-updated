@@ -1,25 +1,20 @@
 import React from 'react';
 import { X, ExternalLink, Download, FileText, Video, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { FrontendAsset as BaseFrontendAsset } from '../../pages/Analysis';
 
-interface Asset {
-  id: string;
-  type: 'video' | 'screenshot' | 'webpage' | 'image' | 'og' | 'twitter' | 'schema' | 'robots' | 'sitemap' | 'meta' | 'paragraph' | 'title' | 'canonical' | 'heading' | 'link';
-  title: string;
-  url: string;
-  sourceDomain: string;
-  thumbnail?: string;
+// Extend FrontendAsset locally to add optional description for preview
+interface FrontendAsset extends BaseFrontendAsset {
   description?: string;
-  createdAt: Date;
 }
 
 interface AssetPreviewModalProps {
-  asset: Asset;
+  asset: FrontendAsset;
   onClose: () => void;
 }
 
 export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalProps) {
-  const getIcon = (type: Asset['type']) => {
+  const getIcon = (type: FrontendAsset['type']) => {
     switch (type) {
       case 'video':
         return <Video className="w-5 h-5" />;
@@ -56,7 +51,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
     }
   };
 
-  const getTypeColor = (type: Asset['type']) => {
+  const getTypeColor = (type: FrontendAsset['type']) => {
     switch (type) {
       case 'video':
         return 'text-red-400 bg-red-400/10 border-red-400/20';
@@ -135,18 +130,25 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
             {/* Preview */}
             <div className="aspect-video bg-gray-800/50 rounded-xl mb-6 flex items-center justify-center overflow-hidden border border-white/10">
-              {/* Dynamic preview logic for all asset types */}
               {['image','og','twitter'].includes(asset.type) && (
                 <img src={asset.url} alt={asset.title ?? ''} className="w-full h-full object-cover" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />
               )}
               {asset.type==='video' && (
                 <video src={asset.url} controls className="w-full h-full object-cover"/>
               )}
+              {asset.type==='webpage' && (
+                <iframe
+                  src={asset.url}
+                  title={asset.title}
+                  className="w-full h-full object-cover"
+                  sandbox="allow-scripts allow-same-origin allow-popups"
+                />
+              )}
               {['schema','robots','sitemap'].includes(asset.type) && (
                 <pre className="p-6 overflow-auto text-sm w-full h-full">{asset.description}</pre>
               )}
               {['meta','paragraph','title','canonical','heading','link'].includes(asset.type) && (
-                <div className="p-6 text-sm whitespace-pre-wrap w-full h-full">{asset.description || (asset.title ?? '')}</div>
+                <div className="p-6 text-sm whitespace-pre-wrap w-full h-full">{asset.description}</div>
               )}
             </div>
 

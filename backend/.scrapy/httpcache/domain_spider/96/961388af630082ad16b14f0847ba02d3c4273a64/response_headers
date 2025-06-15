@@ -1,0 +1,15 @@
+Content-Length: 8360
+Content-Type: text/html; charset=utf-8
+Date: Sun, 15 Jun 2025 09:55:23 GMT
+X-Amzn-Requestid: 509292ea-9471-4f06-988e-b0ff125e1ec6
+Content-Encoding: gzip
+X-Amzn-Remapped-Connection: keep-alive
+Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate
+Vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Accept-Encoding
+X-Powered-By: Next.js
+X-Amzn-Trace-Id: Root=1-684e988b-03efee9648a5142b72e9fd4c;Parent=533403d0212378a0;Sampled=0;Lineage=1:f63acb67:0
+X-Amzn-Remapped-Date: Sun, 15 Jun 2025 09:55:23 GMT
+X-Cache: Error from cloudfront
+Via: 1.1 ce3baca0b6c9126607602f8e13f57b20.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: BLR50-P1
+X-Amz-Cf-Id: DNO1mOSBTlXQfM3In1D7Q4-2bRmxHWzr5X7ht57U_vWqyYl5kXke_g==

@@ -1,0 +1,23 @@
+Date: Sun, 15 Jun 2025 10:02:30 GMT
+Content-Type: text/html; charset=utf-8
+Content-Encoding: gzip
+Access-Control-Allow-Origin: *
+Cache-Control: public, max-age=0, must-revalidate
+Link: <https://www.googletagmanager.com/gtm.js?id=GTM-TXZJJM5K>; rel="preload"; as=script, <//static.klaviyo.com/onsite/js/klaviyo.js?company_id=QSPPdB>; rel="preload"; as=script, <//js-na2.hs-scripts.com/242775490.js>; rel="preload"; as=script
+Vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Accept-Encoding
+Referrer-Policy: strict-origin-when-cross-origin
+X-Content-Type-Options: nosniff
+X-Matched-Path: /pricing
+X-Next-Cache-Tags: _N_T_/layout,_N_T_/(pages)/layout,_N_T_/(pages)/pricing/layout,_N_T_/(pages)/pricing/page,_N_T_/pricing
+X-Nextjs-Prerender: 1
+X-Nextjs-Stale-Time: 300
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=w8Dx8LCOvmXs5s9FF%2BiuWFRGLvNYkR6dyJvnVzxP981sRUdyGoSovNSISMiKANfyLkqvIeuF%2Bm2pwRIJRhtV1UMQO1G1eU0SdfJT5UXVeEEpP9MNfCehv4yP8ixX"}],"group":"cf-nel","max_age":604800}
+Nel: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Cf-Cache-Status: DYNAMIC
+Server-Timing: cfCacheStatus;desc="DYNAMIC"
+Server-Timing: cfOrigin;dur=20,cfEdge;dur=5
+Server-Timing: cfL4;desc="?proto=TCP&rtt=18786&min_rtt=11247&rtt_var=14621&sent=25&recv=15&lost=0&retrans=0&sent_bytes=20590&recv_bytes=2740&delivery_rate=1035309&cwnd=257&unsent_bytes=0&cid=db5bc771a3c716e2&ts=3025&x=0"
+Speculation-Rules: "/cdn-cgi/speculation"
+Server: cloudflare
+Cf-Ray: 95013b761871e14a-MAA
+Alt-Svc: h3=":443"; ma=86400

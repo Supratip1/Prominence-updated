@@ -1,0 +1,20 @@
+Date: Sun, 15 Jun 2025 10:02:27 GMT
+Content-Type: text/html; charset=utf-8
+Content-Encoding: gzip
+Access-Control-Allow-Origin: *
+Cache-Control: public, max-age=14400, must-revalidate
+Link: <https://www.googletagmanager.com/gtm.js?id=GTM-TXZJJM5K>; rel="preload"; as=script, <//static.klaviyo.com/onsite/js/klaviyo.js?company_id=QSPPdB>; rel="preload"; as=script, <//js-na2.hs-scripts.com/242775490.js>; rel="preload"; as=script
+Referrer-Policy: strict-origin-when-cross-origin
+X-Content-Type-Options: nosniff
+X-Matched-Path: /404
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=49t8vxKONKofAJOBXz421EG5nieBN1epfqzwNVPMbbGvpeZcdFxioQ%2FftfzMV%2FFfub54E8AFfRMDWH9JFV95niDGAT%2F5h7UnrP1rVKFSL0Bu6bYlJWGIr%2FwiVLtC"}],"group":"cf-nel","max_age":604800}
+Nel: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Vary: Accept-Encoding
+Cf-Cache-Status: EXPIRED
+Server-Timing: cfCacheStatus;desc="EXPIRED"
+Server-Timing: cfOrigin;dur=94,cfEdge;dur=24
+Server-Timing: cfL4;desc="?proto=TCP&rtt=12159&min_rtt=11678&rtt_var=5342&sent=5&recv=6&lost=0&retrans=0&sent_bytes=3896&recv_bytes=1878&delivery_rate=278189&cwnd=252&unsent_bytes=0&cid=db5bc771a3c716e2&ts=140&x=0"
+Speculation-Rules: "/cdn-cgi/speculation"
+Server: cloudflare
+Cf-Ray: 95013b637df5e14a-MAA
+Alt-Svc: h3=":443"; ma=86400

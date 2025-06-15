@@ -1,0 +1,33 @@
+Content-Length: 536
+Accept-Ranges: bytes
+Access-Control-Allow-Origin: *
+Age: 7799
+Cache-Control: public, max-age=0, must-revalidate
+Content-Disposition: inline; filename="robots.txt"
+Content-Security-Policy: default-src 'self' vercel.com *.vercel.com *.vercel.sh vercel.live *.stripe.com twitter.com *.twitter.com *.google.com *.github.com *.codesandbox.io https://risk.clearbit.com wss://*.vercel.com localhost:* chrome-extension://*;script-src 'self' 'unsafe-eval' 'unsafe-inline' www.google.com www.google-analytics.com www.googleadservices.com www.gstatic.com *.youtube.com *.youtube-nocookie.com *.ytimg.com *.twimg.com cdn.ampproject.org www.googletagmanager.com *.googleapis.com *.heapanalytics.com heapanalytics.com *.fides-cdn.ethyca.com *.ethyca.com cdn.ethyca.com cdn.vercel-insights.com va.vercel-scripts.com vercel.com *.vercel.com *.vercel.sh vercel.live *.stripe.com twitter.com *.twitter.com *.google.com *.github.com *.codesandbox.io https://risk.clearbit.com wss://*.vercel.com localhost:* chrome-extension://*;child-src *.youtube.com *.youtube-nocookie.com *.stripe.com www.google.com td.doubleclick.net github.com calendly.com *.vusercontent.net vercel.com *.vercel.com *.vercel.sh vercel.live *.stripe.com twitter.com *.twitter.com *.google.com *.github.com *.codesandbox.io https://risk.clearbit.com wss://*.vercel.com localhost:* chrome-extension://*;style-src 'self' 'unsafe-inline' *.googleapis.com heapanalytics.com vercel.com *.vercel.com *.vercel.sh vercel.live *.stripe.com twitter.com *.twitter.com *.google.com *.github.com *.codesandbox.io https://risk.clearbit.com wss://*.vercel.com localhost:* chrome-extension://*;img-src * blob: data:;media-src 'self' videos.ctfassets.net user-images.githubusercontent.com replicate.delivery blob: data: vercel.com *.vercel.com *.vercel.sh vercel.live *.stripe.com twitter.com *.twitter.com *.google.com *.github.com *.codesandbox.io https://risk.clearbit.com wss://*.vercel.com localhost:* chrome-extension://*;connect-src wss://ws-us3.pusher.com data: *;font-src 'self' *.vercel.com *.gstatic.com vercel.live;worker-src 'self' *.vercel.com blob:
+Content-Type: text/plain; charset=utf-8
+Date: Sun, 15 Jun 2025 10:04:09 GMT
+Etag: "b0cc9b9e7b7dd0b088d813258f912990"
+Feature-Policy: fullscreen 'self'; camera 'none'
+Last-Modified: Sun, 15 Jun 2025 00:09:41 GMT
+Referrer-Policy: origin-when-cross-origin
+Server: Vercel
+Set-Cookie: visitor-id=36596TwstYlApKMRwdjjx; Path=/; Max-Age=86400
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+X-Content-Type-Options: nosniff
+X-Dns-Prefetch-Control: on
+X-Download-Options: noopen
+X-Frame-Options: DENY
+X-Matched-Path: /robots.txt
+X-Vercel-Cache: HIT
+X-Vercel-Id: bom1::bbhkl-1749981849499-69b0ff2d57c9
+X-Vercel-Ip-As-Number: 132559
+X-Vercel-Ip-City: Bengaluru
+X-Vercel-Ip-Continent: AS
+X-Vercel-Ip-Country: IN
+X-Vercel-Ip-Country-Region: KA
+X-Vercel-Ip-Latitude: 12.9753
+X-Vercel-Ip-Longitude: 77.591
+X-Vercel-Ip-Postal-Code: 560068
+X-Vercel-Ip-Timezone: Asia/Kolkata
+X-Xss-Protection: 0

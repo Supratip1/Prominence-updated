@@ -1,0 +1,16 @@
+Content-Length: 16464
+Content-Encoding: gzip
+Content-Security-Policy: frame-ancestors 'none';
+Content-Type: text/html; charset=utf-8
+Date: Sun, 15 Jun 2025 10:13:09 GMT
+Etag: W/"beb9-P9boOddW1E23rJG4Zd56kvCyyHg"
+Server: DMS/1.0.42
+Server-Timing: total;dur=16, dc;desc="ix7"
+Set-Cookie: ff=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT
+Set-Cookie: ff=; Domain=.dailymotion.com; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT
+Set-Cookie: ff=on; Domain=.dailymotion.com; Path=/; Secure; SameSite=None
+Strict-Transport-Security: max-age=31708800; includeSubDomains; preload
+Timing-Allow-Origin: *
+Vary: Accept-Encoding
+X-Frame-Options: DENY
+X-Powered-By: Express

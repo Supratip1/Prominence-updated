@@ -1,0 +1,6 @@
+Referer: https://www.amazon.com
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en
+User-Agent: domain_scraper (+http://www.yourdomain.com/contact)
+Accept-Encoding: gzip, deflate
+Cookie: session-id=131-3063014-9976942; session-id-time=2082787201l; i18n-prefs=USD; lc-main=en_US; sp-cdn="L5Z9:IN"; skin=noskin

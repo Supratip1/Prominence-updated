@@ -11,6 +11,9 @@ import uuid
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from .models import ScrapeRequest, JobStatus, PageContent, ContentBlock
+import logging
+
+logger = logging.getLogger("scraper")
 
 class ScrapyRunner:
     """Handles running Scrapy spiders asynchronously"""
@@ -21,19 +24,48 @@ class ScrapyRunner:
         self.job_progress: Dict[str, int] = {}
     
     async def start_scraping(self, job_id: str, request: ScrapeRequest) -> bool:
-        """Start scraping process asynchronously"""
+        """Start scraping process synchronously for error capture"""
+        # create a temp JSON file for output
+        out_file = tempfile.NamedTemporaryFile(delete=False, suffix=".json")
+        out_file.close()
+        cmd = [
+            "scrapy",
+            "crawl",
+            "domain_spider",
+            f"-a", f"domain={request.domain}",
+            f"-a", f"max_pages={request.max_pages}",
+            f"-a", f"output_file={out_file.name}",
+            "-s", "LOG_LEVEL=WARNING",
+            # "-s", "LOG_LEVEL=DEBUG",
+        ]
         try:
-            # Create async task for scraping
-            task = asyncio.create_task(self._run_scraping_task(job_id, request))
-            self.running_jobs[job_id] = task
-            self.job_progress[job_id] = 0
-            
-            print(f"✅ Started scrape job {job_id} for domain {request.domain}")
+            # run and capture both stdout and stderr
+            result = subprocess.run(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True,
+            )
+            logger.info(f"[{job_id}] Scrapy finished successfully\n{result.stdout}")
+            # Load results if needed (simulate async)
+            await self._load_scraping_results(job_id, out_file.name)
             return True
-            
-        except Exception as e:
-            print(f"❌ Failed to start scraping job {job_id}: {e}")
+        except subprocess.CalledProcessError as e:
+            # Scrapy exited non-zero: grab stderr (or stdout if stderr is empty)
+            error_output = e.stderr.strip() or e.stdout.strip()
+            logger.error(f"[{job_id}] Scrapy failed (code {e.returncode}):\n{error_output}")
+            self.job_results[job_id] = {
+                'status': 'failed',
+                'error': error_output,
+                'completed_at': datetime.now().isoformat()
+            }
             return False
+        finally:
+            try:
+                os.unlink(out_file.name)
+            except OSError:
+                pass
     
     async def _run_scraping_task(self, job_id: str, request: ScrapeRequest):
         """Run the actual scraping task"""
