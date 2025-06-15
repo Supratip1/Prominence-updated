@@ -2,19 +2,10 @@
 Domain Content Scraper - FastAPI Application with Supabase PostgreSQL
 Main entry point for the backend API with full Scrapy integration and database persistence
 """
-<<<<<<< HEAD
-from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from typing import Dict, Any
-import uuid
-from datetime import datetime
-import logging, traceback
-=======
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
 from typing import Dict, Any
 import uuid
 from datetime import datetime, timedelta
->>>>>>> 2863a68be8b9fbfe5a8caa1424844cc80f959bf4
 
 from .models import ScrapeRequest, ScrapeJob, ScrapeResults, JobStatus, PageContent
 from .scraper import get_scraper
@@ -25,19 +16,6 @@ app = FastAPI(
     description="A backend service that extracts text content from domains with full SEO analysis and PostgreSQL persistence",
     version="2.0.0"
 )
-<<<<<<< HEAD
-# enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],            # or ["http://localhost:5174"]
-    allow_credentials=True,
-    allow_methods=["*"],            # GET POST OPTIONS DELETE etc
-    allow_headers=["*"],            # Content-Type Authorization etc
-)
-# In-memory storage for MVP (will be replaced with SQLite in Phase 4)
-scrape_jobs: Dict[str, ScrapeJob] = {}
-scrape_results: Dict[str, ScrapeResults] = {}
-=======
 
 # Database dependency
 async def get_db() -> SupabaseManager:
@@ -52,10 +30,6 @@ async def startup_event():
         print("🚀 Application started with Supabase PostgreSQL")
     except Exception as e:
         print(f"❌ Failed to initialize database: {e}")
->>>>>>> 2863a68be8b9fbfe5a8caa1424844cc80f959bf4
-
-logger = logging.getLogger("scraper")
-logging.basicConfig(level=logging.INFO)
 
 @app.get("/")
 async def root():
@@ -85,37 +59,13 @@ async def health_check(db: SupabaseManager = Depends(get_db)):
         "scrapy_integration": "active"
     }
 
-async def _run_scrape(job_id: str, request: ScrapeRequest):
-    job = scrape_jobs[job_id]
-    job.status = JobStatus.RUNNING
-    try:
-        logger.info(f"[{job_id}] starting scrape of {request.domain}")
-        scraper = get_scraper()
-        success = await scraper.start_scraping(job_id, request)
-        if not success:
-            msg = "Scraper returned False (no exception)"
-            logger.error(f"[{job_id}] {msg}")
-            job.error_message = msg
-            job.status = JobStatus.FAILED
-        else:
-            job.status = JobStatus.COMPLETED
-    except Exception as e:
-        tb = traceback.format_exc()
-        logger.error(f"[{job_id}] exception during scrape:\n{tb}")
-        job.error_message = tb  # now your `/status` will return the real traceback
-        job.status = JobStatus.FAILED
-    finally:
-        job.completed_at = datetime.now()
-    # Optionally: store results in scrape_results[job_id]
-
 @app.post("/scrape")
-<<<<<<< HEAD
-async def trigger_scrape(request: ScrapeRequest, bg: BackgroundTasks):
-=======
 async def trigger_scrape(request: ScrapeRequest, db: SupabaseManager = Depends(get_db)):
     """Trigger scraping for a domain with database persistence"""
->>>>>>> 2863a68be8b9fbfe5a8caa1424844cc80f959bf4
     job_id = str(uuid.uuid4())
+    scraper = get_scraper()
+    
+    # Create job
     job = ScrapeJob(
         job_id=job_id,
         domain=request.domain,
@@ -127,15 +77,6 @@ async def trigger_scrape(request: ScrapeRequest, db: SupabaseManager = Depends(g
             "percentage": 0
         }
     )
-<<<<<<< HEAD
-    scrape_jobs[job_id] = job
-    # Schedule the crawl to run in the background
-    bg.add_task(_run_scrape, job_id, request)
-    return {
-        "job_id": job_id,
-        "status": "pending"
-    }
-=======
     
     # Save job to database
     try:
@@ -158,7 +99,6 @@ async def trigger_scrape(request: ScrapeRequest, db: SupabaseManager = Depends(g
     else:
         await db.update_job_status(job_id, JobStatus.FAILED, error_message="Failed to start scraping")
         raise HTTPException(status_code=500, detail="Failed to start scraping")
->>>>>>> 2863a68be8b9fbfe5a8caa1424844cc80f959bf4
 
 @app.get("/status/{job_id}")
 async def get_scrape_status(job_id: str, db: SupabaseManager = Depends(get_db)):
