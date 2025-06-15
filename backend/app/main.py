@@ -1,22 +1,31 @@
 """
-Domain Content Scraper - FastAPI Application
-Main entry point for the backend API with full Scrapy integration
+Domain Content Scraper - FastAPI Application with Supabase PostgreSQL
+Main entry point for the backend API with full Scrapy integration and database persistence
 """
+<<<<<<< HEAD
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
 import uuid
 from datetime import datetime
 import logging, traceback
+=======
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from typing import Dict, Any
+import uuid
+from datetime import datetime, timedelta
+>>>>>>> 2863a68be8b9fbfe5a8caa1424844cc80f959bf4
 
 from .models import ScrapeRequest, ScrapeJob, ScrapeResults, JobStatus, PageContent
 from .scraper import get_scraper
+from .supabase_db import get_database, SupabaseManager
 
 app = FastAPI(
-    title="Domain Content Scraper",
-    description="A backend service that extracts text content from domains with full Scrapy integration",
-    version="1.0.0"
+    title="Domain Content Scraper with Supabase",
+    description="A backend service that extracts text content from domains with full SEO analysis and PostgreSQL persistence",
+    version="2.0.0"
 )
+<<<<<<< HEAD
 # enable CORS
 app.add_middleware(
     CORSMiddleware,
@@ -28,6 +37,22 @@ app.add_middleware(
 # In-memory storage for MVP (will be replaced with SQLite in Phase 4)
 scrape_jobs: Dict[str, ScrapeJob] = {}
 scrape_results: Dict[str, ScrapeResults] = {}
+=======
+
+# Database dependency
+async def get_db() -> SupabaseManager:
+    return get_database()
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup"""
+    try:
+        db = get_database()
+        await db.init_database()
+        print("🚀 Application started with Supabase PostgreSQL")
+    except Exception as e:
+        print(f"❌ Failed to initialize database: {e}")
+>>>>>>> 2863a68be8b9fbfe5a8caa1424844cc80f959bf4
 
 logger = logging.getLogger("scraper")
 logging.basicConfig(level=logging.INFO)
@@ -35,15 +60,28 @@ logging.basicConfig(level=logging.INFO)
 @app.get("/")
 async def root():
     """Health check endpoint"""
-    return {"message": "Domain Content Scraper API is running with full Scrapy integration!"}
+    return {
+        "message": "Domain Content Scraper API with Supabase PostgreSQL",
+        "version": "2.0.0",
+        "database": "Supabase PostgreSQL",
+        "features": ["SEO Analysis", "Content Extraction", "Database Persistence"]
+    }
 
 @app.get("/health")
-async def health_check():
-    """Health check endpoint"""
+async def health_check(db: SupabaseManager = Depends(get_db)):
+    """Comprehensive health check"""
+    try:
+        # Test database connection
+        await db.list_jobs(limit=1)
+        db_status = "healthy"
+    except Exception as e:
+        db_status = f"unhealthy: {str(e)}"
+    
     return {
-        "status": "healthy",
+        "status": "healthy" if db_status == "healthy" else "degraded",
         "timestamp": datetime.now().isoformat(),
-        "version": "1.0.0",
+        "version": "2.0.0",
+        "database": db_status,
         "scrapy_integration": "active"
     }
 
@@ -71,7 +109,12 @@ async def _run_scrape(job_id: str, request: ScrapeRequest):
     # Optionally: store results in scrape_results[job_id]
 
 @app.post("/scrape")
+<<<<<<< HEAD
 async def trigger_scrape(request: ScrapeRequest, bg: BackgroundTasks):
+=======
+async def trigger_scrape(request: ScrapeRequest, db: SupabaseManager = Depends(get_db)):
+    """Trigger scraping for a domain with database persistence"""
+>>>>>>> 2863a68be8b9fbfe5a8caa1424844cc80f959bf4
     job_id = str(uuid.uuid4())
     job = ScrapeJob(
         job_id=job_id,
@@ -84,6 +127,7 @@ async def trigger_scrape(request: ScrapeRequest, bg: BackgroundTasks):
             "percentage": 0
         }
     )
+<<<<<<< HEAD
     scrape_jobs[job_id] = job
     # Schedule the crawl to run in the background
     bg.add_task(_run_scrape, job_id, request)
@@ -91,70 +135,109 @@ async def trigger_scrape(request: ScrapeRequest, bg: BackgroundTasks):
         "job_id": job_id,
         "status": "pending"
     }
+=======
+    
+    # Save job to database
+    try:
+        await db.create_job(job)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create job in database: {str(e)}")
+    
+    # Start actual scraping with Scrapy
+    success = await scraper.start_scraping(job_id, request)
+    
+    if success:
+        await db.update_job_status(job_id, JobStatus.RUNNING)
+        return {
+            "job_id": job_id,
+            "message": f"Scraping started for {request.domain}",
+            "status": "running",
+            "max_pages": request.max_pages,
+            "database": "supabase"
+        }
+    else:
+        await db.update_job_status(job_id, JobStatus.FAILED, error_message="Failed to start scraping")
+        raise HTTPException(status_code=500, detail="Failed to start scraping")
+>>>>>>> 2863a68be8b9fbfe5a8caa1424844cc80f959bf4
 
 @app.get("/status/{job_id}")
-async def get_scrape_status(job_id: str):
-    """Get scraping status with real-time updates"""
-    if job_id not in scrape_jobs:
+async def get_scrape_status(job_id: str, db: SupabaseManager = Depends(get_db)):
+    """Get scraping status with real-time updates from database"""
+    # Get job from database
+    job = await db.get_job(job_id)
+    if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
-    job = scrape_jobs[job_id]
     scraper = get_scraper()
     
     # Update job status from scraper
     current_status = scraper.get_job_status(job_id)
     progress = scraper.get_job_progress(job_id)
     
-    # Update job object
+    # Update database if status changed
     if current_status != job.status:
+        await db.update_job_status(job_id, current_status)
         job.status = current_status
-        if current_status in [JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED]:
-            job.completed_at = datetime.now()
     
-    # Update progress
-    job.progress["percentage"] = progress
+    # Update progress in database
+    if progress != job.progress.get("percentage", 0):
+        updated_progress = job.progress.copy()
+        updated_progress["percentage"] = progress
+        await db.update_job_status(job_id, current_status, progress=updated_progress)
     
     return {
         "job_id": job_id,
         "domain": job.domain,
-        "status": job.status.value,
+        "status": current_status.value,
         "created_at": job.created_at.isoformat(),
         "completed_at": job.completed_at.isoformat() if job.completed_at else None,
-        "progress": job.progress,
+        "progress": {
+            **job.progress,
+            "percentage": progress
+        },
         "error_message": job.error_message
     }
 
 @app.get("/results/{job_id}")
-async def get_scrape_results(job_id: str):
-    """Get scraping results from completed jobs"""
-    if job_id not in scrape_jobs:
+async def get_scrape_results(job_id: str, db: SupabaseManager = Depends(get_db)):
+    """Get scraping results from database"""
+    # Get job from database
+    job = await db.get_job(job_id)
+    if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
-    job = scrape_jobs[job_id]
     scraper = get_scraper()
+    current_status = scraper.get_job_status(job_id)
     
     # Check if job is completed
-    current_status = scraper.get_job_status(job_id)
     if current_status != JobStatus.COMPLETED:
         raise HTTPException(
             status_code=400, 
             detail=f"Job not completed yet. Current status: {current_status.value}"
         )
     
-    # Update job object with current status (fix for race condition)
-    if current_status != job.status:
-        job.status = current_status
-        if current_status in [JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED]:
-            job.completed_at = datetime.now()
+    # Get results from database first
+    pages = await db.get_results(job_id)
     
-    # Get results from scraper
-    results = scraper.get_job_results(job_id)
-    if not results:
+    # If no results in database but job is completed, save results from scraper
+    if not pages:
+        print(f"🔄 No results in database for job {job_id}, attempting to save from scraper...")
+        scraper_results = scraper.get_job_results(job_id)
+        if scraper_results and 'pages' in scraper_results:
+            print(f"📊 Found {len(scraper_results['pages'])} pages in scraper, saving to database...")
+            await db.save_content(job_id, scraper_results['pages'])
+            await db.update_job_status(job_id, JobStatus.COMPLETED)
+            # Get results again after saving
+            pages = await db.get_results(job_id)
+        else:
+            print(f"❌ No results found in scraper for job {job_id}")
+    
+    if not pages:
         raise HTTPException(status_code=404, detail="Results not found")
     
     # Convert PageContent objects to dict for JSON response
     pages_data = []
-    for page in results.get('pages', []):
+    for page in pages:
         if hasattr(page, 'dict'):  # Pydantic model
             pages_data.append(page.dict())
         else:  # Already a dict
@@ -164,25 +247,47 @@ async def get_scrape_results(job_id: str):
         "job": {
             "job_id": job.job_id,
             "domain": job.domain,
-            "status": current_status.value,  # Use current_status instead of job.status
+            "status": current_status.value,
             "created_at": job.created_at.isoformat(),
             "completed_at": job.completed_at.isoformat() if job.completed_at else None
         },
         "pages": pages_data,
-        "summary": results.get('summary', {})
+        "summary": {
+            "total_pages": len(pages),
+            "total_blocks": sum(len(page.blocks) for page in pages),
+            "source": "supabase_database"
+        }
+    }
+
+@app.get("/seo-analysis/{job_id}")
+async def get_seo_analysis(job_id: str, db: SupabaseManager = Depends(get_db)):
+    """Get comprehensive SEO analysis for a completed job"""
+    # Check if job exists
+    job = await db.get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Get SEO analysis
+    seo_analysis = await db.get_seo_analysis(job_id)
+    if not seo_analysis:
+        raise HTTPException(status_code=404, detail="SEO analysis not found. Job may not be completed.")
+    
+    return {
+        "job_id": job_id,
+        "seo_analysis": seo_analysis
     }
 
 @app.delete("/jobs/{job_id}")
-async def cancel_job(job_id: str):
+async def cancel_job(job_id: str, db: SupabaseManager = Depends(get_db)):
     """Cancel a running job"""
-    if job_id not in scrape_jobs:
+    # Get job from database
+    job = await db.get_job(job_id)
+    if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
-    job = scrape_jobs[job_id]
     scraper = get_scraper()
-    
-    # Check current status
     current_status = scraper.get_job_status(job_id)
+    
     if current_status in [JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED]:
         raise HTTPException(status_code=400, detail="Job already finished")
     
@@ -190,39 +295,51 @@ async def cancel_job(job_id: str):
     success = await scraper.stop_scraping(job_id)
     
     if success:
-        job.status = JobStatus.CANCELLED
-        job.error_message = "Job cancelled by user"
-        job.completed_at = datetime.now()
+        await db.update_job_status(job_id, JobStatus.CANCELLED, error_message="Job cancelled by user")
         return {"message": f"Job {job_id} cancelled successfully"}
     else:
         raise HTTPException(status_code=500, detail="Failed to cancel job")
 
 @app.get("/jobs")
-async def list_jobs():
-    """List all jobs with real-time status updates"""
-    scraper = get_scraper()
-    jobs = []
-    
-    for job_id, job in scrape_jobs.items():
-        # Update status from scraper
-        current_status = scraper.get_job_status(job_id)
-        progress = scraper.get_job_progress(job_id)
-        
-        # Update job object with current status (consistency fix)
-        if current_status != job.status:
-            job.status = current_status
-            if current_status in [JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED]:
-                job.completed_at = datetime.now()
-        
-        jobs.append({
-            "job_id": job_id,
-            "domain": job.domain,
-            "status": current_status.value,
-            "created_at": job.created_at.isoformat(),
-            "progress": progress
-        })
-    
-    return {"jobs": jobs, "total": len(jobs)}
+async def list_jobs(limit: int = 50, offset: int = 0, db: SupabaseManager = Depends(get_db)):
+    """List all jobs from database with pagination"""
+    try:
+        jobs = await db.list_jobs(limit=limit, offset=offset)
+        return {
+            "jobs": jobs,
+            "total": len(jobs),
+            "limit": limit,
+            "offset": offset,
+            "source": "supabase_database"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list jobs: {str(e)}")
+
+@app.get("/analytics/domain/{domain}")
+async def get_domain_analytics(domain: str, db: SupabaseManager = Depends(get_db)):
+    """Get analytics for a specific domain"""
+    try:
+        # This would require additional database queries
+        # For now, return a placeholder
+        return {
+            "domain": domain,
+            "message": "Domain analytics endpoint - to be implemented",
+            "suggestion": "Use /seo-analysis/{job_id} for detailed SEO analysis"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get domain analytics: {str(e)}")
+
+@app.post("/admin/cleanup")
+async def cleanup_old_jobs(days: int = 30, db: SupabaseManager = Depends(get_db)):
+    """Admin endpoint to cleanup old jobs"""
+    try:
+        await db.cleanup_old_jobs(days=days)
+        return {
+            "message": f"Cleanup completed for jobs older than {days} days",
+            "status": "success"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cleanup failed: {str(e)}")
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -230,4 +347,5 @@ async def shutdown_event():
     scraper = get_scraper()
     # Cancel all running jobs
     for job_id in list(scraper.running_jobs.keys()):
-        await scraper.stop_scraping(job_id) 
+        await scraper.stop_scraping(job_id)
+    print("🛑 Application shutdown complete") 
