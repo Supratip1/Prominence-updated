@@ -1,9 +1,0 @@
-Content-Length: 248
-Location: https://policies.google.com/terms?hl=en-IN&fg=1
-Cache-Control: private
-Content-Type: text/html; charset=UTF-8
-Content-Security-Policy: object-src 'none';base-uri 'self';script-src 'nonce-Np9sjXEwUFQafDE-_vJq8Q' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other
-Date: Tue, 17 Jun 2025 10:50:57 GMT
-Server: gws
-X-Xss-Protection: 0
-Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

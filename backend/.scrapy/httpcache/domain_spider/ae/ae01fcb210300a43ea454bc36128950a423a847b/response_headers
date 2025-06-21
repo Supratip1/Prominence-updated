@@ -1,8 +1,0 @@
-Content-Length: 0
-Server: AkamaiGHost
-Location: https://www.myntra.com/robots.txt
-Date: Tue, 17 Jun 2025 18:09:22 GMT
-Server-Timing: cdn-cache; desc=HIT
-Server-Timing: edge; dur=1
-Server-Timing: ak_p; desc="1750183762618_399834845_44314888_45_734_20_34_-";dur=1
-Strict-Transport-Security: max-age=15768000 ; includeSubDomains
