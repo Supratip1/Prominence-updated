@@ -1,0 +1,16 @@
+Content-Length: 0
+Content-Type: application/binary
+Vary: Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site
+Location: https://accounts.google.com/ServiceLogin?passive=1209600&continue=https://www.google.com/setting/search/privateresults/?hl%3Den-IN&followup=https://www.google.com/setting/search/privateresults/?hl%3Den-IN&hl=en-IN
+Content-Security-Policy: require-trusted-types-for 'script';report-uri /setting/search/privateresults/_/FootprintsConsentUi/cspreport
+Content-Security-Policy: script-src 'report-sample' 'nonce-R_hbjkwf3Bb8bsa4TpYC1g' 'unsafe-inline';object-src 'none';base-uri 'self';report-uri /setting/search/privateresults/_/FootprintsConsentUi/cspreport;worker-src 'self'
+Cross-Origin-Opener-Policy: same-origin
+Permissions-Policy: ch-ua-arch=*, ch-ua-bitness=*, ch-ua-full-version=*, ch-ua-full-version-list=*, ch-ua-model=*, ch-ua-wow64=*, ch-ua-form-factors=*, ch-ua-platform=*, ch-ua-platform-version=*
+Accept-Ch: Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Model, Sec-CH-UA-WoW64, Sec-CH-UA-Form-Factors, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
+Cross-Origin-Resource-Policy: same-site
+Date: Tue, 17 Jun 2025 10:51:13 GMT
+Server: ESF
+X-Xss-Protection: 0
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

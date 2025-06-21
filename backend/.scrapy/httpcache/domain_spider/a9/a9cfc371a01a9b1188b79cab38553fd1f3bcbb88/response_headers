@@ -1,0 +1,17 @@
+Content-Type: text/html; charset=utf-8
+Date: Tue, 17 Jun 2025 18:13:22 GMT
+Content-Encoding: gzip
+Access-Control-Allow-Origin: *
+Cache-Control: public, max-age=0, must-revalidate
+Referrer-Policy: strict-origin-when-cross-origin
+X-Content-Type-Options: nosniff
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=%2FYifWGxbrHmHxFpNdWbkp4n5Wde3r0m7viMs9KHOupE1D5FwROlVfs%2BCJV3kOUm7hKK9IsNgtp5rBa2zCjCl4Nm3EYJAN9qxaaBl5y7y2HX6HtQeKkwBxqjhHMfpgb0pMB6i1UjzywrtKUJX"}],"group":"cf-nel","max_age":604800}
+Nel: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Server: cloudflare
+Cf-Ray: 951485420e2e4019-BOM
+Server-Timing: cfL4;desc="?proto=TCP&rtt=580&min_rtt=574&rtt_var=166&sent=7&recv=8&lost=0&retrans=0&sent_bytes=3327&recv_bytes=701&delivery_rate=7567944&cwnd=253&unsent_bytes=0&cid=23827b217a82b131&ts=47&x=0"
+Vary: Accept-Encoding
+X-Cache: Miss from cloudfront
+Via: 1.1 b76856b4c353f872f6e40939a077ee2e.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: BLR50-P1
+X-Amz-Cf-Id: -kBiSsMi3bGM5n_vSMqKbOJHlIyish2gfvAjmR6RroPdvFREMC53YA==

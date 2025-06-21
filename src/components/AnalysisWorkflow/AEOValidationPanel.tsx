@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle, MessageSquare, User, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { FrontendAsset } from '../../pages/Analysis';
 
 interface Asset {
   id: string;
@@ -23,13 +24,18 @@ interface ValidationResult {
 }
 
 interface AEOValidationPanelProps {
-  scores: AEOScore[];
-  assets: Asset[];
-  validated: Record<string, ValidationResult>;
-  onValidate: (assetId: string, passed: boolean, notes?: string) => void;
+  scores?: AEOScore[];
+  assets?: FrontendAsset[];
+  validated?: Record<string, ValidationResult>;
+  onValidate?: (assetId: string, passed: boolean, notes?: string) => void;
 }
 
-export default function AEOValidationPanel({ scores, assets, validated, onValidate }: AEOValidationPanelProps) {
+export default function AEOValidationPanel({
+  scores = [],
+  assets = [],
+  validated = {},
+  onValidate = () => {}
+}: AEOValidationPanelProps) {
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
 
@@ -48,6 +54,10 @@ export default function AEOValidationPanel({ scores, assets, validated, onValida
     if (score >= 60) return 'text-yellow-400';
     return 'text-red-400';
   };
+
+  if (assets.length === 0) {
+    return <p className="text-gray-400">No assets to validate.</p>;
+  }
 
   return (
     <motion.div 

@@ -1,8 +1,14 @@
+import sys, asyncio
+
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
 """
 Domain Content Scraper - FastAPI Application with Supabase PostgreSQL
 Main entry point for the backend API with full Scrapy integration and database persistence
 """
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
 import uuid
 from datetime import datetime, timedelta
@@ -15,6 +21,15 @@ app = FastAPI(
     title="Domain Content Scraper with Supabase",
     description="A backend service that extracts text content from domains with full SEO analysis and PostgreSQL persistence",
     version="2.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],            # or e.g. ["http://localhost:3000"]
+    allow_credentials=True,
+    allow_methods=["*"],            # GET, POST, OPTIONS, etc.
+    allow_headers=["*"],            # Authorization, Content-Type, etc.
 )
 
 # Database dependency
@@ -173,7 +188,7 @@ async def get_scrape_results(job_id: str, db: SupabaseManager = Depends(get_db))
             print(f"❌ No results found in scraper for job {job_id}")
     
     if not pages:
-        raise HTTPException(status_code=404, detail="Results not found")
+        raise HTTPException(status_code=404, detail="website is not scrapable")
     
     # Convert PageContent objects to dict for JSON response
     pages_data = []

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart3, TrendingUp, Brain, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { FrontendAsset } from '../../pages/Analysis';
 
 interface Asset {
   id: string;
@@ -23,13 +24,23 @@ interface AEOScore {
 
 interface AEOScorecardProps {
   engine: 'perplexity' | 'chatgpt' | 'claude';
-  assets: Asset[];
-  scores: AEOScore[];
-  isScoring: boolean;
-  onScoreComplete: (engine: 'perplexity' | 'chatgpt' | 'claude') => void;
+  assets?: FrontendAsset[];
+  scores?: AEOScore[];
+  isScoring?: boolean;
+  onScoreComplete?: (engine: 'perplexity' | 'chatgpt' | 'claude') => void;
 }
 
-export default function AEOScorecard({ engine, assets, scores, isScoring, onScoreComplete }: AEOScorecardProps) {
+export default function AEOScorecard({
+  engine,
+  assets = [],
+  scores = [],
+  isScoring = false,
+  onScoreComplete = () => {}
+}: AEOScorecardProps) {
+  if (assets.length === 0) {
+    return <p className="text-gray-400">No assets to score.</p>;
+  }
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-400 bg-green-400/10 border-green-400/20';
     if (score >= 60) return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';

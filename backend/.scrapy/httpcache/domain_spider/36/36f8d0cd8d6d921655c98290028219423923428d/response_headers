@@ -1,0 +1,16 @@
+Date: Tue, 17 Jun 2025 18:15:41 GMT
+Content-Type: text/html
+Content-Encoding: gzip
+Cf-Cache-Status: DYNAMIC
+Cache-Control: public, max-age=0, must-revalidate
+Last-Modified: Wed, 04 Jun 2025 16:58:52 GMT
+Link: <https://framerusercontent.com>; rel="preconnect", <https://framerusercontent.com>; rel="preconnect"; crossorigin=""
+Strict-Transport-Security: max-age=31536000
+Vary: Accept-Encoding
+Server-Timing: region;desc="ap-south-1", cache;desc="not-cached", ssg-status;desc="optimized", version;desc="b27bc02"
+Server-Timing: cfL4;desc="?proto=TCP&rtt=5818&min_rtt=3206&rtt_var=1862&sent=90&recv=25&lost=0&retrans=0&sent_bytes=91231&recv_bytes=2882&delivery_rate=6063157&cwnd=255&unsent_bytes=0&cid=10533e2b2a395e3a&ts=6462&x=0"
+X-Content-Type-Options: nosniff
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=aqFil7vlrvKv08pCbuIBLMpKLEKSI9acoggpPvNJbXV7vn8ug2hjUqeF6v0AENy%2ByS09NPmxz2mUxQpbVKpkO6sDTzPtg%2B15LvNFJGoZAulIhXJ53TDtMhhy%2Fw%3D%3D"}],"group":"cf-nel","max_age":604800}
+Nel: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Server: cloudflare
+Cf-Ray: 951488a31ed4c18d-BLR

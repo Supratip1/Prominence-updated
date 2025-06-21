@@ -1,0 +1,17 @@
+Content-Type: text/html; charset=utf-8
+Date: Tue, 17 Jun 2025 18:13:25 GMT
+Content-Encoding: gzip
+Access-Control-Allow-Origin: *
+Cache-Control: public, max-age=0, must-revalidate
+Referrer-Policy: strict-origin-when-cross-origin
+X-Content-Type-Options: nosniff
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=75MvDrtICMIhxEBT%2BUqYoLJ%2F%2FOHalyRCTFRPg2qPRhkxPDuI%2BmACrPmWkKwOmFyBHabUiRuDOofk%2BicNLU3o587wLlt%2Fo%2BrMSWIFx1yZVP1%2FlunNsfNswLW679RgTEhQDHoVJX14BXiY4Zh2"}],"group":"cf-nel","max_age":604800}
+Nel: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+Server: cloudflare
+Cf-Ray: 951485549f036eb9-BOM
+Server-Timing: cfL4;desc="?proto=TCP&rtt=900&min_rtt=858&rtt_var=352&sent=3&recv=7&lost=0&retrans=0&sent_bytes=358&recv_bytes=858&delivery_rate=1687645&cwnd=250&unsent_bytes=0&cid=a29cf2afd311f354&ts=40&x=0"
+Vary: Accept-Encoding
+X-Cache: Miss from cloudfront
+Via: 1.1 b76856b4c353f872f6e40939a077ee2e.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: BLR50-P1
+X-Amz-Cf-Id: W-TeSqZ7UsaP872WVHH_kIAGOfcg7wM_t7pHTkG48_5aGgmn-PBW7A==

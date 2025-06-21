@@ -70,6 +70,7 @@ function normalizeDomain(raw: string): string {
 }
 
 const Analysis: React.FC = () => {
+  console.log('Analysis page loaded')
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const rawParam = searchParams.get('domain') || '';
@@ -341,10 +342,11 @@ const Analysis: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+    <div className="min-h-screen bg-white">
+      
       {/* Premium Header */}
       <motion.div 
-        className="relative py-20 overflow-hidden"
+        className="relative py-20 overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -407,9 +409,9 @@ const Analysis: React.FC = () => {
       </motion.div>
 
       {/* Analysis Interface */}
-      <div className="container mx-auto px-4 pb-20">
+      <div className="container mx-auto px-4 pb-20 mt-16">
         <motion.div
-          className="space-y-8"
+          className="space-y-12"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -437,7 +439,7 @@ const Analysis: React.FC = () => {
               {/* Filter Bar */}
               <motion.div variants={itemVariants}>
                 <AssetFilterBar 
-                  filters={['all', 'video', 'screenshot', 'webpage', 'heading', 'meta', 'schema', 'image', 'link']}
+                  filters={['all', 'webpage', 'image', 'heading', 'meta', 'schema', 'link', 'video']}
                   sources={Array.from(new Set(assets.map(a => a.sourceDomain)))}
                   onFilterChange={setFilterOptions}
                 />
@@ -453,7 +455,7 @@ const Analysis: React.FC = () => {
 
               {/* Action Buttons */}
               <motion.div 
-                className="flex flex-col sm:flex-row gap-4 justify-center"
+                className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
                 variants={itemVariants}
               >
                 <ExportCSVButton assets={filteredAssets} />

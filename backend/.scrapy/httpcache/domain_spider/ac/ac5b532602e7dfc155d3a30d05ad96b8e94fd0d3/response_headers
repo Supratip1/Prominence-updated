@@ -1,0 +1,15 @@
+Content-Length: 0
+Date: Fri, 20 Jun 2025 19:39:50 GMT
+Retry-After: 0
+Location: https://vimeo.com/
+Accept-Ranges: bytes
+Via: 1.1 varnish
+X-Served-By: cache-maa10234-MAA
+X-Cache: HIT
+X-Cache-Hits: 0
+X-Timer: S1750448390.314120,VS0,VE0
+Cf-Cache-Status: DYNAMIC
+Set-Cookie: __cf_bm=JuIWjoL5CQFvyycRTM6SLRouon3zSpncgZALI_bHQXU-1750448390-1.0.1.1-CjqXG0wQTNA4TYAf9qSLtR5iEfduH3y582QOEqW82O8UwIH_yff0HILHw9vkyu8U; path=/; expires=Fri, 20-Jun-25 20:09:50 GMT; domain=.vimeo.com; HttpOnly
+Set-Cookie: _cfuvid=KlXG2GHZeIXLoDmEyntSgEo9FuHykkFpASVSj4UCU10-1750448390298-0.0.1.1-604800000; path=/; domain=.vimeo.com; HttpOnly
+Server: cloudflare
+Cf-Ray: 952dbc074ca54fd4-MAA

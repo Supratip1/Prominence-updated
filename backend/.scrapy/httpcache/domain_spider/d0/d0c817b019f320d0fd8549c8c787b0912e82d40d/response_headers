@@ -1,0 +1,12 @@
+Content-Length: 231
+Location: https://www.youtube.com/robots.txt
+Cross-Origin-Resource-Policy: cross-origin
+X-Content-Type-Options: nosniff
+Server: sffe
+X-Xss-Protection: 0
+Date: Tue, 17 Jun 2025 17:54:51 GMT
+Expires: Tue, 17 Jun 2025 18:24:51 GMT
+Cache-Control: public, max-age=1800
+Content-Type: text/html; charset=UTF-8
+Age: 0
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

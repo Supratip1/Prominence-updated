@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Target,
   User,
@@ -17,19 +17,18 @@ import Button from '../UI/Button';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 0;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 10);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [scrolled]);
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -69,16 +68,26 @@ export default function Header() {
     { label: 'Pricing', icon: <DollarSign className="h-5 w-5 inline-block mr-1" />, href: '#pricing', onClick: () => goToSection('pricing') },
   ];
 
+  // Dynamic text color classes
+  const textColorClass = 'text-white';
+  const textHoverClass = 'hover:text-white';
+  const textOpacityClass = 'text-white/80';
+
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? 'bg-black/20 backdrop-blur-sm' : 'bg-transparent'}`}>
+      <header 
+        ref={headerRef}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          isScrolled ? 'bg-black' : 'bg-transparent'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Replace logo image with bold "Prominance.ai" */}
             <div className="flex items-center">
               <button
                 onClick={() => goToSection('hero')}
-                className="text-white font-bold text-xl md:text-2xl hover:opacity-90 transition-opacity"
+                className={`font-bold text-xl md:text-2xl hover:opacity-90 transition-opacity ${textColorClass}`}
               >
                 Prominance.ai
               </button>
@@ -91,7 +100,7 @@ export default function Header() {
                   <button
                     key={link.label}
                     onClick={link.onClick}
-                    className="text-white/80 hover:text-white transition-colors duration-200 cursor-pointer"
+                    className={`${textOpacityClass} ${textHoverClass} transition-colors duration-200 cursor-pointer`}
                   >
                     {link.icon}
                     {link.label}
@@ -100,7 +109,7 @@ export default function Header() {
                   <a
                     key={link.label}
                     href={link.href}
-                    className="text-white/80 hover:text-white transition-colors duration-200 cursor-pointer"
+                    className={`${textOpacityClass} ${textHoverClass} transition-colors duration-200 cursor-pointer`}
                   >
                     {link.icon}
                     {link.label}
@@ -113,7 +122,7 @@ export default function Header() {
             <div className="md:hidden">
               <button
                 onClick={() => setOpen(!open)}
-                className="text-white hover:text-white/80 transition-colors duration-200"
+                className={`${textColorClass} hover:opacity-80 transition-colors duration-200`}
               >
                 {open ? (
                   <X className="h-6 w-6" />

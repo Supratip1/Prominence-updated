@@ -1,0 +1,9 @@
+Content-Type: text/html; charset=ISO-8859-1
+Content-Security-Policy: object-src 'none';base-uri 'self';script-src 'nonce-r_grJm3j-H77Wd5DkjJerw' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/xsrp
+Accept-Ch: Sec-CH-Prefers-Color-Scheme
+Content-Encoding: gzip
+Date: Tue, 17 Jun 2025 10:51:03 GMT
+Server: gws
+X-Xss-Protection: 0
+X-Frame-Options: SAMEORIGIN
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

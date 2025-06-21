@@ -53,21 +53,25 @@ class ScrapyRunner:
             
             print(f"🕷️ Running: {' '.join(cmd)}")
             
-            # Run scrapy process
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                cwd=os.getcwd()
-            )
-            
+            # Run scrapy synchronously in a thread (works on Windows)
+            def _sync_run():
+                return subprocess.run(
+                    cmd,
+                    cwd=os.getcwd(),
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=False,
+                )
+
+            # offload to a thread so we don't block asyncio
+            result = await asyncio.to_thread(_sync_run)
+            stdout, stderr = result.stdout, result.stderr
+            returncode = result.returncode
+
             # Update progress
             self.job_progress[job_id] = 25
             
-            # Wait for completion
-            stdout, stderr = await process.communicate()
-            
-            if process.returncode == 0:
+            if returncode == 0:
                 # Success! Load results
                 self.job_progress[job_id] = 75
                 await self._load_scraping_results(job_id, output_file)

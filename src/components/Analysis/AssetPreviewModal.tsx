@@ -1,7 +1,27 @@
-import React from 'react';
-import { X, ExternalLink, Download, FileText, Video, Camera } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { X, ExternalLink, Download, FileText, Video, Camera, File, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FrontendAsset as BaseFrontendAsset } from '../../pages/Analysis';
+
+// helpers for YouTube
+function isYouTubeURL(url: string) {
+  return /youtu(?:\.be|be\.com)\/(watch\?v=)?/.test(url)
+}
+
+function getYouTubeID(url: string) {
+  const m = url.match(/(?:youtu\.be\/|v=)([A-Za-z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
+// helpers for Vimeo
+function isVimeoURL(url: string) {
+  return /vimeo\.com\/\d+/.test(url)
+}
+
+function getVimeoID(url: string) {
+  const m = url.match(/vimeo\.com\/(\d+)/)
+  return m ? m[1] : null
+}
 
 // Extend FrontendAsset locally to add optional description for preview
 interface FrontendAsset extends BaseFrontendAsset {
@@ -13,78 +33,55 @@ interface AssetPreviewModalProps {
   onClose: () => void;
 }
 
+// Video player component with HLS support
+function VideoPlayer({ url, onLoad }: { url: string, onLoad: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current && url.endsWith('.m3u8')) {
+      // If it's an HLS stream, we'll need to implement HLS.js here
+      console.log('HLS stream detected:', url);
+    }
+  }, [url]);
+
+  return (
+    <video
+      ref={videoRef}
+      controls
+      className="w-full h-full object-cover"
+      crossOrigin="anonymous"
+      onLoad={onLoad}
+    >
+      <source src={url} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  );
+}
+
 export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalProps) {
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Debug logging
+  console.log('⚙️  AssetPreviewModal got type=', asset.type, 'url=', asset.url);
+
   const getIcon = (type: FrontendAsset['type']) => {
+    const iconClass = "w-6 h-6";
     switch (type) {
-      case 'video':
-        return <Video className="w-5 h-5" />;
-      case 'screenshot':
-        return <Camera className="w-5 h-5" />;
-      case 'webpage':
-        return <FileText className="w-5 h-5" />;
-      case 'image':
-        return <img src={asset.url} alt={asset.title} className="w-5 h-5" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />;
-      case 'og':
-        return <img src={asset.url} alt={asset.title} className="w-5 h-5" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />;
-      case 'twitter':
-        return <img src={asset.url} alt={asset.title} className="w-5 h-5" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />;
-      case 'schema':
-        return <FileText className="w-5 h-5" />;
-      case 'robots':
-        return <FileText className="w-5 h-5" />;
-      case 'sitemap':
-        return <FileText className="w-5 h-5" />;
-      case 'meta':
-        return <FileText className="w-5 h-5" />;
-      case 'paragraph':
-        return <FileText className="w-5 h-5" />;
-      case 'title':
-        return <FileText className="w-5 h-5" />;
-      case 'canonical':
-        return <FileText className="w-5 h-5" />;
-      case 'heading':
-        return <FileText className="w-5 h-5" />;
-      case 'link':
-        return <FileText className="w-5 h-5" />;
-      default:
-        return <FileText className="w-5 h-5" />;
+      case 'video': return <Video className={iconClass} />;
+      case 'webpage': return <FileText className={iconClass} />;
+      case 'document': return <File className={iconClass} />;
+      case 'social': return <Globe className={iconClass} />;
+      default: return <FileText className={iconClass} />;
     }
   };
 
   const getTypeColor = (type: FrontendAsset['type']) => {
     switch (type) {
-      case 'video':
-        return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'screenshot':
-        return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'webpage':
-        return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'image':
-        return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
-      case 'og':
-        return 'text-pink-400 bg-pink-400/10 border-pink-400/20';
-      case 'twitter':
-        return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'schema':
-        return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'robots':
-        return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
-      case 'sitemap':
-        return 'text-orange-400 bg-orange-400/10 border-orange-400/20';
-      case 'meta':
-        return 'text-teal-400 bg-teal-400/10 border-teal-400/20';
-      case 'paragraph':
-        return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
-      case 'title':
-        return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'canonical':
-        return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'heading':
-        return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'link':
-        return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
-      default:
-        return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+      case 'video': return 'text-red-600 bg-red-100 border-red-200';
+      case 'webpage': return 'text-blue-600 bg-blue-100 border-blue-200';
+      case 'document': return 'text-purple-600 bg-purple-100 border-purple-200';
+      case 'social': return 'text-orange-600 bg-orange-100 border-orange-200';
+      default: return 'text-gray-600 bg-gray-100 border-gray-200';
     }
   };
 
@@ -98,7 +95,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
         onClick={onClose}
       >
         <motion.div 
-          className="bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-white/20 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+          className="bg-white rounded-2xl border border-gray-200 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -106,88 +103,123 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-4">
-              <div className={`p-3 rounded-xl ${getTypeColor(asset.type)}`}>
+              <div className={`p-3 rounded-xl border ${getTypeColor(asset.type)}`}>
                 {getIcon(asset.type)}
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-white">{asset.title}</h2>
-                <p className="text-gray-400 text-sm">{asset.sourceDomain}</p>
+                <h2 className="text-xl font-semibold text-gray-900">{asset.title}</h2>
+                <p className="text-gray-600 text-sm">{asset.sourceDomain}</p>
               </div>
             </div>
             <motion.button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-xl transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <X className="w-6 h-6 text-gray-400" />
+              <X className="w-6 h-6 text-gray-600" />
             </motion.button>
           </div>
 
           {/* Content */}
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
             {/* Preview */}
-            <div className="aspect-video bg-gray-800/50 rounded-xl mb-6 flex items-center justify-center overflow-hidden border border-white/10">
-              {['image','og','twitter'].includes(asset.type) && (
-                <img src={asset.url} alt={asset.title ?? ''} className="w-full h-full object-cover" onError={e => { e.currentTarget.src = '/no-preview.png'; }} />
+            <div className="aspect-video bg-gray-100 rounded-xl mb-6 flex items-center justify-center overflow-hidden border border-gray-200 relative">
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+                </div>
               )}
-              {asset.type==='video' && (
-                <video src={asset.url} controls className="w-full h-full object-cover"/>
-              )}
-              {asset.type==='webpage' && (
-                <iframe
-                  src={asset.url}
-                  title={asset.title}
+
+              {asset.type === 'video' ? (
+                (() => {
+                  // YouTube?
+                  if (isYouTubeURL(asset.url)) {
+                    const id = getYouTubeID(asset.url)
+                    return id
+                      ? <iframe
+                          className="w-full h-full object-cover"
+                          src={`https://www.youtube.com/embed/${id}`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          onLoad={() => setIsLoading(false)}
+                        />
+                      : <p className="text-gray-700">Invalid YouTube URL</p>
+                  }
+
+                  // Vimeo?
+                  if (isVimeoURL(asset.url)) {
+                    const id = getVimeoID(asset.url)
+                    return id
+                      ? <iframe
+                          className="w-full h-full object-cover"
+                          src={`https://player.vimeo.com/video/${id}`}
+                          allow="autoplay; fullscreen; picture-in-picture"
+                          allowFullScreen
+                          onLoad={() => setIsLoading(false)}
+                        />
+                      : <p className="text-gray-700">Invalid Vimeo URL</p>
+                  }
+
+                  // Direct video file?
+                  if (/\.(mp4|webm|ogg)$/i.test(asset.url)) {
+                    return <VideoPlayer url={asset.url} onLoad={() => setIsLoading(false)} />
+                  }
+
+                  // Any other "video" type—fall back to screenshot
+                  return (
+                    <img
+                      src={`http://localhost:3001/api/screenshot?url=${encodeURIComponent(asset.url)}`}
+                      alt={asset.title}
+                      className="w-full h-full object-cover"
+                      onLoad={() => setIsLoading(false)}
+                      onError={e => {
+                        e.currentTarget.src = '/no-preview.png';
+                        setIsLoading(false);
+                      }}
+                    />
+                  )
+                })()
+              ) : (
+                // EVERY non‐video asset now shows a screenshot
+                <img
+                  src={`http://localhost:3001/api/screenshot?url=${encodeURIComponent(asset.url)}`}
+                  alt={asset.title}
                   className="w-full h-full object-cover"
-                  sandbox="allow-scripts allow-same-origin allow-popups"
+                  onLoad={() => setIsLoading(false)}
+                  onError={e => {
+                    e.currentTarget.src = '/no-preview.png';
+                    setIsLoading(false);
+                  }}
                 />
-              )}
-              {['schema','robots','sitemap'].includes(asset.type) && (
-                <pre className="p-6 overflow-auto text-sm w-full h-full">{asset.description}</pre>
-              )}
-              {['meta','paragraph','title','canonical','heading','link'].includes(asset.type) && (
-                <div className="p-6 text-sm whitespace-pre-wrap w-full h-full">{asset.description}</div>
               )}
             </div>
 
             {/* Details */}
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-4">Asset Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-sm text-gray-400 block mb-2">Type</label>
-                    <div className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium border ${getTypeColor(asset.type)}`}>
-                      {getIcon(asset.type)}
-                      <span className="ml-2 capitalize">{asset.type}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-400 block mb-2">Created</label>
-                    <p className="text-white">{asset.createdAt.toLocaleString()}</p>
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="text-sm text-gray-400 block mb-2">URL</label>
-                    <p className="text-white break-all bg-white/5 p-3 rounded-lg border border-white/10">{asset.url}</p>
-                  </div>
-                  {asset.description && (
-                    <div className="md:col-span-2">
-                      <label className="text-sm text-gray-400 block mb-2">Description</label>
-                      <p className="text-white bg-white/5 p-3 rounded-lg border border-white/10">{asset.description}</p>
-                    </div>
-                  )}
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-gray-600" />
+                <h3 className="text-lg font-medium text-gray-900">{asset.title}</h3>
+              </div>
+              {asset.description && (
+                <p className="text-gray-700 text-sm">{asset.description}</p>
+              )}
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <ExternalLink className="w-4 h-4" />
+                <a href={asset.url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">
+                  {asset.url}
+                </a>
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end space-x-4 p-6 border-t border-white/10">
+          <div className="flex items-center justify-end space-x-4 p-6 border-t border-gray-200">
             <motion.button
               onClick={() => window.open(asset.url, '_blank')}
-              className="flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors border border-white/20"
+              className="flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors border border-gray-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -201,7 +233,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
                 link.download = asset.title;
                 link.click();
               }}
-              className="flex items-center px-6 py-3 bg-gradient-to-r from-[#adff2f] to-[#7cfc00] text-black font-bold rounded-xl transition-colors shadow-lg shadow-green-500/30"
+              className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-500/30"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

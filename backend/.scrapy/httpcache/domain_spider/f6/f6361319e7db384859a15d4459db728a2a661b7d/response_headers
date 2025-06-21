@@ -1,0 +1,9 @@
+Content-Length: 349
+Location: https://www.google.com/safesearch?hl=en-IN&prev=https://www.google.com/preferences?hl%3Den%26sa%3DX%26ved%3D0ahUKEwjy4PbOpPiNAxV4cmwGHc3aHfMQ0o8LCAQ
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Content-Security-Policy: object-src 'none';base-uri 'self';script-src 'nonce-UlfC78m2rFD7iUkCh1PWmA' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other
+Date: Tue, 17 Jun 2025 10:51:07 GMT
+Server: gws
+X-Xss-Protection: 0
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

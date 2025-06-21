@@ -1,0 +1,8 @@
+Content-Length: 0
+Server: AkamaiGHost
+Location: https://www.myntra.com/
+Date: Tue, 17 Jun 2025 18:11:23 GMT
+Server-Timing: cdn-cache; desc=HIT
+Server-Timing: edge; dur=1
+Server-Timing: ak_p; desc="1750183883119_399834788_12845014_15_1271_17_18_-";dur=1
+Strict-Transport-Security: max-age=15768000 ; includeSubDomains

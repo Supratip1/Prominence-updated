@@ -45,7 +45,7 @@ const ConveyorBelt: React.FC<ConveyorBeltProps> = ({ logos }) => {
               key={alt + i}
               src={src}
               alt={alt}
-              className="h-12 md:h-20 mx-6 md:mx-12 object-contain min-w-[80px] md:min-w-[120px] opacity-80 hover:opacity-100 transition-opacity duration-300 bg-black rounded-[30px] p-2"
+              className="h-16 md:h-24 mx-6 md:mx-12 object-contain min-w-[100px] md:min-w-[150px] opacity-95 hover:opacity-100 transition-opacity duration-300"
               loading="lazy"
             />
           ))}
@@ -56,7 +56,7 @@ const ConveyorBelt: React.FC<ConveyorBeltProps> = ({ logos }) => {
               key={alt + '-dup-' + i}
               src={src}
               alt={alt}
-              className="h-12 md:h-20 mx-6 md:mx-12 object-contain min-w-[80px] md:min-w-[120px] opacity-80 hover:opacity-100 transition-opacity duration-300 bg-black rounded-[30px] p-2"
+              className="h-16 md:h-24 mx-6 md:mx-12 object-contain min-w-[100px] md:min-w-[150px] opacity-95 hover:opacity-100 transition-opacity duration-300"
               loading="lazy"
             />
           ))}

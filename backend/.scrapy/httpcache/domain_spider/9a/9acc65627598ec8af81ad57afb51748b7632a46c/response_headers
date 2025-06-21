@@ -1,0 +1,14 @@
+Server: nginx/1.18.0
+Date: Tue, 17 Jun 2025 18:20:54 GMT
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-cache
+X-Nitro-Cache: HIT
+X-Nitro-Cache-From: drop-in
+Vary: user-agent
+X-Nitro-Rev: 0e6ccdf
+Link: <https://cdn-eklii.nitrocdn.com>; rel=preconnect
+Link: <https://webvizio.com/wp-json/>; rel="https://api.w.org/"
+Link: <https://webvizio.com/wp-json/wp/v2/features/1350>; rel="alternate"; title="JSON"; type="application/json"
+Link: <https://webvizio.com/?p=1350>; rel=shortlink
+X-Cache-Ctime: 1749594695
+Content-Encoding: gzip

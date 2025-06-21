@@ -1,0 +1,87 @@
+X-Xss-Protection: 1; mode=block
+X-Frame-Options: sameorigin
+Accept-Ranges: bytes
+X-Content-Type-Options: nosniff
+Content-Type: text/html; charset=utf-8
+Etag: W/"8d5e5-VduPayTCsaVIiNlx7H1U0BL3Z48"
+Content-Security-Policy: img-src 'self' data: *.nykaa.com *.naikaa.com fsnecommerce.sc.omtrdc.net evbk.gamooga.com webevbk.gamooga.com www.google-analytics.com www.google.com www.google.co.in www.facebook.com stats.g.doubleclick.net cm.everesttech.net www.googletagmanager.com *.criteo.net *.criteo.com www.youtube.com dpm.demdex.net cm.g.doubleclick.net  www.gstatic.com m.youtube.com cdn-jp.gsecondscreen.com *.googlesyndication.com googleads.g.doubleclick.net d286adtp3hdk00.cloudfront.net;script-src 'self' 'unsafe-inline' 'unsafe-eval' *.nykaa.com *.naikaa.com assets.adobedtm.com www.googletagmanager.com www.google-analytics.com  www.googleadservices.com *.criteo.net *.criteo.com connect.facebook.net cdn-jp.gsecondscreen.com googleads.g.doubleclick.net apis.google.com *.netcoresmartech.com ae.gsecondscreen.com evbk.gamooga.com webevbk.gamooga.com *.speedcurve.com nykaa.verloop.io cdn-ops.verloop.io cdn.speedcurve.com lux.speedcurve.com cdn.nykaaman.com https://11310639.fls.doubleclick.net/activityi googleads.g.doubleclick.net *.googlesyndication.com connect.facebook.net *.clarity.ms traqkar.com cakecdn.com/jssdk/lib.js https://script.mfilterit.net/v3/v/client/web.nykaabeauty.cpv.js accounts.google.com https://www.artfut.com/static/tracking.min.js https://www.artfut.com/static/tagtag.min.js https://www.artfut.com/static/crossdevice.min.js https://ad.admitad.com/tt/ https://cdn.mxpnl.com/libs/mixpanel-js-wrapper.js https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js https://js-agent.newrelic.com https://bam.nr-data.net www.gstatic.com https://www.google.com/recaptcha/api.js http://static.clevertap.com/js/clevertap.min.js https://in1.clevertap-prod.com https://d2r1yp2w7bby2u.cloudfront.net/js/clevertap.min.js https://static.zdassets.com https://pod-29.zendesk.com https://bat.bing.com/bat.js https://bat.bing.com/p/action/187147406.js;frame-ancestors 'self' ;upgrade-insecure-requests;form-action 'self' ;object-src 'none' ;
+Vary: Accept-Encoding
+Content-Encoding: gzip
+Date: Tue, 17 Jun 2025 18:11:04 GMT
+Set-Cookie: countryCode=IN; Max-Age=1800; Path=/; Expires=Tue, 17 Jun 2025 18:41:04 GMT
+Set-Cookie: storeId=nykaa; Max-Age=1800; Path=/; Expires=Tue, 17 Jun 2025 18:41:04 GMT
+Set-Cookie: bcookie=0b982689-75b1-45f8-9f88-eacfbadaa1d1; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_DWEB_SHOPPING_BAG_URL=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_NEW_SIGN_UP=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_CART_GRATIFICATION_POPUP=B; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ITEM_DISCOUNT=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ORDERS_REVAMP=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_CART_LOGIN_SEGMENT=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ADP_RV_REORDER=B; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_CP_GAMES=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ADP_RV_SEGMENT=B; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_AUTOFILL=B; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ADP_RV_VIEW_SIMILAR_HLP=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ADP_RV_VIEW_SIMILAR=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ADP_RV_PLP_CONFIGURABLE_NO_RESULTS=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ADP_RV_PRODUCT_V3=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_HLP_CARD_REVAMP=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_WISHLIST=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_PRICE_REVEAL_NEW=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_PLP_INLINE_FILTER=REVAMPED; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_EDD_DELIVERY_WIDGET=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ADP_RV_MULTI_COUPONS=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_ADP_RV_SEARCH_BAR_NEW=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_AUTH_DWEB=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_PLP_INLINE_WIDGETS=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_PLP_PINKBOX_CTA=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_SLP_RELATED_SEARCHES=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_QUERY_PARAM_EXP=C; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_PDP_IMAGE=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_CALLOUT_NUDGE=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_TRUECALLER=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_GOOGLE_ONE_TAP=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_HLP_PAGE=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_NEW_PLP=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_PRODUCT_CARD_CTA=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_TOP_NAV_CONFIG=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_PRODUCT_HIGHLIGHTS=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_QUERY_PARAM_EXP_DWEB=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_BEAUTY_PORTFOLIO=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_HP_SEARCH_ANIMATION=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_PDP_HAMBURGER=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_HLP_OFFERS=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_WEB_AUTOREAD_OTP=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AD_BRV=variant1; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_PDP_RELEVANT_CATEGORY=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_REMOVE_LOGIN_BOTTOMSHEET=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_ZENDESK_CHAT=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_ACCOUNT_REVAMP=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_HORIZONTAL_WIDGET_TYPE=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_IOC_CART_NUDGE=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_APPSFLYER_DOWNLOAD_CTA=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_PDP_SIMILAR_PRODUCT_SHEET=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_FULL_SCREEN_RECO_WIDGET=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_BEST_SELLER_PDP=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_ENABLE_HLP_NEW_API=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_SPECULATIVE_PRERENDERING=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_TAGS_RATING_ON_LISTING=ONLY_TAGS; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_SEARCH_INP_ON_CART=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_NEW_TAGS_ON_PDP=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_REVIEW_SUBMIT=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_GUIDES_V2=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_OFFER_DELTA_COMMUNICATION=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_HLP_COUPON_OFFERS=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_NEW_GC_PAGE=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_PLP_DNW_DWEB=A; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_AB_STATUS_WIDGET=CONTROL; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_PRIVE_CTA_DISABLE=DEFAULT; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_UPDATED_AT=1750161244733; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Set-Cookie: EXP_SSR_CACHE=c07b71fb73afde7329647b4dd30c3114; Max-Age=31536000; Path=/; Expires=Wed, 17 Jun 2026 18:11:04 GMT
+Alt-Svc: h3=":443"; ma=93600
+Ak-Ray: 0.96d70b17.1750183864.52d9613a
+Pragma: no-cache
+Expires: -1
+Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+Strict-Transport-Security: max-age=31536000 ; includeSubDomains ; preload
+Akamai-Cache-Status: Miss from child, Miss from child, Miss from parent from parent

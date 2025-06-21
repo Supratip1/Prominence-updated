@@ -1,0 +1,5 @@
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en
+User-Agent: domain_scraper (+http://www.yourdomain.com/contact)
+Accept-Encoding: gzip, deflate
+Cookie: utm=%7B%7D; b=7ec18bc284ec148de7291fcd805d14e5; x=7ec18bc284ec148de7291fcd805d14e5.1750052590

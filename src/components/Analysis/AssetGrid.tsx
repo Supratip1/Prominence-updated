@@ -23,8 +23,6 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
     switch (type) {
       case 'video':
         return <Video className="w-5 h-5" />;
-      case 'screenshot':
-        return <Camera className="w-5 h-5" />;
       case 'webpage':
         return <FileText className="w-5 h-5" />;
       default:
@@ -36,8 +34,6 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
     switch (type) {
       case 'video':
         return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'screenshot':
-        return 'text-green-400 bg-green-400/10 border-green-400/20';
       case 'webpage':
         return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
       default:

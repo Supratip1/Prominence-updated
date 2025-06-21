@@ -1,11 +1,36 @@
-import React from 'react';
-import { Sparkles, Loader2, Lightbulb, TrendingUp, Zap, AlertCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+// src/pages/Optimization.tsx
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import AEOScorecard from './AEOScorecard';
+import AEOValidationPanel from './AEOValidationPanel';
+import OptimizationEngine from './OptimizationEngine';
+import { FrontendAsset } from '../../pages/Analysis';
 
-interface Asset {
-  id: string;
-  title: string;
-  type: string;
+// ——— Types ———————————————————————————————————————————————
+
+interface LocationState {
+  assets?: FrontendAsset[]
+}
+
+interface AEOScore {
+  assetId: string;
+  engine: 'perplexity' | 'chatgpt' | 'claude';
+  score: number;
+  factors: {
+    relevance: number;
+    authority: number;
+    freshness: number;
+    engagement: number;
+  };
+  lastUpdated: Date;
+}
+
+interface ValidationResult {
+  assetId: string;
+  passed: boolean;
+  notes?: string;
+  validatedBy: string;
+  validatedAt: Date;
 }
 
 interface OptimizationSuggestion {
@@ -19,227 +44,165 @@ interface OptimizationSuggestion {
   implemented: boolean;
 }
 
-interface OptimizationEngineProps {
-  assets: Asset[];
-  suggestions: OptimizationSuggestion[];
-  isGenerating: boolean;
-  onGenerate: () => void;
-}
+// ——— Component ——————————————————————————————————————————
 
-export default function OptimizationEngine({ assets, suggestions, isGenerating, onGenerate }: OptimizationEngineProps) {
-  const getPriorityColor = (priority: OptimizationSuggestion['priority']) => {
-    switch (priority) {
-      case 'high': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'medium': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
-      case 'low': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
-    }
+export default function Optimization() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state as LocationState) || {};
+  const assets = state.assets || [];
+
+  // 1) AEO Scoring state
+  const [scores, setScores] = useState<AEOScore[]>([]);
+  const [isScoring, setIsScoring] = useState(false);
+
+  const handleScoreComplete = async (engine: 'perplexity'|'chatgpt'|'claude') => {
+    if (!assets.length) return;
+    setIsScoring(true);
+
+    // simulate API delay
+    await new Promise(r => setTimeout(r, 2000));
+
+    // fake scores
+    const newScores: AEOScore[] = assets.map(a => ({
+      assetId: a.id,
+      engine,
+      score: Math.floor(Math.random()*40+60),
+      factors: {
+        relevance: Math.floor(Math.random()*30+70),
+        authority: Math.floor(Math.random()*40+60),
+        freshness: Math.floor(Math.random()*50+50),
+        engagement: Math.floor(Math.random()*35+65),
+      },
+      lastUpdated: new Date()
+    }));
+
+    setScores(newScores);
+    setIsScoring(false);
   };
 
-  const getEffortColor = (effort: OptimizationSuggestion['effort']) => {
-    switch (effort) {
-      case 'high': return 'text-red-400';
-      case 'medium': return 'text-yellow-400';
-      case 'low': return 'text-green-400';
-      default: return 'text-gray-400';
-    }
+  // 2) Validation state
+  const [validated, setValidated] = useState<Record<string,ValidationResult>>({});
+  const handleValidate = (assetId: string, passed: boolean, notes?: string) => {
+    setValidated(prev => ({
+      ...prev,
+      [assetId]: {
+        assetId,
+        passed,
+        notes,
+        validatedBy: 'Current User',
+        validatedAt: new Date()
+      }
+    }));
   };
 
-  const getTypeIcon = (type: OptimizationSuggestion['type']) => {
-    switch (type) {
-      case 'title': return '📝';
-      case 'description': return '📄';
-      case 'content': return '📖';
-      case 'technical': return '⚙️';
-      case 'structure': return '🏗️';
-      default: return '💡';
-    }
+  // 3) Suggestions state
+  const [suggestions, setSuggestions] = useState<OptimizationSuggestion[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerate = async () => {
+    if (!assets.length) return;
+    setIsGenerating(true);
+
+    // simulate API delay
+    await new Promise(r => setTimeout(r, 2000));
+
+    const types: OptimizationSuggestion['type'][] = ['title','description','content','technical','structure'];
+    const priorities: OptimizationSuggestion['priority'][] = ['high','medium','low'];
+    const efforts: OptimizationSuggestion['effort'][] = ['low','medium','high'];
+
+    const newSugs: OptimizationSuggestion[] = assets.flatMap(a => {
+      const count = Math.floor(Math.random()*3+1);
+      return Array.from({length:count}).map((_,i) => {
+        const type = types[Math.floor(Math.random()*types.length)];
+        return {
+          id: `sug-${a.id}-${i}`,
+          assetId: a.id,
+          type,
+          priority: priorities[Math.floor(Math.random()*priorities.length)],
+          suggestion: `Improve ${type} of "${a.title}"`,
+          impact: `${Math.floor(Math.random()*30+20)}% uplift`,
+          effort: efforts[Math.floor(Math.random()*efforts.length)],
+          implemented: false
+        };
+      });
+    });
+
+    setSuggestions(newSugs);
+    setIsGenerating(false);
   };
 
-  const groupedSuggestions = suggestions.reduce((acc, suggestion) => {
-    const asset = assets.find(a => a.id === suggestion.assetId);
-    if (!asset) return acc;
-    
-    if (!acc[asset.id]) {
-      acc[asset.id] = { asset, suggestions: [] };
-    }
-    acc[asset.id].suggestions.push(suggestion);
-    return acc;
-  }, {} as Record<string, { asset: Asset; suggestions: OptimizationSuggestion[] }>);
+  // --- no assets guard ---
+  if (assets.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white p-4">
+        <div className="text-center space-y-4">
+          <p>No assets to optimize.</p>
+          <button
+            onClick={() => navigate('/analysis')}
+            className="underline text-green-400"
+          >
+            Go back to Analysis
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <motion.div 
-      className="mb-8 sm:mb-12 max-w-6xl mx-auto px-4"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-    >
-      <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 sm:p-8 shadow-2xl">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-2xl sm:text-3xl shadow-lg">
-              🚀
-            </div>
-            <div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-1">
-                AI Optimization Suggestions
-              </h3>
-              <p className="text-sm sm:text-base text-gray-400">
-                Powered by advanced AI analysis
-              </p>
-            </div>
-          </div>
-          
-          {!isGenerating && suggestions.length === 0 && (
-            <motion.button
-              onClick={onGenerate}
-              className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#adff2f] to-[#7cfc00] text-black font-bold rounded-xl shadow-lg shadow-green-500/30 text-sm sm:text-base whitespace-nowrap flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Sparkles className="w-4 h-4" />
-              Generate Suggestions
-            </motion.button>
-          )}
-        </div>
+    <div className="min-h-screen bg-gray-900 text-white p-8 space-y-12">
+      <header>
+        <h1 className="text-4xl font-bold mb-2">Optimization Workflow</h1>
+        <p className="text-gray-400">
+          Step through AEO scoring, validation, and AI-powered suggestions.
+        </p>
+      </header>
 
-        {/* Loading State */}
-        {isGenerating && (
-          <motion.div 
-            className="text-center py-8 sm:py-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="inline-block mb-4"
-            >
-              <Loader2 className="w-8 h-8 sm:w-12 sm:h-12 text-[#adff2f]" />
-            </motion.div>
-            <h4 className="text-lg sm:text-xl font-semibold text-white mb-2">
-              Generating AI Suggestions
-            </h4>
-            <p className="text-sm sm:text-base text-gray-400">
-              Analyzing your assets for optimization opportunities...
-            </p>
-          </motion.div>
-        )}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">1. AEO Scoring</h2>
+        <AEOScorecard
+          engine="chatgpt"
+          assets={assets}
+          scores={scores}
+          isScoring={isScoring}
+          onScoreComplete={handleScoreComplete}
+        />
+      </section>
 
-        {/* Results */}
-        {!isGenerating && suggestions.length > 0 && (
-          <>
-            {/* Summary Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 sm:mb-8">
-              <div className="text-center p-4 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl sm:text-3xl font-bold text-[#adff2f] mb-1">
-                  {suggestions.length}
-                </div>
-                <div className="text-xs sm:text-sm text-gray-400">Total</div>
-              </div>
-              <div className="text-center p-4 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl sm:text-3xl font-bold text-red-400 mb-1">
-                  {suggestions.filter(s => s.priority === 'high').length}
-                </div>
-                <div className="text-xs sm:text-sm text-gray-400">High Priority</div>
-              </div>
-              <div className="text-center p-4 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl sm:text-3xl font-bold text-green-400 mb-1">
-                  {suggestions.filter(s => s.effort === 'low').length}
-                </div>
-                <div className="text-xs sm:text-sm text-gray-400">Quick Wins</div>
-              </div>
-              <div className="text-center p-4 bg-white/5 rounded-xl border border-white/10">
-                <div className="text-2xl sm:text-3xl font-bold text-blue-400 mb-1">
-                  {suggestions.filter(s => s.implemented).length}
-                </div>
-                <div className="text-xs sm:text-sm text-gray-400">Implemented</div>
-              </div>
-            </div>
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">2. Validate Results</h2>
+        <AEOValidationPanel
+          assets={assets}
+          scores={scores}
+          validated={validated}
+          onValidate={handleValidate}
+        />
+      </section>
 
-            {/* Suggestions by Asset */}
-            <div className="space-y-6 sm:space-y-8">
-              {Object.values(groupedSuggestions).map(({ asset, suggestions: assetSuggestions }, index) => (
-                <motion.div
-                  key={asset.id}
-                  className="bg-white/5 rounded-xl border border-white/10 p-4 sm:p-6"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-sm sm:text-base font-bold text-white">
-                      {assetSuggestions.length}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-white font-medium text-sm sm:text-base truncate">
-                        {asset.title}
-                      </h4>
-                      <p className="text-gray-400 text-xs sm:text-sm capitalize">
-                        {asset.type}
-                      </p>
-                    </div>
-                  </div>
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">3. Generate Suggestions</h2>
+        <OptimizationEngine
+          assets={assets}
+          suggestions={suggestions}
+          isGenerating={isGenerating}
+          onGenerate={handleGenerate}
+        />
+      </section>
 
-                  <div className="space-y-3 sm:space-y-4">
-                    {assetSuggestions.map((suggestion, suggestionIndex) => (
-                      <motion.div
-                        key={suggestion.id}
-                        className="bg-white/5 rounded-lg border border-white/10 p-3 sm:p-4"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: suggestionIndex * 0.05 }}
-                      >
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{getTypeIcon(suggestion.type)}</span>
-                            <span className="text-white font-medium text-sm capitalize">
-                              {suggestion.type}
-                            </span>
-                          </div>
-                          
-                          <div className="flex items-center gap-2 sm:ml-auto">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(suggestion.priority)}`}>
-                              {suggestion.priority}
-                            </span>
-                            <span className={`text-xs font-medium ${getEffortColor(suggestion.effort)}`}>
-                              {suggestion.effort} effort
-                            </span>
-                          </div>
-                        </div>
-
-                        <p className="text-gray-300 text-sm sm:text-base mb-3 leading-relaxed">
-                          {suggestion.suggestion}
-                        </p>
-
-                        <div className="flex items-start gap-2 text-xs sm:text-sm text-gray-400">
-                          <TrendingUp className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                          <span>{suggestion.impact}</span>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* Empty State */}
-        {!isGenerating && suggestions.length === 0 && (
-          <div className="text-center py-8 sm:py-12">
-            <Lightbulb className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-400 opacity-50" />
-            <h4 className="text-lg sm:text-xl font-semibold text-white mb-2">
-              Ready for AI Optimization
-            </h4>
-            <p className="text-sm sm:text-base text-gray-400 mb-6">
-              Generate personalized suggestions to improve your assets' AI visibility
-            </p>
-          </div>
-        )}
+      <footer className="flex gap-4">
+        <button
+          onClick={() => {/* export logic here */}}
+          className="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-md"
+        >
+          Export Optimized Assets
+        </button>
+        <button
+          onClick={() => navigate('/analysis')}
+          className="bg-gray-700 hover:bg-gray-600 px-5 py-2 rounded-md"
+        >
+          Back to Analysis
+        </button>
+      </footer>
       </div>
-    </motion.div>
   );
 } 

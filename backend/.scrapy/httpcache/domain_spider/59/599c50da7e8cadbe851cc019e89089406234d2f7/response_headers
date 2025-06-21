@@ -1,0 +1,12 @@
+Content-Length: 0
+Content-Type: application/binary
+Location: https://www.google.com/setting/search/privateresults/?hl=en-IN
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: Mon, 01 Jan 1990 00:00:00 GMT
+Date: Tue, 17 Jun 2025 10:51:06 GMT
+Server: ESF
+X-Xss-Protection: 0
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

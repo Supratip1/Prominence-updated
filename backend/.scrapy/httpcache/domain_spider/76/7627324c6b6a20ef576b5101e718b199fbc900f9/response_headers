@@ -1,0 +1,9 @@
+Content-Length: 321
+Location: https://myactivity.google.com/product/search/controls?utm_source=google&utm_medium=pref-page&hl=en-IN&authuser=0
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Content-Security-Policy: object-src 'none';base-uri 'self';script-src 'nonce-thohyUd-Nrbmy8QKb5HNVQ' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other
+Date: Tue, 17 Jun 2025 10:51:12 GMT
+Server: gws
+X-Xss-Protection: 0
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

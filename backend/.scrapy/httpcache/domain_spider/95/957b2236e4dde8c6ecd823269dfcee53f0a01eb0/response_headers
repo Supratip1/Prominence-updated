@@ -1,0 +1,13 @@
+Content-Type: application/xhtml+xml; charset=ISO-8859-1
+Content-Security-Policy: object-src 'none';base-uri 'self';script-src 'nonce-PTokjkNgzBMJlnLzuOVu2A' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/xsrp
+Accept-Ch: Sec-CH-Prefers-Color-Scheme
+P3P: CP="This is not a P3P policy! See g.co/p3phelp for more info."
+Content-Encoding: gzip
+Date: Tue, 17 Jun 2025 10:50:55 GMT
+Server: gws
+X-Xss-Protection: 0
+X-Frame-Options: SAMEORIGIN
+Expires: Tue, 17 Jun 2025 10:50:55 GMT
+Cache-Control: private
+Set-Cookie: NID=524=YhCmJq5DmHOB8ZqKKq7-ENaAw3CGc3O_Rrcze0w3mIBNR9Hx8pnCY8jQzVP2CVJRgmOKn_sZSi5SWonIrDlNmlWQlP6jbPpwV77-KLbpzae7rafLa4QMfjnP6OjqZB95bxOKCqJAMQib7TBMko4MMgGo8tYdzGRQNeBOCvqCca0zyRL3Kw7Zp7yTlixjP2Wy7wV_l3JxCW8Q94PRFg; expires=Wed, 17-Dec-2025 10:50:52 GMT; path=/; domain=.google.com; HttpOnly
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000

@@ -12,8 +12,6 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
     switch (type) {
       case 'video':
         return <Video className="w-4 h-4" />;
-      case 'screenshot':
-        return <Camera className="w-4 h-4" />;
       case 'webpage':
         return <FileText className="w-4 h-4" />;
       default:
@@ -24,13 +22,11 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
   const getTypeColor = (type: FrontendAsset['type']) => {
     switch (type) {
       case 'video':
-        return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'screenshot':
-        return 'text-green-400 bg-green-400/10 border-green-400/20';
+        return 'text-red-600 bg-red-100 border-red-200';
       case 'webpage':
-        return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+        return 'text-blue-600 bg-blue-100 border-blue-200';
       default:
-        return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+        return 'text-gray-600 bg-gray-100 border-gray-200';
     }
   };
 
@@ -43,22 +39,22 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
+      <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
         <motion.span 
-          className="w-3 h-3 bg-[#adff2f] rounded-full mr-3"
+          className="w-3 h-3 bg-blue-600 rounded-full mr-3"
           animate={{ opacity: [1, 0.3, 1] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         />
         Live Asset Feed ({assets.length} discovered)
       </h3>
       
-      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 max-h-80 overflow-y-auto">
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 max-h-80 overflow-y-auto shadow-lg">
         <AnimatePresence>
           <div className="space-y-3">
             {assets.map((asset, index) => (
               <motion.div 
                 key={asset.id}
-                className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all"
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-all"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
@@ -68,8 +64,8 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
                     {getIcon(asset.type)}
                   </div>
                   <div>
-                    <p className="text-white font-medium text-sm">{asset.title}</p>
-                    <p className="text-gray-400 text-xs truncate max-w-md">{asset.url}</p>
+                    <p className="text-gray-900 font-medium text-sm">{asset.title}</p>
+                    <p className="text-gray-600 text-xs truncate max-w-md">{asset.url}</p>
                   </div>
                 </div>
                 <div className="text-xs text-gray-500">

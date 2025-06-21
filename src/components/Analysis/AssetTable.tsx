@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, FileText, Tag, Globe, Calendar, Link } from 'lucide-react';
 import type { FrontendAsset } from '../../pages/Analysis';
 
 type SortKey = 'title' | 'type' | 'sourceDomain' | 'createdAt' | 'url';
@@ -66,31 +66,32 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
     return <p className="text-gray-400 py-8 text-center">No assets found.</p>;
   }
 
-  const headers: { label: string; key: SortKey }[] = [
-    { label: 'Name',   key: 'title' },
-    { label: 'Type',   key: 'type' },
-    { label: 'Source', key: 'sourceDomain' },
-    { label: 'Created',key: 'createdAt' },
-    { label: 'URL',    key: 'url' },
+  const headers: { label: string; key: SortKey; icon: React.ReactNode }[] = [
+    { label: 'Name',   key: 'title', icon: <FileText className="w-4 h-4" /> },
+    { label: 'Type',   key: 'type', icon: <Tag className="w-4 h-4" /> },
+    { label: 'Source', key: 'sourceDomain', icon: <Globe className="w-4 h-4" /> },
+    { label: 'Created',key: 'createdAt', icon: <Calendar className="w-4 h-4" /> },
+    { label: 'URL',    key: 'url', icon: <Link className="w-4 h-4" /> },
   ];
 
   return (
     <motion.div
-      className="overflow-x-auto rounded-lg bg-gray-900 border border-white"
+      className="overflow-x-auto rounded-2xl bg-white border border-gray-200 shadow-lg"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <table className="min-w-full border-separate border-spacing-0">
-        <thead className="bg-gray-800">
+      <table className="min-w-full border-separate border-spacing-0 text-sm font-sans">
+        <thead className="bg-gray-50">
           <tr>
             {headers.map(h => (
               <th
                 key={h.key}
                 onClick={() => onHeader(h.key)}
-                className="px-6 py-3 text-xs font-medium tracking-wider text-gray-300 border-r border-white cursor-pointer select-none"
+                className="px-6 py-3 text-xs font-semibold tracking-wide text-gray-700 uppercase border-r border-gray-200 cursor-pointer select-none"
               >
-                <div className="inline-flex items-center space-x-1">
+                <div className="inline-flex items-center space-x-2">
+                  {h.icon}
                   <span>{h.label}</span>
                   {sortKey === h.key && (
                     <span className="text-xs">{dir === 'asc' ? '▲' : '▼'}</span>
@@ -105,27 +106,29 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
           {paged.map((asset, idx) => (
             <tr
               key={asset.id}
-              className={`${idx % 2 === 0 ? 'bg-gray-850' : 'bg-gray-800'} hover:bg-gray-700 cursor-pointer`}
+              className={`${
+                idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+              } hover:bg-gray-100 cursor-pointer transition-colors`}
             >
               <td
                 onClick={() => onNameClick(asset)}
-                className="px-6 py-4 text-sm font-medium text-white border-r border-white underline"
+                className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-200 underline"
               >
                 {asset.title || 'Untitled'}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-200 border-r border-white">{asset.type}</td>
-              <td className="px-6 py-4 text-sm text-gray-200 border-r border-white">
+              <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200">{asset.type}</td>
+              <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200">
                 {asset.sourceDomain}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-400 border-r border-white">
+              <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">
                 {new Date(asset.createdAt).toLocaleDateString()}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-200">
+              <td className="px-6 py-4 text-sm text-gray-700">
                 <a
                   href={asset.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center hover:text-white"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
                   onClick={e => e.stopPropagation()}
                 >
                   <ExternalLink className="w-4 h-4 mr-1" /> View
@@ -138,37 +141,37 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
 
       {/* pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-t border-white">
-          <span className="text-sm text-gray-300">
+        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
+          <span className="text-sm text-gray-600">
             Showing{' '}
-            <span className="font-medium text-white">
+            <span className="font-medium text-gray-900">
               {(currentPage - 1) * rowsPerPage + 1}
             </span>{' '}
             to{' '}
-            <span className="font-medium text-white">
+            <span className="font-medium text-gray-900">
               {Math.min(currentPage * rowsPerPage, sorted.length)}
             </span>{' '}
-            of <span className="font-medium text-white">{sorted.length}</span> assets
+            of <span className="font-medium text-gray-900">{sorted.length}</span> assets
           </span>
           <nav className="flex space-x-1">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-700 text-gray-300 rounded disabled:opacity-50 hover:bg-gray-600"
+              className="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded disabled:opacity-40 hover:bg-gray-50 transition"
             >
               ←
             </button>
             {pages.map((p, i) =>
               p === -1 ? (
-                <span key={i} className="px-3 py-1 text-gray-300">…</span>
+                <span key={i} className="px-3 py-1 text-gray-500">…</span>
               ) : (
                 <button
                   key={p}
                   onClick={() => setCurrentPage(p)}
-                  className={`px-3 py-1 rounded ${
+                  className={`px-3 py-1 rounded border ${
                     p === currentPage
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition'
                   }`}
                 >
                   {p}
@@ -178,7 +181,7 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-gray-700 text-gray-300 rounded disabled:opacity-50 hover:bg-gray-600"
+              className="px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded disabled:opacity-40 hover:bg-gray-50 transition"
             >
               →
             </button>

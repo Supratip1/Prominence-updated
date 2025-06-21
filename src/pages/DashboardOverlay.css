@@ -1,0 +1,16 @@
+.hero-section {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 1;
+}
+
+.demo-video-section {
+  position: relative;
+  z-index: 2;
+  margin-top: 100vh;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  transform: translateY(0);
+  transition: transform 0.3s ease-out;
+} 
