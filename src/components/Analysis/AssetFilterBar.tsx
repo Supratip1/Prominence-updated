@@ -36,14 +36,14 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
       transition={{ duration: 0.6 }}
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+        <h3 className="text-xl font-semibold text-white flex items-center">
           <Filter className="w-5 h-5 mr-3 text-blue-600" />
           Filter Assets
         </h3>
         {(selectedType !== 'all' || selectedSource !== 'all') && (
           <motion.button
             onClick={clearFilters}
-            className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="flex items-center text-sm text-white hover:text-gray-300 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -56,7 +56,7 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
       <div className="flex flex-wrap gap-6">
         {/* Type Filters */}
         <div className="flex flex-wrap gap-3">
-          <span className="text-sm text-gray-700 mr-2 self-center">Type:</span>
+          <span className="text-sm text-white mr-2 self-center">Type:</span>
           {filters.map((filter) => (
             <motion.button
               key={filter}
@@ -77,7 +77,7 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
         {/* Source Filters */}
         {sources.length > 0 && (
           <div className="flex flex-wrap gap-3">
-            <span className="text-sm text-gray-700 mr-2 self-center">Source:</span>
+            <span className="text-sm text-white mr-2 self-center">Source:</span>
             <motion.button
               onClick={() => handleSourceChange('all')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${

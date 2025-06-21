@@ -634,6 +634,16 @@ export default function Dashboard() {
     }
   }, [location.hash])
 
+  const smoothScrollTo = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
+
   const demoRef = useRef(null)
   const { scrollYProgress: demoScrollYProgress } = useScroll({
     target: demoRef,
@@ -896,247 +906,78 @@ export default function Dashboard() {
     <div className="relative overflow-hidden bg-black text-white">
       {/* Main content wrapper with higher z-index */}
       <div className="relative z-10">
-        {/* HERO (dark gradient) */}
-        <div className="min-h-screen relative overflow-hidden">
-          {/* Grid Overlay - only visible on mouse movement, only in hero section */}
-          <div className={`grid-overlay absolute inset-0 ${isGridVisible ? 'visible' : ''}`} />
-
-          {/* Space Background Elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <SpaceStars />
-
-            {/* Animated space particles */}
-            <div className="absolute inset-0">
-              {Array.from({ length: 100 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-[1px] h-[1px] bg-white rounded-full shadow-[0_0_2px_1px_rgba(255,255,255,0.8)]"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                  }}
-                  animate={{
-                    opacity: [0.4, 1, 0.4],
-                    scale: [0.5, 1.2, 0.5],
-                    y: [0, -15, 0],
-                  }}
-                  transition={{
-                    duration: Math.random() * 4 + 3,
-                    repeat: Number.POSITIVE_INFINITY,
-                    delay: Math.random() * 2,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Cosmic glow effects */}
-            <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-900/30 via-transparent to-transparent" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-blue-900/30 via-transparent to-transparent" />
-          </div>
+        {/* New Hero Section */}
+        <div className="relative overflow-hidden bg-black text-white pb-20">
+          <div
+            className="absolute top-0 left-0 right-0 h-[100vh] pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at 50% 0%, rgba(20, 83, 214, 0.3) 0%, rgba(0,0,0,0) 35%)'
+            }}
+          />
 
           <div
             id="hero"
-            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 lg:pt-12 pb-4 sm:pb-12 relative z-10 mt-0 sm:mt-8 md:mt-16"
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
           >
-            {/* Hero Section */}
-            <motion.div
-              className="flex flex-col lg:grid lg:grid-cols-2 items-center gap-2 sm:gap-3 lg:gap-1 mb-2 sm:mb-3 lg:mb-4"
-              initial="hidden"
-              animate="show"
-              variants={container}
-            >
-              {/* Animation */}
-              <motion.div
-                className="order-1 lg:order-2 flex justify-center lg:justify-end w-full mb-4 lg:mb-0 mt-8 lg:mt-0"
-                variants={item}
+            <div className="text-center pt-24 pb-16 md:pt-40 md:pb-24">
+              <motion.h1
+                className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
               >
-                <div className="w-full max-w-md overflow-hidden">
-                  {animationData && <Lottie animationData={animationData} loop autoplay className="w-full h-auto" />}
-                </div>
-              </motion.div>
-
-              {/* Enhanced Horizontal Divider for mobile/tablet */}
-              <motion.div className="order-2 lg:hidden w-full" variants={item}>
-                <div className="relative flex justify-center my-6">
-                  <div className="h-px bg-gradient-to-r from-transparent via-white/40 to-transparent w-full max-w-sm" />
-                  <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" />
-                </div>
-              </motion.div>
-
-              {/* Premium Enhanced Headline/Text with Space Theme */}
-              <motion.div
-                className="order-3 lg:order-1 flex flex-col w-full text-center lg:text-left max-w-5xl mx-auto lg:mx-0 lg:ml-16 relative"
-                variants={item}
+                Increase your Ranking
+                <br />
+                in LLM Searches
+              </motion.h1>
+              <motion.p
+                className="text-xl md:text-2xl font-medium text-gray-400 max-w-2xl mx-auto mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
               >
-                {/* Cosmic glow behind text */}
-                <div className="absolute -inset-8 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-green-500/20 rounded-3xl blur-3xl opacity-50" />
-
-                <motion.div className="relative z-10">
-                  <motion.h1
-                    className="
-                      text-4xl sm:text-5xl md:text-6xl lg:text-5xl
-                      font-bold text-white
-                      mb-3 leading-tight tracking-[-2px]
-                      drop-shadow-2xl
-                    "
-                    variants={textReveal}
-                    style={{
-                      fontFamily:
-                        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                      fontWeight: 700,
-                      letterSpacing: "-0.025em",
-                      textShadow: "0 0 30px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.5)",
-                      filter: "brightness(1.2)",
-                    }}
-                  >
-                    <motion.span
-                      className="inline-block"
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      style={{
-                        background: "linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                      }}
-                    >
-                      Increase your Ranking
-                    </motion.span>
-                    <br />
-                    <motion.span
-                      className="inline-block"
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25, delay: 0.1 }}
-                      style={{
-                        background: "linear-gradient(135deg, #adff2f 0%, #7cfc00 50%, #32cd32 100%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                        textShadow: "0 0 20px rgba(173, 255, 47, 0.5)",
-                      }}
-                    >
-                      in LLM Searches
-                    </motion.span>
-                  </motion.h1>
-
-                  <motion.p
-                    className="
-                      text-lg sm:text-xl lg:text-3xl
-                      text-gray-300 mb-8 leading-relaxed
-                      max-w-2xl mx-auto lg:mx-0 text-center lg:text-left
-                      font-medium
-                    "
-                    variants={textReveal}
-                    style={{
-                      fontFamily:
-                        '-apple-system, BlinkMacSystemFont, "Segue UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                      letterSpacing: "-0.01em",
-                      textShadow: "0 0 10px rgba(255, 255, 255, 0.3)",
-                    }}
-                  >
-                    <motion.span
-                      className="inline-block"
-                      whileHover={{ scale: 1.01 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    >
-                      Rise to the top in AI-powered search.
-                    </motion.span>
-                  </motion.p>
-
-                  {/* Premium Start Analysis Section in Hero */}
-                  <motion.div className="mt-12 max-w-2xl mx-auto lg:mx-0" variants={textReveal}>
-                    <motion.div
-                      className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/20 p-8 shadow-2xl"
-                      whileHover={{ scale: 1.02, boxShadow: "0 25px 50px rgba(173, 255, 47, 0.15)" }}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#adff2f]/10 to-[#7cfc00]/10 rounded-2xl" />
-
-                      <div className="relative z-10">
-                        <div className="text-center mb-6">
-                          <h3 className="text-2xl font-bold text-white mb-2">Start Your Analysis</h3>
-                          <p className="text-sm text-white/60">Discover hidden opportunities in seconds</p>
-                        </div>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                          <p className="text-center text-white/60 text-sm mb-8">
-                            Get instant insights into your digital assets and SEO performance
-                          </p>
-                          <div className="relative">
-                            <div className="flex flex-col sm:flex-row gap-2 w-full items-stretch sm:items-center">
-                              <input
-                                type="text"
-                                name="domain"
-                                placeholder="Enter your domain (e.g., yourcompany.com)"
-                                required
-                                onBlur={handleBlur}
-                                onChange={handleInputChange}
-                                className="flex-1 w-full h-14 pl-6 pr-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#adff2f]/50 focus:border-[#adff2f]/50 text-lg"
-                              />
-                              {isValidating && (
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-                                </div>
-                              )}
-                              <motion.button
-                                type="submit"
-                                className="h-10 px-6 bg-gradient-to-r from-[#adff2f] to-[#7cfc00] text-black font-bold rounded-lg transition-all shadow-lg shadow-green-500/30 w-full sm:w-auto mt-2 sm:mt-0"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                              >
-                                Analyze →
-                              </motion.button>
-                            </div>
-                            {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
-                          </div>
-                        </form>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                </motion.div>
+                Rise to the top in AI-powered search.
+              </motion.p>
+              <motion.div
+                className="flex justify-center items-center gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <button
+                  onClick={() => navigate('/analysis')}
+                  className="bg-white text-black font-semibold rounded-full px-6 py-3 transition-transform hover:scale-105"
+                >
+                  Start with AI
+                </button>
+                <button
+                  onClick={() => smoothScrollTo('pricing')}
+                  className="bg-[#1C1C1C] text-white font-semibold rounded-full px-6 py-3 transition-transform hover:scale-105 border border-gray-700"
+                >
+                  Start for free
+                </button>
               </motion.div>
-            </motion.div>
+            </div>
           </div>
+          
+          <motion.div
+            className="relative max-w-7xl mx-auto px-4 z-10"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <div className="relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-blue-500/20">
+              <video
+                className="w-full h-full object-cover"
+                src="/16296848-uhd_3840_2160_24fps.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+              />
+            </div>
+          </motion.div>
         </div>
-
-        {/* Premium Demo Video Section */}
-        <motion.section
-          id="demo"
-          className="py-20 relative z-10"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <div className="container mx-auto px-4">
-            {/* Premium Video Container */}
-            <motion.div
-              className="relative max-w-6xl mx-auto"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
-            >
-              {/* Video Container */}
-              <div className="relative">
-                <div className="aspect-video relative overflow-hidden">
-                  <video
-                    className="w-full h-full object-cover"
-                    src="/16296848-uhd_3840_2160_24fps.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  />
-                  {/* Left fade */}
-                  <div className="absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-black to-transparent pointer-events-none" />
-                  {/* Right fade */}
-                  <div className="absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-black to-transparent pointer-events-none" />
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </motion.section>
 
         {/* Portfolio Screenshots Section */}
         <div className="relative z-10">

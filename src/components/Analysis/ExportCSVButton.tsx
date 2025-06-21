@@ -1,20 +1,10 @@
 import React from 'react';
 import { Download } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-interface Asset {
-  id: string;
-  type: 'video' | 'screenshot' | 'webpage';
-  title: string;
-  url: string;
-  sourceDomain: string;
-  thumbnail?: string;
-  description?: string;
-  createdAt: Date;
-}
+import type { FrontendAsset } from '../../pages/Analysis';
 
 interface ExportCSVButtonProps {
-  assets: Asset[];
+  assets: FrontendAsset[];
 }
 
 export default function ExportCSVButton({ assets }: ExportCSVButtonProps) {

@@ -17,18 +17,7 @@ import Button from '../UI/Button';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     if (open) {
@@ -75,48 +64,42 @@ export default function Header() {
 
   return (
     <>
-      <header 
+      <header
         ref={headerRef}
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          isScrolled ? 'bg-black' : 'bg-transparent'
-        }`}
+        className="fixed top-0 left-0 right-0 z-40 bg-black/50 backdrop-blur-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Replace logo image with bold "Prominance.ai" */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-8">
               <button
                 onClick={() => goToSection('hero')}
-                className={`font-bold text-xl md:text-2xl hover:opacity-90 transition-opacity ${textColorClass}`}
+                className="font-bold text-xl text-white hover:opacity-90 transition-opacity"
               >
                 Prominance.ai
               </button>
-            </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              {links.map((link) =>
-                link.onClick ? (
+              <nav className="hidden md:flex items-center space-x-6">
+                {links.map((link) => (
                   <button
                     key={link.label}
                     onClick={link.onClick}
-                    className={`${textOpacityClass} ${textHoverClass} transition-colors duration-200 cursor-pointer`}
+                    className="text-base font-medium text-gray-400 hover:text-white transition-colors duration-200"
                   >
-                    {link.icon}
                     {link.label}
                   </button>
-                ) : (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className={`${textOpacityClass} ${textHoverClass} transition-colors duration-200 cursor-pointer`}
-                  >
-                    {link.icon}
-                    {link.label}
-                  </a>
-                )
-              )}
-            </nav>
+                ))}
+              </nav>
+            </div>
+
+            {/* Desktop Auth buttons */}
+            <div className="hidden md:flex items-center space-x-4">
+              <button className="text-base font-medium text-gray-400 hover:text-white transition-colors duration-200">
+                Login
+              </button>
+              <button className="text-sm bg-white text-black font-medium px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
+                Sign up
+              </button>
+            </div>
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">

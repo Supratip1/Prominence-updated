@@ -52,7 +52,7 @@ interface ScrapeResults {
 // Local asset type for frontend
 export interface FrontendAsset {
   id: string;
-  type: string;
+  type: 'video' | 'screenshot' | 'webpage' | 'document' | 'social' | 'heading' | 'meta' | 'schema' | 'image' | 'link' | string;
   title: string;
   description?: string;
   url: string;
@@ -342,133 +342,84 @@ const Analysis: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      
-      {/* Premium Header */}
-      <motion.div 
-        className="relative py-20 overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        {/* Background Effects */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#adff2f]/5 via-transparent to-[#7cfc00]/5" />
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#adff2f]/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#7cfc00]/10 rounded-full blur-3xl" />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-12"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
+    <div className="bg-black text-white min-h-screen">
+      {/* Hero Section */}
+      <div className="relative bg-black text-white pt-20 pb-20">
+        <div
+          className="absolute top-0 left-0 right-0 h-[50vh] pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle at 50% 0%, rgba(20, 83, 214, 0.3) 0%, rgba(0,0,0,0) 45%)'
+          }}
+        />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center">
+          <motion.h1
+            className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <motion.h1 
-              className="text-5xl md:text-7xl font-bold mb-6"
-              variants={itemVariants}
-              style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #adff2f 50%, #7cfc00 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Asset Discovery & Analysis
-            </motion.h1>
-          </motion.div>
-
-          <motion.div variants={itemVariants} className="max-w-2xl mx-auto">
-            <AssetDiscoveryForm 
-              value={inputValue}
-              onChange={(val) => {
-                setInputValue(val);
-                setError(null);
-                debouncedValidate(val);
-              }}
-              onSubmit={async () => {
-                const isValid = await validateDomain(inputValue);
-                if (!isValid) return;
-                handleAnalysisSubmit(inputValue);
-              }}
-              disableSubmit={isAnalyzing || isValidating || !inputValue.trim()}
-              isAnalyzing={isAnalyzing}
-            />
-            {isValidating && (
-              <div className="flex items-center mt-2 text-sm text-gray-400">
-                <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></span>
-                Validating URL...
-              </div>
-            )}
-            {error && (
-              <div className="text-sm text-red-400 mt-2">{error}</div>
-            )}
-          </motion.div>
+            Asset Discovery
+          </motion.h1>
+          <motion.p
+            className="text-xl md:text-2xl font-medium text-gray-400 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Enter a domain to discover and analyze digital assets.
+          </motion.p>
         </div>
-      </motion.div>
-
-      {/* Analysis Interface */}
-      <div className="container mx-auto px-4 pb-20 mt-16">
-        <motion.div
-          className="space-y-12"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Crawl Progress */}
-          {isAnalyzing && (
-            <motion.div variants={itemVariants}>
-              <CrawlProgress 
-                percent={Math.round(crawlProgress)} 
-                message={`Analyzing ${analysisQuery} - Fetching assets relevant to ${analysisQuery}...`} 
-              />
-            </motion.div>
-          )}
-
-          {/* Live Asset Feed */}
-          {isAnalyzing && (
-            <motion.div variants={itemVariants}>
-              <LiveAssetFeed assets={assets.slice(0, Math.floor(crawlProgress / 20))} />
-            </motion.div>
-          )}
-
-          {/* Results Section */}
-          {!isAnalyzing && assets.length > 0 && (
-            <>
-              {/* Filter Bar */}
-              <motion.div variants={itemVariants}>
-                <AssetFilterBar 
-                  filters={['all', 'webpage', 'image', 'heading', 'meta', 'schema', 'link', 'video']}
-                  sources={Array.from(new Set(assets.map(a => a.sourceDomain)))}
-                  onFilterChange={setFilterOptions}
-                />
-              </motion.div>
-
-              {/* Asset Grid */}
-              <motion.div variants={itemVariants}>
-                <AssetTable
-                  assets={filteredAssets}
-                  onNameClick={setPreviewAsset}
-                />
-              </motion.div>
-
-              {/* Action Buttons */}
-              <motion.div 
-                className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
-                variants={itemVariants}
-              >
-                <ExportCSVButton assets={filteredAssets} />
-                <SendToOptimizationButton assets={filteredAssets} />
-              </motion.div>
-            </>
-          )}
-        </motion.div>
       </div>
 
-      {/* Asset Preview Modal */}
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20">
+        <AssetDiscoveryForm
+          value={inputValue}
+          onChange={setInputValue}
+          onSubmit={() => handleAnalysisSubmit(inputValue)}
+          disableSubmit={isAnalyzing || isValidating}
+          isAnalyzing={isAnalyzing}
+        />
+      </div>
+
+      <main className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {isAnalyzing ? (
+          <CrawlProgress 
+            percent={crawlProgress}
+            message={`Analyzing ${analysisQuery}...`}
+          />
+        ) : assets.length > 0 ? (
+          <>
+            <motion.div 
+              className="mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <AssetFilterBar
+                filters={['all', 'webpage', 'image', 'heading', 'meta', 'schema', 'link', 'video']}
+                sources={Array.from(new Set(assets.map(a => a.sourceDomain)))}
+                onFilterChange={setFilterOptions}
+              />
+            </motion.div>
+            <AssetTable
+              assets={assets.filter(asset => 
+                (filterOptions.type === 'all' || asset.type === filterOptions.type) &&
+                (filterOptions.source === 'all' || asset.sourceDomain === filterOptions.source)
+              )}
+              onNameClick={setPreviewAsset}
+            />
+            <div className="flex justify-end gap-4 mt-6">
+              <ExportCSVButton assets={assets} />
+              <SendToOptimizationButton assets={assets} />
+            </div>
+          </>
+        ) : (
+          !isAnalyzing && <p className="text-center text-gray-500 mt-8">No assets discovered yet.</p>
+        )}
+      </main>
+
       {previewAsset && (
-        <AssetPreviewModal 
+        <AssetPreviewModal
           asset={previewAsset}
           onClose={() => setPreviewAsset(null)}
         />

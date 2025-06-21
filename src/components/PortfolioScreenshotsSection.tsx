@@ -3,53 +3,52 @@
 import type React from "react"
 import { useRef } from "react"
 import { motion, useInView } from "framer-motion"
-import { Eye, Activity, BarChart3, Zap, Target } from "lucide-react"
+import { Eye, Activity, BarChart3, Zap, Target, GitBranch, Users, Lightbulb } from "lucide-react"
 
 // Feature cards data
 const featureCardsData = [
   {
     key: "discover",
     icon: <Eye className="w-6 h-6" />,
-    title: "Discover",
+    title: "Discover Assets",
     description:
       "Automatically discover and fetch your digital assets from websites, social media, and other online sources.",
     imageSrc: "/screenshots/Assetfetching.png",
-    borderColor: "#ec4899", // pink-500
+    borderColor: "#1e40af", // deep blue
   },
   {
-    key: "track",
-    icon: <Activity className="w-6 h-6" />,
-    title: "Track",
-    description: "Monitor your discovered assets in real-time with comprehensive tracking and status monitoring.",
-    imageSrc: "/screenshots/fetched.png",
-    borderColor: "#3b82f6", // blue-500
+    key: "competitors",
+    icon: <Users className="w-6 h-6" />,
+    title: "Analyze Competitors",
+    description: "See how you stack up against competitors in AI responses and identify content gaps.",
+    imageSrc: "/screenshots/competitor.png",
+    borderColor: "#b91c1c", // deep red
   },
   {
     key: "integrate",
-    icon: <BarChart3 className="w-6 h-6" />,
-    title: "Integrate",
+    icon: <GitBranch className="w-6 h-6" />,
+    title: "Integrate Workflows",
     description:
-      "Seamlessly integrate with your existing workflow tools like Jira for project management and collaboration.",
-    imageSrc: "/screenshots/jira.png",
-    borderColor: "#8b5cf6", // violet-500
+      "Seamlessly integrate with your existing workflow tools like Jira, Notion, and GitHub for project management.",
+    imageSrc: "/screenshots/integrations.png",
+    borderColor: "#b45309", // deep amber
   },
   {
     key: "optimize",
     icon: <Zap className="w-6 h-6" />,
-    title: "Optimize",
+    title: "Optimize Content",
     description:
       "Get intelligent optimization suggestions to improve your content's AI search visibility and performance.",
     imageSrc: "/screenshots/optimization.png",
-    borderColor: "#a3e635", // lime-400
+    borderColor: "#4d7c0f", // deep lime (neon)
   },
   {
-    key: "analyze",
-    icon: <Target className="w-6 h-6" />,
-    title: "Analyze",
-    description:
-      "View comprehensive analytics and scoring dashboards to track your AI visibility performance over time.",
-    imageSrc: "/screenshots/score.png",
-    borderColor: "#fb923c", // orange-400
+    key: "recommendations",
+    icon: <Lightbulb className="w-6 h-6" />,
+    title: "Get Recommendations",
+    description: "Receive actionable recommendations and track their implementation as fixes.",
+    imageSrc: "/screenshots/recommendation.png",
+    borderColor: "#15803d", // deep green
   },
 ]
 
@@ -125,7 +124,7 @@ function PortfolioCard({
           <img
             src={imageSrc || "/placeholder.svg"}
             alt={`${title} feature screenshot`}
-            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {/* Subtle overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
@@ -170,9 +169,9 @@ export default function PortfolioScreenshotsSection() {
 
         {/* Dynamic Portfolio Grid */}
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 auto-rows-[180px] sm:auto-rows-[220px] lg:auto-rows-[300px]">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 auto-rows-[220px] lg:auto-rows-[350px]">
             <PortfolioCard
-              className="col-span-2 row-span-1 lg:col-span-2 lg:row-span-2"
+              className="col-span-2 row-span-2"
               icon={featureCardsData[0].icon}
               title={featureCardsData[0].title}
               description={featureCardsData[0].description}
@@ -181,7 +180,7 @@ export default function PortfolioScreenshotsSection() {
               index={0}
             />
             <PortfolioCard
-              className="col-span-1 row-span-2 lg:col-span-1 lg:row-span-2"
+              className="col-span-1 row-span-2 lg:col-span-1 lg:row-span-1"
               icon={featureCardsData[1].icon}
               title={featureCardsData[1].title}
               description={featureCardsData[1].description}
@@ -190,7 +189,7 @@ export default function PortfolioScreenshotsSection() {
               index={1}
             />
             <PortfolioCard
-              className="col-span-1 row-span-1 lg:col-span-1 lg:row-span-2"
+              className="col-span-1 row-span-1 lg:col-span-1 lg:row-span-1"
               icon={featureCardsData[2].icon}
               title={featureCardsData[2].title}
               description={featureCardsData[2].description}
@@ -199,7 +198,7 @@ export default function PortfolioScreenshotsSection() {
               index={2}
             />
             <PortfolioCard
-              className="col-span-1 row-span-1 lg:col-span-2 lg:row-span-1"
+              className="col-span-1 row-span-1 lg:col-span-1 lg:row-span-1"
               icon={featureCardsData[3].icon}
               title={featureCardsData[3].title}
               description={featureCardsData[3].description}
