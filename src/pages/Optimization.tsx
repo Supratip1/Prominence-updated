@@ -394,8 +394,8 @@ const MarketShareChart = ({ data, historicalData }: { data: Series[], historical
           <h4 className="text-md font-semibold text-gray-700 mb-4 text-center">Current Market Share</h4>
           <div className="relative h-64">
             <Doughnut data={doughnutChartData} options={doughnutChartOptions} />
-          </div>
-        </div>
+              </div>
+            </div>
 
         {/* Line Chart Section */}
         <div>

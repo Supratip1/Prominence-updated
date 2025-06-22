@@ -13,8 +13,9 @@ const featureCardsData = [
     title: "Discover Assets",
     description:
       "Automatically discover and fetch your digital assets from websites, social media, and other online sources.",
-    imageSrc: "/screenshots/Assetfetching.png",
+    imageSrc: "/screenshots/Assetfetching.mp4",
     borderColor: "#1e40af", // deep blue
+    isVideo: true,
   },
   {
     key: "competitors",
@@ -23,6 +24,7 @@ const featureCardsData = [
     description: "See how you stack up against competitors in AI responses and identify content gaps.",
     imageSrc: "/screenshots/competitor.png",
     borderColor: "#b91c1c", // deep red
+    isVideo: false,
   },
   {
     key: "integrate",
@@ -32,6 +34,7 @@ const featureCardsData = [
       "Seamlessly integrate with your existing workflow tools like Jira, Notion, and GitHub for project management.",
     imageSrc: "/screenshots/integrations.png",
     borderColor: "#b45309", // deep amber
+    isVideo: false,
   },
   {
     key: "optimize",
@@ -41,6 +44,7 @@ const featureCardsData = [
       "Get intelligent optimization suggestions to improve your content's AI search visibility and performance.",
     imageSrc: "/screenshots/optimization.png",
     borderColor: "#4d7c0f", // deep lime (neon)
+    isVideo: false,
   },
   {
     key: "recommendations",
@@ -49,6 +53,7 @@ const featureCardsData = [
     description: "Receive actionable recommendations and track their implementation as fixes.",
     imageSrc: "/screenshots/recommendation.png",
     borderColor: "#15803d", // deep green
+    isVideo: false,
   },
 ]
 
@@ -61,6 +66,7 @@ function PortfolioCard({
   className,
   index,
   borderColor,
+  isVideo = false,
 }: {
   icon: React.ReactNode
   title: string
@@ -69,6 +75,7 @@ function PortfolioCard({
   className?: string
   index: number
   borderColor: string
+  isVideo?: boolean
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-50px" })
@@ -119,13 +126,27 @@ function PortfolioCard({
           </div>
         </div>
 
-        {/* Background Image */}
+        {/* Background Image/Video */}
         <div className="absolute inset-0">
-          <img
-            src={imageSrc || "/placeholder.svg"}
-            alt={`${title} feature screenshot`}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          {isVideo ? (
+            <video
+              src={imageSrc}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 high-quality-video"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls={false}
+              preload="auto"
+              poster=""
+            />
+          ) : (
+            <img
+              src={imageSrc || "/placeholder.svg"}
+              alt={`${title} feature screenshot`}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          )}
           {/* Subtle overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
         </div>
@@ -177,6 +198,7 @@ export default function PortfolioScreenshotsSection() {
               description={featureCardsData[0].description}
               imageSrc={featureCardsData[0].imageSrc}
               borderColor={featureCardsData[0].borderColor}
+              isVideo={featureCardsData[0].isVideo}
               index={0}
             />
             <PortfolioCard
@@ -186,6 +208,7 @@ export default function PortfolioScreenshotsSection() {
               description={featureCardsData[1].description}
               imageSrc={featureCardsData[1].imageSrc}
               borderColor={featureCardsData[1].borderColor}
+              isVideo={featureCardsData[1].isVideo}
               index={1}
             />
             <PortfolioCard
@@ -195,6 +218,7 @@ export default function PortfolioScreenshotsSection() {
               description={featureCardsData[2].description}
               imageSrc={featureCardsData[2].imageSrc}
               borderColor={featureCardsData[2].borderColor}
+              isVideo={featureCardsData[2].isVideo}
               index={2}
             />
             <PortfolioCard
@@ -204,15 +228,17 @@ export default function PortfolioScreenshotsSection() {
               description={featureCardsData[3].description}
               imageSrc={featureCardsData[3].imageSrc}
               borderColor={featureCardsData[3].borderColor}
+              isVideo={featureCardsData[3].isVideo}
               index={3}
             />
             <PortfolioCard
-              className="col-span-2 row-span-1 lg:col-span-2 lg:row-span-1"
+              className="col-span-1 row-span-1 lg:col-span-1 lg:row-span-1"
               icon={featureCardsData[4].icon}
               title={featureCardsData[4].title}
               description={featureCardsData[4].description}
               imageSrc={featureCardsData[4].imageSrc}
               borderColor={featureCardsData[4].borderColor}
+              isVideo={featureCardsData[4].isVideo}
               index={4}
             />
           </div>

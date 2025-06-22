@@ -619,7 +619,6 @@ const footerItemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { type: "spring" } },
 }
-
 export default function Dashboard() {
   const location = typeof window !== "undefined" ? window.location : { hash: "" }
   useEffect(() => {
@@ -654,6 +653,7 @@ export default function Dashboard() {
 
   const [timeRange, setTimeRange] = useState<"7d" | "30d">("7d")
   const [animationData, setAnimationData] = React.useState<any>(null)
+  const [currentAnimationIndex, setCurrentAnimationIndex] = useState(0)
   const [demoStep, setDemoStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setMuted] = useState(false)
@@ -692,6 +692,38 @@ export default function Dashboard() {
   const [isGridVisible, setIsGridVisible] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const mouseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [mobileActiveTab, setMobileActiveTab] = useState<'animation' | 'video'>('video')
+
+  // Lottie animation rotation system
+  const lottieAnimations = ["/lottie/Animation1.json", "/lottie/Animation2.json", "/lottie/Animation3.json"]
+  const animationIntervals = [240000, 300000, 270000] // 4 min, 5 min, 4.5 min intervals
+
+  // Load and rotate Lottie animations
+  useEffect(() => {
+    const loadAnimation = async (index: number) => {
+      try {
+        const response = await fetch(lottieAnimations[index])
+        const data = await response.json()
+        setAnimationData(data)
+      } catch (error) {
+        console.error('Failed to load animation:', error)
+      }
+    }
+
+    // Load initial animation
+    loadAnimation(currentAnimationIndex)
+
+    // Set up rotation interval
+    const interval = setInterval(() => {
+      setCurrentAnimationIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % lottieAnimations.length
+        loadAnimation(nextIndex)
+        return nextIndex
+      })
+    }, animationIntervals[currentAnimationIndex])
+
+    return () => clearInterval(interval)
+  }, [currentAnimationIndex])
 
   // Mouse movement detection for grid visibility
   useEffect(() => {
@@ -781,13 +813,6 @@ export default function Dashboard() {
 
     navigate(`/analysis?domain=${encodeURIComponent(domain)}`)
   }
-
-  useEffect(() => {
-    const randomLottieUrl = lottieAnimations[Math.floor(Math.random() * lottieAnimations.length)]
-    fetch(randomLottieUrl)
-      .then((res) => res.json())
-      .then(setAnimationData)
-  }, [])
 
   // Demo automation
   useEffect(() => {
@@ -907,82 +932,526 @@ export default function Dashboard() {
       {/* Main content wrapper with higher z-index */}
       <div className="relative z-10">
         {/* New Hero Section */}
-        <div className="relative overflow-hidden bg-black text-white pb-20">
+        <div className="relative overflow-hidden bg-black text-white">
           <div
-            className="absolute top-0 left-0 right-0 h-[100vh] pointer-events-none"
+            className="absolute -inset-0 pointer-events-none"
             style={{
-              background: 'radial-gradient(circle at 50% 0%, rgba(20, 83, 214, 0.3) 0%, rgba(0,0,0,0) 35%)'
+              background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent)",
             }}
           />
 
-          <div
-            id="hero"
-            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
-          >
-            <div className="text-center pt-24 pb-16 md:pt-40 md:pb-24">
-              <motion.h1
-                className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                Increase your Ranking
-                <br />
-                in LLM Searches
-              </motion.h1>
-              <motion.p
-                className="text-xl md:text-2xl font-medium text-gray-400 max-w-2xl mx-auto mb-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                Rise to the top in AI-powered search.
-              </motion.p>
+          <div id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            {/* Mobile Layout - Only applies to mobile */}
+            <div className="lg:hidden">
+              <div className="text-center pt-16 pb-8">
+                <motion.h1
+                  className="text-4xl sm:text-5xl font-bold tracking-tighter mb-4 text-white"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  Increase your Ranking
+                  <br />
+                  in LLM Searches
+                </motion.h1>
+                <motion.p
+                  className="text-lg sm:text-xl font-medium text-gray-400 max-w-xl mx-auto mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  Rise to the top in AI-powered search.
+                </motion.p>
+                <motion.div
+                  className="flex flex-row justify-center items-center gap-2 sm:gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <button
+                    onClick={() => navigate('/analysis')}
+                    className="bg-white text-black font-semibold rounded-lg px-3 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-base transition-transform hover:scale-105 shadow-lg"
+                  >
+                    Start with AI
+                  </button>
+                  <button
+                    onClick={() => smoothScrollTo('pricing')}
+                    className="bg-transparent text-white font-semibold rounded-lg px-3 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-base transition-transform hover:scale-105 border border-white/30 hover:bg-white/10"
+                  >
+                    Start for free
+                  </button>
+                </motion.div>
+              </div>
+              
+              {/* Mobile: Tabbed Interface */}
+              <div className="mt-8">
+                {/* Tab Navigation */}
+                <div className="flex border-b border-white/20 mb-6">
+                  <button 
+                    className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                      mobileActiveTab === 'video' 
+                        ? 'text-white border-b-2 border-white' 
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                    onClick={() => setMobileActiveTab('video')}
+                  >
+                    Demo Video
+                  </button>
+                  <button 
+                    className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                      mobileActiveTab === 'animation' 
+                        ? 'text-white border-b-2 border-white' 
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                    onClick={() => setMobileActiveTab('animation')}
+                  >
+                    Animation
+                  </button>
+                </div>
+                
+                {/* Tab Content */}
+                <div className="relative">
+                  {mobileActiveTab === 'animation' && (
+                    <motion.div
+                      key="animation"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex justify-center"
+                    >
+                      {animationData && <Lottie animationData={animationData} loop={true} />}
+                    </motion.div>
+                  )}
+                  
+                  {mobileActiveTab === 'video' && (
+                    <motion.div
+                      key="video"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-blue-500/20">
+                        <video
+                          className="w-full h-auto object-cover"
+                          src="/16296848-uhd_3840_2160_24fps.mp4"
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Layout - Original unchanged */}
+            <div className="hidden lg:grid lg:grid-cols-2 gap-16 items-center pt-24 pb-8">
+              {/* Left: Text Content */}
+              <div className="text-left">
+                <motion.h1
+                  className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  Increase your Ranking
+                  <br />
+                  in LLM Searches
+                </motion.h1>
+                <motion.p
+                  className="text-xl md:text-2xl font-medium text-gray-400 max-w-xl mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  Rise to the top in AI-powered search.
+                </motion.p>
+                <motion.div
+                  className="flex items-center gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <button
+                    onClick={() => navigate('/analysis')}
+                    className="bg-white text-black font-semibold rounded-lg px-6 py-3 transition-transform hover:scale-105 shadow-lg"
+                  >
+                    Start with AI
+                  </button>
+                  <button
+                    onClick={() => smoothScrollTo('pricing')}
+                    className="bg-transparent text-white font-semibold rounded-lg px-6 py-3 transition-transform hover:scale-105 border border-white/30 hover:bg-white/10"
+                  >
+                    Start for free
+                  </button>
+                </motion.div>
+              </div>
+
+              {/* Right: Lottie Animation */}
               <motion.div
-                className="flex justify-center items-center gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
+                className="relative"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
               >
-                <button
-                  onClick={() => navigate('/analysis')}
-                  className="bg-white text-black font-semibold rounded-full px-6 py-3 transition-transform hover:scale-105"
-                >
-                  Start with AI
-                </button>
-                <button
-                  onClick={() => smoothScrollTo('pricing')}
-                  className="bg-[#1C1C1C] text-white font-semibold rounded-full px-6 py-3 transition-transform hover:scale-105 border border-gray-700"
-                >
-                  Start for free
-                </button>
+                {animationData && <Lottie animationData={animationData} loop={true} />}
               </motion.div>
             </div>
+            
+            {/* Desktop: Video below heading and animation */}
+            <motion.div
+              className="hidden lg:block relative mt-8"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+            >
+              <div className="relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-blue-500/20">
+                <video
+                  className="w-full h-full object-cover"
+                  src="/16296848-uhd_3840_2160_24fps.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+              </div>
+            </motion.div>
           </div>
-          
-          <motion.div
-            className="relative max-w-7xl mx-auto px-4 z-10"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
-            <div className="relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-blue-500/20">
-              <video
-                className="w-full h-full object-cover"
-                src="/16296848-uhd_3840_2160_24fps.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-              />
-            </div>
-          </motion.div>
         </div>
 
-        {/* Portfolio Screenshots Section */}
-        <div className="relative z-10">
-          <PortfolioScreenshotsSection />
-        </div>
+        {/* New "Our Services" Section */}
+        <section id="our-services" className="py-20 sm:py-32 relative bg-black text-white">
+            <div className="absolute -top-1/2 right-0 w-1/2 h-full bg-purple-500/10 to-transparent blur-[200px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/3 -left-1/4 w-1/2 h-full bg-purple-500/10 to-transparent blur-[200px] rounded-full pointer-events-none" />
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div className="text-center max-w-3xl mx-auto">
+                    <div className="inline-block mb-4">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">
+                            Our Platform
+                        </span>
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+                        A Complete Toolkit for AI Search Dominance
+                    </h2>
+                    <p className="mt-6 text-base sm:text-lg text-gray-400">
+                        From asset discovery to competitive analysis, our platform provides everything you need to win in the new era of search.
+                    </p>
+                </div>
+
+                <div className="mt-16 lg:mt-20 space-y-16 lg:space-y-20">
+                    {/* Mobile Layout - Card-based 2-column grid */}
+                    <div className="lg:hidden grid grid-cols-2 gap-4">
+                        {/* Mobile Card 1: Asset Discovery */}
+                        <div className="bg-gradient-to-b from-black to-purple-900/20 rounded-xl border border-purple-800/30 overflow-hidden">
+                            <div className="aspect-[4/3]">
+                                <video
+                                    src="/screenshots/Assetfetching.mp4"
+                                    className="w-full h-full object-contain"
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                />
+                            </div>
+                            <div className="p-3">
+                                <h3 className="text-sm font-bold text-white mb-1">Automated Asset Discovery</h3>
+                                <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                                    Automatically discover and fetch your digital assets from across the web.
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Web Crawling</span>
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Real-time</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Card 2: Integrations */}
+                        <div className="bg-gradient-to-b from-black to-purple-900/20 rounded-xl border border-purple-800/30 overflow-hidden">
+                            <div className="aspect-[4/3]">
+                                <img src="/screenshots/integrations.png" alt="Integrations Screenshot" className="w-full h-full object-contain" />
+                            </div>
+                            <div className="p-3">
+                                <h3 className="text-sm font-bold text-white mb-1">Seamless Workflow Integrations</h3>
+                                <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                                    Connect with your existing tools like Jira, Slack, and more.
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Jira</span>
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Slack</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Card 3: Optimization */}
+                        <div className="bg-gradient-to-b from-black to-purple-900/20 rounded-xl border border-purple-800/30 overflow-hidden">
+                            <div className="aspect-[4/3]">
+                                <img src="/screenshots/optimization.png" alt="AI Optimization Screenshot" className="w-full h-full object-contain" />
+                            </div>
+                            <div className="p-3">
+                                <h3 className="text-sm font-bold text-white mb-1">AI-Powered Optimization</h3>
+                                <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                                    Our AI analyzes your content and provides actionable recommendations.
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Content Analysis</span>
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">SEO</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Card 4: Recommendations */}
+                        <div className="bg-gradient-to-b from-black to-purple-900/20 rounded-xl border border-purple-800/30 overflow-hidden">
+                            <div className="aspect-[4/3]">
+                                <img src="/screenshots/recommendation.png" alt="Recommendations Screenshot" className="w-full h-full object-contain" />
+                            </div>
+                            <div className="p-3">
+                                <h3 className="text-sm font-bold text-white mb-1">Targeted Recommendations</h3>
+                                <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                                    Receive specific recommendations to enhance your content's impact.
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Keywords</span>
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Strategy</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mobile Card 5: Competitor Analysis */}
+                        <div className="bg-gradient-to-b from-black to-purple-900/20 rounded-xl border border-purple-800/30 overflow-hidden">
+                            <div className="aspect-[4/3]">
+                                <img src="/screenshots/competitor.png" alt="Competitor Analysis Screenshot" className="w-full h-full object-contain" />
+                            </div>
+                            <div className="p-3">
+                                <h3 className="text-sm font-bold text-white mb-1">Competitor Insights</h3>
+                                <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                                    Track your competitors' digital footprint and benchmark your performance.
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Benchmarking</span>
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">Strategy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Desktop Layout - Original side-by-side layout */}
+                    <div className="hidden lg:block space-y-20">
+                        {/* Feature 1: Asset Discovery */}
+                        <div className="grid grid-cols-2 gap-16 items-center">
+                            <div className="order-1">
+                                <video
+                                    src="/screenshots/Assetfetching.mp4"
+                                    className="rounded-xl shadow-2xl shadow-purple-500/10 border border-white/10 w-full"
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                />
+                            </div>
+                            <div className="order-2 text-left">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20 mb-3">
+                                    Asset Discovery
+                                </span>
+                                <h3 className="text-3xl font-bold text-white mb-4">Automated Asset Discovery</h3>
+                                <p className="text-gray-400 mb-6">
+                                    Automatically discover and fetch your digital assets from across the web. We scan websites, social media, and other sources to build a complete inventory of your brand's presence.
+                                </p>
+                                <div className="flex gap-2 flex-wrap">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Web Crawling</span>
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Real-time</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Feature 2: Integrations */}
+                        <div className="grid grid-cols-2 gap-16 items-center">
+                            <div className="order-2 lg:order-1 text-left">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20 mb-3">
+                                    Integrations
+                                </span>
+                                <h3 className="text-3xl font-bold text-white mb-4">Seamless Workflow Integrations</h3>
+                                <p className="text-gray-400 mb-6">
+                                    Connect with your existing tools like Jira, Slack, and more. Keep your team in sync and automate your content optimization process from start to finish.
+                                </p>
+                                <div className="flex gap-2 flex-wrap">
+                                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Jira</span>
+                                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Slack</span>
+                                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Webhooks</span>
+                                </div>
+                            </div>
+                            <div className="order-1 lg:order-2">
+                                 <img src="/screenshots/integrations.png" alt="Integrations Screenshot" className="rounded-xl shadow-2xl shadow-purple-500/10 border border-white/10 w-full" />
+                            </div>
+                        </div>
+
+                        {/* Feature 3: Optimization */}
+                        <div className="grid grid-cols-2 gap-16 items-center">
+                            <div className="order-1">
+                                <img src="/screenshots/optimization.png" alt="AI Optimization Screenshot" className="rounded-xl shadow-2xl shadow-purple-500/10 border border-white/10 w-full" />
+                            </div>
+                            <div className="order-2 text-left">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20 mb-3">
+                                    AI-Powered Suggestions
+                                </span>
+                                <h3 className="text-3xl font-bold text-white mb-4">AI-Powered Optimization</h3>
+                                <p className="text-gray-400 mb-6">
+                                    Our AI analyzes your content and provides actionable recommendations to improve its performance in search results. Boost your visibility with data-driven insights.
+                                </p>
+                                <div className="flex gap-2 flex-wrap">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Content Analysis</span>
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">SEO</span>
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Performance</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Feature 4: Recommendations */}
+                        <div className="grid grid-cols-2 gap-16 items-center">
+                            <div className="order-2 lg:order-1 text-left">
+                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20 mb-3">
+                                    Recommendations
+                                </span>
+                                <h3 className="text-3xl font-bold text-white mb-4">Targeted Recommendations</h3>
+                                <p className="text-gray-400 mb-6">
+                                    Receive specific, targeted recommendations to enhance your content's impact. From keyword suggestions to structural improvements, we guide you every step of the way.
+                                </p>
+                                <div className="flex gap-2 flex-wrap">
+                                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Keywords</span>
+                                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Content Strategy</span>
+                                </div>
+                            </div>
+                            <div className="order-1 lg:order-2">
+                                <img src="/screenshots/recommendation.png" alt="Recommendations Screenshot" className="rounded-xl shadow-2xl shadow-purple-500/10 border border-white/10 w-full" />
+                            </div>
+                        </div>
+
+                        {/* Feature 5: Competitor Analysis */}
+                        <div className="grid grid-cols-2 gap-16 items-center">
+                            <div className="order-1">
+                                <img src="/screenshots/competitor.png" alt="Competitor Analysis Screenshot" className="rounded-xl shadow-2xl shadow-purple-500/10 border border-white/10 w-full" />
+                            </div>
+                            <div className="order-2 text-left">
+                                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20 mb-3">
+                                    Competitor Insights
+                                </span>
+                                <h3 className="text-3xl font-bold text-white mb-4">Competitor Insights</h3>
+                                <p className="text-gray-400 mb-6">
+                                    Track your competitors' digital footprint and benchmark your performance against theirs. Uncover their strategies and find opportunities to get ahead.
+                                </p>
+                                <div className="flex gap-2 flex-wrap">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Benchmarking</span>
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">Strategy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {/* New "Key Benefits of AI" Section */}
+        <section id="key-benefits" className="py-20 sm:py-32 bg-black text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto">
+              <div className="inline-block mb-4">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">
+                  Benefits
+                </span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+                The Key Benefits of AI for Your Business Growth
+              </h2>
+              <p className="mt-6 text-base sm:text-lg text-gray-400">
+                Discover how our platform enhances your online presence, reduces costs, and drives business growth with smarter, faster processes.
+              </p>
+            </div>
+
+            <div className="mt-16 lg:mt-20 grid grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {/* Benefit 1: Boost LLM & AI Search Rankings */}
+              <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
+                <div className="flex items-center gap-3 lg:gap-4 mb-4">
+                  <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg lg:text-xl font-bold text-white">Boost LLM & AI Search Rankings</h3>
+                </div>
+                <p className="text-white text-sm lg:text-base">
+                  Track and improve your brand's ranking in AI-powered search engines.
+                </p>
+              </div>
+
+              {/* Benefit 2: AI-Optimized Content */}
+              <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
+                <div className="flex items-center gap-3 lg:gap-4 mb-4">
+                  <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
+                    <Lightbulb className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg lg:text-xl font-bold text-white">AI-Optimized Content</h3>
+                </div>
+                <p className="text-white text-sm lg:text-base">
+                  Get AI-driven recommendations to optimize your content.
+                </p>
+              </div>
+
+              {/* Benefit 3: Continuous Brand Monitoring */}
+              <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
+                <div className="flex items-center gap-3 lg:gap-4 mb-4">
+                  <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
+                    <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg lg:text-xl font-bold text-white">Continuous Brand Monitoring</h3>
+                </div>
+                <p className="text-white text-sm lg:text-base">
+                  Monitor AI responses and get alerts for new mentions.
+                </p>
+              </div>
+
+              {/* Benefit 4: Competitor Intelligence */}
+              <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
+                <div className="flex items-center gap-3 lg:gap-4 mb-4">
+                  <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
+                    <Users className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg lg:text-xl font-bold text-white">Competitor Intelligence</h3>
+                </div>
+                <p className="text-white text-sm lg:text-base">
+                  Benchmark your performance against competitors.
+                </p>
+              </div>
+
+              {/* Benefit 5: Actionable Analytics */}
+              <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
+                <div className="flex items-center gap-3 lg:gap-4 mb-4">
+                  <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg lg:text-xl font-bold text-white">Actionable Analytics</h3>
+                </div>
+                <p className="text-white text-sm lg:text-base">
+                  Get clear insights and ROI tracking.
+                </p>
+              </div>
+
+              {/* Benefit 6: Automated Asset Discovery */}
+              <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
+                <div className="flex items-center gap-3 lg:gap-4 mb-4">
+                  <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
+                    <Search className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg lg:text-xl font-bold text-white">Automated Asset Discovery</h3>
+                </div>
+                <p className="text-white text-sm lg:text-base">
+                  Automatically discover your brand's digital footprint.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Enhanced Trust Indicators */}
         {/* <motion.section
@@ -1003,14 +1472,14 @@ export default function Dashboard() {
               What Our Customers Say
             </motion.h2>
             <TestimonialCarousel testimonials={testimonials} />
-          </div>
+                        </div>
         </motion.section> */}
 
         {/* Pricing Section */}
-        <motion.section id="pricing" className="py-20 relative z-10">
-          <div className="container mx-auto px-4">
+        <motion.section id="pricing" className="py-16 sm:py-20 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.h2
-              className="text-3xl font-bold text-white mb-8 text-center"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 sm:mb-8 text-center"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -1024,19 +1493,19 @@ export default function Dashboard() {
       {/* end main content wrapper */}
 
       {/* Footer Section */}
-      <footer className="relative z-20 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col items-center gap-6 border-t border-white/10">
+      <footer className="relative z-20 mt-12 sm:mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex flex-col items-center gap-4 sm:gap-6 border-t border-white/10">
           {/* Navigation Links */}
-          <nav className="flex flex-wrap justify-center gap-6 text-sm font-medium mb-2">
+          <nav className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium mb-2">
             <button
               onClick={() => document.getElementById("hero")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-              className="text-white/70 hover:text-green-300 transition"
+              className="text-white/70 hover:text-green-300 transition px-2 py-1"
             >
               Dashboard
             </button>
             <button
               onClick={() => (window.location.href = "/analysis")}
-              className="text-white/70 hover:text-green-300 transition"
+              className="text-white/70 hover:text-green-300 transition px-2 py-1"
             >
               Asset Discovery
             </button>
@@ -1044,13 +1513,13 @@ export default function Dashboard() {
               onClick={() =>
                 document.getElementById("testimonials")?.scrollIntoView({ behavior: "smooth", block: "start" })
               }
-              className="text-white/70 hover:text-green-300 transition"
+              className="text-white/70 hover:text-green-300 transition px-2 py-1"
             >
               Testimonials
             </button>
             <button
               onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-              className="text-white/70 hover:text-green-300 transition"
+              className="text-white/70 hover:text-green-300 transition px-2 py-1"
             >
               Pricing
             </button>
@@ -1061,13 +1530,13 @@ export default function Dashboard() {
 
           {/* Socials */}
           <div className="flex gap-4 mb-2">
-            <a href="#" className="text-white/60 hover:text-green-300 transition" aria-label="Twitter">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a href="#" className="text-white/60 hover:text-green-300 transition p-2" aria-label="Twitter">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M22.46 6c-.77.35-1.6.58-2.47.69a4.3 4.3 0 0 0 1.88-2.37 8.59 8.59 0 0 1-2.72 1.04A4.28 4.28 0 0 0 16.11 4c-2.37 0-4.29 1.92-4.29 4.29 0 .34.04.67.11.99C7.69 9.13 4.07 7.38 1.64 4.77c-.37.64-.58 1.39-.58 2.19 0 1.51.77 2.84 1.95 3.62-.72-.02-1.4-.22-1.99-.55v.06c0 2.11 1.5 3.87 3.5 4.27-.36.1-.74.16-1.13.16-.28 0-.54-.03-.8-.08.54 1.68 2.12 2.9 3.99 2.93A8.6 8.6 0 0 1 2 19.54c-.29 0-.57-.02-.85-.05A12.13 12.13 0 0 0 8.29 21.5c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.18 8.18 0 0 0 24 4.59a8.36 8.36 0 0 1-2.54.7z" />
               </svg>
             </a>
-            <a href="#" className="text-white/60 hover:text-green-300 transition" aria-label="LinkedIn">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a href="#" className="text-white/60 hover:text-green-300 transition p-2" aria-label="LinkedIn">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.28c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.28h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.75 1.38-1.54 2.84-1.54 3.04 0 3.6 2 3.6 4.59v4.72z" />
               </svg>
             </a>
@@ -1149,17 +1618,6 @@ function StackedScreenshotCard({
             <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full opacity-40 blur-sm" />
           </div>
         </div>
-
-        {/* Subtle background pattern - REMOVED */}
-        {/* <div className="absolute inset-0 opacity-5">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px)`,
-              backgroundSize: "50px 50px",
-            }}
-          />
-        </div> */}
       </div>
     </motion.div>
   )
@@ -1346,19 +1804,19 @@ function ContentAnalyzerSection() {
               >
                 Try Content Analyzer
               </motion.button>
-            </div>
+                            </div>
             <div className="bg-white/10 rounded-xl p-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-white/80">AI Citation Score</span>
                   <span className="text-green-400 font-bold">87/100</span>
-                </div>
+                        </div>
                 <div className="w-full bg-white/20 rounded-full h-2">
                   <div
                     className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full"
                     style={{ width: "87%" }}
                   ></div>
-                </div>
+                    </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-white/70">Structure</span>
@@ -1435,8 +1893,8 @@ function KeywordResearchSection() {
                         <div className="text-white font-medium">{item.keyword}</div>
                         <div className="text-white/60 text-sm">
                           Volume: {item.volume} • Difficulty: {item.difficulty}
+                            </div>
                         </div>
-                      </div>
                       <div className="text-right">
                         <div className="text-green-400 font-bold">{item.aiScore}</div>
                         <div className="text-white/60 text-xs">AI Score</div>
@@ -1444,8 +1902,8 @@ function KeywordResearchSection() {
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
+                        </div>
+                    </div>
 
             <div className="space-y-6">
               <div className="bg-white/10 rounded-xl p-6">
@@ -1463,7 +1921,7 @@ function KeywordResearchSection() {
                     </li>
                   ))}
                 </ul>
-              </div>
+                        </div>
 
               <motion.button
                 className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-xl font-semibold"
@@ -1529,9 +1987,9 @@ function ApiDocsSection() {
                   <div key={index} className="bg-white/10 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-white">{stat.value}</div>
                     <div className="text-white/60 text-sm">{stat.title}</div>
-                  </div>
+                            </div>
                 ))}
-              </div>
+                        </div>
 
               <motion.button
                 className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
@@ -1541,13 +1999,13 @@ function ApiDocsSection() {
                 View Documentation
                 <ExternalLink className="w-4 h-4" />
               </motion.button>
-            </div>
+                    </div>
 
             <div className="bg-gray-900/50 rounded-xl p-6 font-mono text-sm">
               <div className="text-green-400 mb-2">// Get keyword visibility data</div>
               <div className="text-white">
                 <span className="text-blue-400">GET</span> /api/v1/keywords/visibility
-              </div>
+                </div>
               <div className="text-gray-400 mt-4">
                 {`{
   "keyword": "best CRM software",
@@ -1560,7 +2018,7 @@ function ApiDocsSection() {
     "perplexity": 89
   }
 }`}
-              </div>
+            </div>
             </div>
           </div>
         </motion.div>
@@ -2034,7 +2492,7 @@ function HorizontalScreenshots({ cards }: { cards: React.ReactNode[] }) {
             </div>
           ))}
         </motion.div>
-      </section>
+        </section>
     </div>
   );
 }
@@ -2096,12 +2554,14 @@ function FeatureCard({
   description,
   imageSrc,
   index,
+  isVideo = false,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
   imageSrc: string;
   index: number;
+  isVideo?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
@@ -2134,11 +2594,23 @@ function FeatureCard({
           <p className="text-gray-700 leading-relaxed">{description}</p>
         </div>
         <div className="aspect-video relative rounded-xl overflow-hidden bg-gray-100 shadow-inner mt-6">
-          <img
-            src={imageSrc}
-            alt={`${title} feature screenshot`}
-            className="w-full h-full object-contain"
-          />
+          {isVideo ? (
+            <video
+              src={imageSrc}
+              className="w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls={false}
+            />
+          ) : (
+            <img
+              src={imageSrc}
+              alt={`${title} feature screenshot`}
+              className="w-full h-full object-contain"
+            />
+          )}
         </div>
       </div>
     </motion.div>
@@ -2151,7 +2623,8 @@ const featureCardsData = [
     icon: <Eye className="w-8 h-8" />,
     title: "Discover",
     description: "Automatically discover and fetch your digital assets from websites, social media, and other online sources.",
-    imageSrc: "/screenshots/Assetfetching.png",
+    imageSrc: "/screenshots/Assetfetching.mp4",
+    isVideo: true,
   },
   {
     key: "track",
@@ -2159,6 +2632,7 @@ const featureCardsData = [
     title: "Track",
     description: "Monitor your discovered assets in real-time with comprehensive tracking and status monitoring.",
     imageSrc: "/screenshots/fetched.png",
+    isVideo: false,
   },
   {
     key: "integrate",
@@ -2166,6 +2640,7 @@ const featureCardsData = [
     title: "Integrate",
     description: "Seamlessly integrate with your existing workflow tools like Jira for project management and collaboration.",
     imageSrc: "/screenshots/jira.png",
+    isVideo: false,
   },
   {
     key: "optimize",
@@ -2173,6 +2648,7 @@ const featureCardsData = [
     title: "Optimize",
     description: "Get intelligent optimization suggestions to improve your content's AI search visibility and performance.",
     imageSrc: "/screenshots/optimization.png",
+    isVideo: false,
   },
   {
     key: "analyze",
@@ -2180,5 +2656,7 @@ const featureCardsData = [
     title: "Analyze",
     description: "View comprehensive analytics and scoring dashboards to track your AI visibility performance over time.",
     imageSrc: "/screenshots/score.png",
+    isVideo: false,
   },
 ];
+
