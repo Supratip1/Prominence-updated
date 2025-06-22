@@ -39,7 +39,7 @@ export default function AssetDiscoveryForm({ value, onChange, onSubmit, disableS
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Enter domain or URL (e.g., example.com)"
-            className="w-full h-16 pl-14 pr-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 disabled:opacity-50 text-lg"
+            className="w-full h-12 sm:h-16 px-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 disabled:opacity-50 text-lg"
           />
           {value && (
             <button
@@ -54,7 +54,7 @@ export default function AssetDiscoveryForm({ value, onChange, onSubmit, disableS
         <button
           type="submit"
           disabled={disableSubmit}
-          className="h-12 sm:h-16 px-8 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-500 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-all shadow-lg shadow-blue-500/30 w-full sm:w-auto mt-2 sm:mt-0"
+          className="h-12 sm:h-16 px-8 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-500 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-all shadow-lg shadow-purple-500/30 w-full sm:w-auto mt-2 sm:mt-0"
         >
           {isAnalyzing ? 'Analyzing…' : 'Analyze'}
         </button>

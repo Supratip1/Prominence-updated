@@ -43,7 +43,7 @@ export default function FeatureCard({
             </div>
             <div>
               <h3 className="text-xl font-bold text-black">{title}</h3>
-              <div className="w-8 h-0.5 bg-gradient-to-r from-green-400 to-blue-500 rounded-full mt-1" />
+              <div className="w-8 h-0.5 bg-gradient-to-r from-green-400 to-purple-500 rounded-full mt-1" />
             </div>
           </div>
           <p className="text-gray-700 leading-relaxed">{description}</p>

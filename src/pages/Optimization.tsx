@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { TrendingUp, TrendingDown, Download, ArrowLeft, BarChart3, FileText, BarChart, Target, TrendingUp as TrendingUpIcon, Users, CheckCircle, Bug, BookOpen, ClipboardList, MessageSquare, AlertTriangle, Settings, GitBranch, Code, Database, Calendar, CheckSquare, FileCheck, GitPullRequest, GitCommit, GitMerge } from "lucide-react"
 import { motion } from "framer-motion"
 import { Line, Doughnut } from 'react-chartjs-2';
+import Header from '../components/Layout/Header';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -100,7 +101,7 @@ const ScoreCard = ({
 
   return (
     <div
-      className={`bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+      className={`bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-gray-700">{title}</h3>
@@ -125,7 +126,7 @@ const ScoreCard = ({
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-1500 ease-out"
+            className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-1500 ease-out"
             style={{ width: `${isVisible ? value : 0}%` }}
           />
         </div>
@@ -136,7 +137,7 @@ const ScoreCard = ({
         {trend.map((point, index) => (
           <div
             key={index}
-            className="flex-1 bg-blue-200 rounded-sm transition-all duration-1000 ease-out"
+            className="flex-1 bg-purple-200 rounded-sm transition-all duration-1000 ease-out"
             style={{
               height: `${isVisible ? (point / Math.max(...trend)) * 100 : 0}%`,
               transitionDelay: `${index * 50}ms`,
@@ -220,7 +221,7 @@ const OpportunityTable = ({ opportunities }: { opportunities: OpportunityRow[] }
                 <div className="flex items-center justify-end space-x-2">
                   <div className="w-16 bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-1000 ease-out"
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-1000 ease-out"
                       style={{ width: `${(opp.competitor / 100) * 100}%` }}
                     />
                   </div>
@@ -247,7 +248,7 @@ const SuggestionCard = ({ suggestion, priority, impact, effort, type }: Suggesti
   const config = priorityConfig[priority as keyof typeof priorityConfig]
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 hover:border-gray-300">
+    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 hover:border-gray-300">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-2">
           <div className={`w-2 h-2 rounded-full ${config.dot}`} />
@@ -263,11 +264,11 @@ const SuggestionCard = ({ suggestion, priority, impact, effort, type }: Suggesti
       </div>
       <p className="text-gray-900 font-medium mb-4 leading-relaxed text-sm">{suggestion}</p>
       <div className="flex items-center justify-between text-xs">
-        <div className="text-gray-600">
-          Impact: <span className="font-semibold text-blue-600">{impact}</span>
+        <div className="text-sm text-gray-600 mt-2">
+          Impact: <span className="font-semibold text-purple-600">{impact}</span>
         </div>
-        <div className="text-gray-600">
-          Effort: <span className="font-semibold text-blue-600 capitalize">{effort}</span>
+        <div className="text-sm text-gray-600">
+          Effort: <span className="font-semibold text-purple-600 capitalize">{effort}</span>
         </div>
       </div>
     </div>
@@ -534,15 +535,18 @@ export default function Optimization() {
 
     return (
     <div className="bg-black text-white min-h-screen">
+      {/* Header */}
+      <Header />
+      
       {/* Hero Section */}
-      <div className="relative bg-black text-white pt-20 pb-12">
+      <div className="relative overflow-hidden bg-black text-white">
         <div
-          className="absolute top-0 left-0 right-0 h-[50vh] pointer-events-none"
+          className="absolute -inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at 50% 0%, rgba(20, 83, 214, 0.3) 0%, rgba(0,0,0,0) 45%)'
+            background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent)",
           }}
         />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center pt-24 pb-8">
           <motion.h1
             className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
             initial={{ opacity: 0, y: 20 }}
@@ -572,7 +576,7 @@ export default function Optimization() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                   activeTab === tab.id
-                    ? "bg-blue-600 text-white shadow-md"
+                    ? "bg-purple-600 text-white shadow-md"
                     : "text-gray-300 hover:bg-gray-700/50"
                 }`}
       >
@@ -662,10 +666,10 @@ const IntegrationTab = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {integrations.map(integration => (
             <div key={integration.name} className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col items-center text-center hover:bg-gray-100 transition-colors">
-              <div className="text-blue-600 mb-4">{integration.icon}</div>
+              <div className="text-purple-600 mb-4">{integration.icon}</div>
               <h4 className="font-semibold text-gray-900 mb-2">{integration.name}</h4>
               <p className="text-sm text-gray-600 mb-4">{integration.description}</p>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors mt-auto">
+              <button className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition-colors mt-auto">
                 Connect
               </button>
             </div>
@@ -688,12 +692,12 @@ const IntegrationTab = () => {
             <tbody>
               {fixes.map(fix => (
                 <tr key={fix.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 font-mono text-blue-600">{fix.id}</td>
+                  <td className="px-6 py-4 font-mono text-purple-600">{fix.id}</td>
                   <td className="px-6 py-4 text-gray-900">{fix.description}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                       fix.status === 'To Do' ? 'bg-yellow-100 text-yellow-800' :
-                      fix.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                      fix.status === 'In Progress' ? 'bg-purple-100 text-purple-800' :
                       'bg-green-100 text-green-800'
                     }`}>
                       {fix.status}
@@ -708,7 +712,7 @@ const IntegrationTab = () => {
                   </td>
 
                   <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:text-blue-500 font-semibold">
+                    <button className="text-purple-600 hover:text-purple-500 font-semibold">
                       View Details
                     </button>
                   </td>

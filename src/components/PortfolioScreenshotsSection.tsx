@@ -14,7 +14,7 @@ const featureCardsData = [
     description:
       "Automatically discover and fetch your digital assets from websites, social media, and other online sources.",
     imageSrc: "/screenshots/Assetfetching.mp4",
-    borderColor: "#1e40af", // deep blue
+    borderColor: "#7c3aed", // deep purple
     isVideo: true,
   },
   {
@@ -112,7 +112,7 @@ function PortfolioCard({
             </div>
             <div className="flex-1">
               <h3 className="text-base md:text-lg font-bold text-white mb-1">{title}</h3>
-              <div className="w-8 h-0.5 bg-gradient-to-r from-green-400 to-blue-500 rounded-full" />
+              <div className="w-8 h-0.5 bg-gradient-to-r from-green-400 to-purple-500 rounded-full" />
             </div>
           </div>
 

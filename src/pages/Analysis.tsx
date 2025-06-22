@@ -10,6 +10,7 @@ import AssetTable from '../components/Analysis/AssetTable';
 import AssetPreviewModal from '../components/Analysis/AssetPreviewModal';
 import ExportCSVButton from '../components/Analysis/ExportCSVButton';
 import SendToOptimizationButton from '../components/Analysis/SendToOptimizationButton';
+import Header from '../components/Layout/Header';
 import debounce from 'lodash/debounce';
 
 // Types from backend
@@ -343,15 +344,18 @@ const Analysis: React.FC = () => {
 
   return (
     <div className="bg-black text-white min-h-screen">
+      {/* Header */}
+      <Header />
+      
       {/* Hero Section */}
-      <div className="relative bg-black text-white pt-20 pb-20">
+      <div className="relative overflow-hidden bg-black text-white">
         <div
-          className="absolute top-0 left-0 right-0 h-[50vh] pointer-events-none"
+          className="absolute -inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at 50% 0%, rgba(20, 83, 214, 0.3) 0%, rgba(0,0,0,0) 45%)'
+            background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent)",
           }}
         />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center pt-24 pb-8">
           <motion.h1
             className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
             initial={{ opacity: 0, y: 20 }}
@@ -371,7 +375,7 @@ const Analysis: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 mt-8 relative z-20">
         <AssetDiscoveryForm
           value={inputValue}
           onChange={setInputValue}

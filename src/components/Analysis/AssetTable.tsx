@@ -116,7 +116,21 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
               >
                 {asset.title || 'Untitled'}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200">{asset.type}</td>
+              <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    asset.type === 'webpage'
+                      ? 'bg-purple-600 text-white border-purple-600'
+                      : asset.type === 'image'
+                      ? 'bg-green-600 text-white border-green-600'
+                      : asset.type === 'video'
+                      ? 'bg-red-600 text-white border-red-600'
+                      : 'bg-gray-600 text-white border-gray-600'
+                  }`}
+                >
+                  {asset.type}
+                </span>
+              </td>
               <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200">
                 {asset.sourceDomain}
               </td>
@@ -128,7 +142,7 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
                   href={asset.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                  className="inline-flex items-center text-purple-600 hover:text-purple-800 transition-colors"
                   onClick={e => e.stopPropagation()}
                 >
                   <ExternalLink className="w-4 h-4 mr-1" /> View
@@ -170,7 +184,7 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
                   onClick={() => setCurrentPage(p)}
                   className={`px-3 py-1 rounded border ${
                     p === currentPage
-                      ? 'bg-blue-600 text-white border-blue-600'
+                      ? 'bg-purple-600 text-white border-purple-600'
                       : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition'
                   }`}
                 >

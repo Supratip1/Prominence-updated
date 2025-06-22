@@ -50,7 +50,7 @@ export default function SuggestionList({ suggestions }: { suggestions: Suggestio
             </div>
 
             <p className="text-gray-300 text-sm mb-1">{s.suggestion}</p>
-            <p className="text-xs text-blue-300">
+            <p className="text-xs text-purple-300">
               {s.impact} ・ effort {s.effort}
             </p>
           </li>

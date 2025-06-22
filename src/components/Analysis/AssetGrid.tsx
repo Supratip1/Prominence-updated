@@ -30,14 +30,13 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
     }
   };
 
-  const getTypeColor = (type: Asset['type']) => {
-    switch (type) {
-      case 'video':
-        return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'webpage':
-        return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      default:
-        return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+  const getTypeStyles = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'webpage': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
+      case 'image': return 'text-green-400 bg-green-400/10 border-green-400/20';
+      case 'video': return 'text-red-400 bg-red-400/10 border-red-400/20';
+      case 'document': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
 
@@ -125,7 +124,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
               </p>
               
               <div className="flex items-center justify-between">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getTypeColor(asset.type)}`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getTypeStyles(asset.type)}`}>
                   {asset.type}
                 </span>
                 <span className="text-gray-500 text-xs">

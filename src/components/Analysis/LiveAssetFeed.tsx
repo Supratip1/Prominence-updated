@@ -19,14 +19,13 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
     }
   };
 
-  const getTypeColor = (type: FrontendAsset['type']) => {
-    switch (type) {
-      case 'video':
-        return 'text-red-600 bg-red-100 border-red-200';
-      case 'webpage':
-        return 'text-blue-600 bg-blue-100 border-blue-200';
-      default:
-        return 'text-gray-600 bg-gray-100 border-gray-200';
+  const getTypeStyles = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'webpage': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
+      case 'image': return 'text-green-400 bg-green-400/10 border-green-400/20';
+      case 'video': return 'text-red-400 bg-red-400/10 border-red-400/20';
+      case 'document': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
 
@@ -40,11 +39,7 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
       transition={{ duration: 0.6 }}
     >
       <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-        <motion.span 
-          className="w-3 h-3 bg-blue-600 rounded-full mr-3"
-          animate={{ opacity: [1, 0.3, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
+        <div className="w-3 h-3 bg-purple-600 rounded-full mr-3"></div>
         Live Asset Feed ({assets.length} discovered)
       </h3>
       
@@ -60,7 +55,7 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
                 transition={{ delay: index * 0.1 }}
               >
                 <div className="flex items-center space-x-4">
-                  <div className={`p-2 rounded-lg border ${getTypeColor(asset.type)}`}>
+                  <div className={`p-2 rounded-lg border ${getTypeStyles(asset.type)}`}>
                     {getIcon(asset.type)}
                   </div>
                   <div>

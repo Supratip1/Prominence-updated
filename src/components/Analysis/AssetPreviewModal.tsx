@@ -75,13 +75,13 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
     }
   };
 
-  const getTypeColor = (type: FrontendAsset['type']) => {
-    switch (type) {
-      case 'video': return 'text-red-600 bg-red-100 border-red-200';
-      case 'webpage': return 'text-blue-600 bg-blue-100 border-blue-200';
-      case 'document': return 'text-purple-600 bg-purple-100 border-purple-200';
-      case 'social': return 'text-orange-600 bg-orange-100 border-orange-200';
-      default: return 'text-gray-600 bg-gray-100 border-gray-200';
+  const getTypeStyles = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'webpage': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
+      case 'image': return 'text-green-400 bg-green-400/10 border-green-400/20';
+      case 'video': return 'text-red-400 bg-red-400/10 border-red-400/20';
+      case 'document': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
 
@@ -105,7 +105,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-4">
-              <div className={`p-3 rounded-xl border ${getTypeColor(asset.type)}`}>
+              <div className={`p-3 rounded-xl border ${getTypeStyles(asset.type)}`}>
                 {getIcon(asset.type)}
               </div>
               <div>
@@ -129,7 +129,8 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
             <div className="aspect-video bg-gray-100 rounded-xl mb-6 flex items-center justify-center overflow-hidden border border-gray-200 relative">
               {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-purple-500"></div>
+                  <p className="text-gray-600 mt-4">Loading asset preview...</p>
                 </div>
               )}
 
@@ -208,7 +209,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
               )}
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <ExternalLink className="w-4 h-4" />
-                <a href={asset.url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">
+                <a href={asset.url} target="_blank" rel="noopener noreferrer" className="hover:text-purple-600 transition-colors">
                   {asset.url}
                 </a>
               </div>
@@ -219,7 +220,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
           <div className="flex items-center justify-end space-x-4 p-6 border-t border-gray-200">
             <motion.button
               onClick={() => window.open(asset.url, '_blank')}
-              className="flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors border border-gray-200"
+              className="flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors border border-gray-200"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -233,7 +234,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
                 link.download = asset.title;
                 link.click();
               }}
-              className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-500/30"
+              className="flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-purple-500/30"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

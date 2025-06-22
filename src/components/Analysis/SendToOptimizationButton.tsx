@@ -30,7 +30,7 @@ export default function SendToOptimizationButton({ assets }: Props) {
     <motion.button
       onClick={sendToOptimization}
       disabled={assets.length === 0 || isSending}
-      className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl disabled:bg-gray-600 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30"
+      className="flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl disabled:bg-gray-600 disabled:cursor-not-allowed shadow-lg shadow-purple-500/30"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >

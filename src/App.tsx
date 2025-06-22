@@ -1,8 +1,11 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AnalysisProvider } from './contexts/AnalysisContext'
-import Layout from './components/Layout/Layout'
 import Onboarding from './pages/Onboarding'
+import ProminenceWorkflow from './components/ProminenceWorkflow'
+import BenefitsSection from './components/BenefitsSection'
+import PricingSection from './components/PricingSection'
+import Footer from './components/Footer'
 
 // Lazy load pages for better performance
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -61,6 +64,18 @@ class ErrorBoundary extends React.Component<
   }
 }
 
+function HomePage() {
+  return (
+    <>
+      <Dashboard />
+      <ProminenceWorkflow />
+      <BenefitsSection />
+      <PricingSection />
+      <Footer />
+    </>
+  )
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -69,14 +84,10 @@ function App() {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/onboarding" element={<Onboarding />} />
-
-              {/* everything under Layout */}
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Navigate to="/dashboard" replace />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="analysis" element={<Analysis />} />
-                <Route path="optimization" element={<Optimization />} />
-              </Route>
+              <Route path="/analysis" element={<Analysis />} />
+              <Route path="/optimization" element={<Optimization />} />
+              <Route path="/dashboard" element={<HomePage />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </Suspense>
         </Router>

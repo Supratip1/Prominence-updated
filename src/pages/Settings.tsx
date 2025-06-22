@@ -131,14 +131,14 @@ export default function Settings() {
                     API Keys
                   </h2>
                   <div className="space-y-4">
-                    <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="p-4 bg-purple-50 rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-medium text-graphite">
-                            Production API Key
+                          <h3 className="font-medium text-purple-900 mb-2">
+                            API Key
                           </h3>
-                          <p className="text-sm text-gray-600 mt-1">
-                            sk-prod-...7a9b
+                          <p className="text-sm text-purple-700 mt-1">
+                            Your API key for accessing Prominence.ai services
                           </p>
                         </div>
                         <Button variant="secondary" size="sm">

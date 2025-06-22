@@ -37,7 +37,7 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
     >
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-semibold text-white flex items-center">
-          <Filter className="w-5 h-5 mr-3 text-blue-600" />
+          <Filter className="w-5 h-5 mr-3 text-purple-600" />
           Filter Assets
         </h3>
         {(selectedType !== 'all' || selectedSource !== 'all') && (
@@ -63,7 +63,7 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
               onClick={() => handleTypeChange(filter)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
                 selectedType === filter
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-500/20'
                   : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200'
               }`}
               whileHover={{ scale: 1.05 }}
@@ -82,7 +82,7 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
               onClick={() => handleSourceChange('all')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
                 selectedSource === 'all'
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-500/20'
                   : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200'
               }`}
               whileHover={{ scale: 1.05 }}
@@ -96,7 +96,7 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
                 onClick={() => handleSourceChange(source)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
                   selectedSource === source
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20'
+                    ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-500/20'
                     : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200'
                 }`}
                 whileHover={{ scale: 1.05 }}
@@ -108,6 +108,17 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
           </div>
         )}
       </div>
+
+      {selectedType !== 'all' && (
+        <span className="px-3 py-1 bg-purple-500/20 text-purple-400 border border-purple-400/50 shadow-lg shadow-purple-500/20 rounded-lg text-sm">
+          Type: {selectedType}
+        </span>
+      )}
+      {selectedSource !== 'all' && (
+        <span className="px-3 py-1 bg-purple-500/20 text-purple-400 border border-purple-400/50 shadow-lg shadow-purple-500/20 rounded-lg text-sm">
+          Source: {selectedSource}
+        </span>
+      )}
     </motion.div>
   );
 } 

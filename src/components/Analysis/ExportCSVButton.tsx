@@ -40,7 +40,7 @@ export default function ExportCSVButton({ assets }: ExportCSVButtonProps) {
     <motion.button
       onClick={exportToCSV}
       disabled={assets.length === 0}
-      className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl transition-colors border border-blue-600 shadow-lg"
+      className="flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl transition-colors border border-purple-600 shadow-lg"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >

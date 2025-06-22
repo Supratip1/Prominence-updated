@@ -21,7 +21,7 @@ export default function CrawlProgress({ percent, message }: CrawlProgressProps) 
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           >
-            <Loader2 className="w-8 h-8 text-blue-600 mr-4" />
+            <Loader2 className="w-8 h-8 text-purple-600 mr-4 animate-spin" />
           </motion.div>
           <span className="text-gray-900 font-semibold text-xl">Analyzing Assets...</span>
         </div>
@@ -29,14 +29,12 @@ export default function CrawlProgress({ percent, message }: CrawlProgressProps) 
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
             <span>{message}</span>
-            <span className="font-semibold text-blue-600">{percent}%</span>
+            <span className="font-semibold text-purple-600">{percent}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-            <motion.div 
-              className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full shadow-lg shadow-blue-500/30"
-              initial={{ width: 0 }}
-              animate={{ width: `${percent}%` }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+            <div
+              className="bg-gradient-to-r from-purple-500 to-purple-600 h-full rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${percent}%` }}
             />
           </div>
         </div>
