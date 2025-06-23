@@ -19,14 +19,6 @@ const Footer = () => {
             Asset Discovery
           </button>
           <button
-            onClick={() =>
-              document.getElementById("testimonials")?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
-            className="text-white/70 hover:text-green-300 transition px-2 py-1"
-          >
-            Testimonials
-          </button>
-          <button
             onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth", block: "start" })}
             className="text-white/70 hover:text-green-300 transition px-2 py-1"
           >

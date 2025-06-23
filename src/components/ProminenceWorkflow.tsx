@@ -74,10 +74,10 @@ const ProminenceWorkflow = () => {
       
       {/* Header */}
       <div className="container mx-auto px-6 py-8 text-center relative z-10">
-        <h2 className="text-5xl md:text-6xl font-normal mb-6">
+        <h2 className="text-5xl md:text-6xl font-normal mb-6 font-display">
           How Prominence Works
         </h2>
-        <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+        <p className="text-xl text-gray-400 max-w-3xl mx-auto font-sans">
           Transform your AI visibility with our comprehensive monitoring and optimization platform
         </p>
       </div>
@@ -120,10 +120,10 @@ const ProminenceWorkflow = () => {
                       </div>
                       
                       <div>
-                        <h3 className="text-2xl font-normal mb-3 text-white">
+                        <h3 className="text-2xl font-normal mb-3 text-white font-display">
                           {feature.title}
                         </h3>
-                        <p className="text-gray-300 leading-relaxed text-sm">
+                        <p className="text-gray-300 leading-relaxed text-sm font-sans">
                           {feature.description}
                         </p>
                       </div>
@@ -197,10 +197,10 @@ const ProminenceWorkflow = () => {
                     </div>
                     
                     <div>
-                        <h3 className="text-4xl md:text-5xl font-normal mb-6 text-white">
+                        <h3 className="text-4xl md:text-5xl font-normal mb-6 text-white font-display">
                         {feature.title}
                       </h3>
-                        <p className="text-xl text-gray-300 leading-relaxed">
+                        <p className="text-xl text-gray-300 leading-relaxed font-sans">
                         {feature.description}
                       </p>
                     </div>

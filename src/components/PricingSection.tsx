@@ -1,6 +1,6 @@
 import React from "react"
 import { motion } from "framer-motion"
-import { ArrowRight, Check, Star } from "lucide-react"
+import { ArrowRight, Check, Star, X as XIcon } from "lucide-react"
 
 // Pricing plans data
 interface PricingPlan {
@@ -13,37 +13,23 @@ interface PricingPlan {
   popular: boolean
 }
 
+// Only show the first 6 features for brevity
+const displayedFeatures = [
+  "5 keywords tracked",
+  "Weekly AI crawls",
+  "Basic visibility dashboard",
+  "Email notifications",
+  "Community support",
+  "100 keywords tracked"
+];
+
 const pricingPlans: PricingPlan[] = [
-  {
-    name: "Starter",
-    price: 0,
-    period: "month",
-    description: "Perfect for individuals and small projects",
-    features: [
-      "5 keywords tracked",
-      "Weekly AI crawls",
-      "Basic visibility dashboard",
-      "Email notifications",
-      "Community support",
-    ],
-    buttonText: "Get Started Free",
-    popular: false,
-  },
   {
     name: "Professional",
     price: 49,
     period: "month",
     description: "Ideal for growing businesses and teams",
-    features: [
-      "100 keywords tracked",
-      "Daily AI crawls",
-      "Advanced analytics & insights",
-      "API access",
-      "Custom reports",
-      "Priority support",
-      "Competitor analysis",
-      "Historical data (12 months)",
-    ],
+    features: displayedFeatures.slice(0, 4),
     buttonText: "Start Free Trial",
     popular: true,
   },
@@ -52,25 +38,23 @@ const pricingPlans: PricingPlan[] = [
     price: 199,
     period: "month",
     description: "For large organizations with advanced needs",
-    features: [
-      "Unlimited keywords",
-      "Real-time AI crawls",
-      "White-label reports",
-      "Team collaboration",
-      "Custom integrations",
-      "Dedicated account manager",
-      "Advanced security",
-      "Custom training & onboarding",
-    ],
+    features: displayedFeatures,
     buttonText: "Contact Sales",
     popular: false,
   },
-]
+];
+
+// Build a master feature list from all plans
+const allFeatures = Array.from(new Set(pricingPlans.flatMap(plan => plan.features)));
 
 // Pricing Cards Component
 function PricingCards({ plans }: { plans: PricingPlan[] }) {
-  const [currentIndex, setCurrentIndex] = React.useState(0)
-  const containerRef = React.useRef<HTMLDivElement>(null)
+  // On desktop, reorder so Professional is first
+  const desktopPlans = [plans[0], plans[1]];
+  // On mobile, start carousel at Professional
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  React.useEffect(() => { setCurrentIndex(0); }, []);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % plans.length)
@@ -83,9 +67,9 @@ function PricingCards({ plans }: { plans: PricingPlan[] }) {
   return (
     <div className="relative">
       {/* Desktop Grid */}
-      <div className="hidden md:grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {plans.map((plan, index) => (
-          <PricingCard key={plan.name} plan={plan} index={index} />
+      <div className="hidden md:grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        {desktopPlans.map((plan, index) => (
+          <PricingCard key={plan.name} plan={plan} index={index} focus={index === 0} />
         ))}
       </div>
 
@@ -98,7 +82,7 @@ function PricingCards({ plans }: { plans: PricingPlan[] }) {
           >
             {plans.map((plan, index) => (
               <div key={plan.name} className="w-full flex-shrink-0 px-4">
-                <PricingCard plan={plan} index={index} />
+                <PricingCard plan={plan} index={index} focus={index === 0} />
               </div>
             ))}
           </div>
@@ -155,16 +139,17 @@ function PricingCards({ plans }: { plans: PricingPlan[] }) {
 }
 
 // Individual Pricing Card Component
-function PricingCard({ plan, index }: { plan: PricingPlan; index: number }) {
+function PricingCard({ plan, index, focus = false }: { plan: PricingPlan; index: number; focus?: boolean }) {
+  // Always show only the first 6 features for every plan
   return (
     <motion.div
       className={`relative p-8 pt-12 md:pt-8 rounded-2xl border ${
-        plan.popular ? "border-green-400 bg-green-900/20" : "border-white/10 bg-white/5"
+        plan.popular || focus ? "border-green-400 bg-green-900/20 scale-105 z-20 shadow-2xl" : "border-white/10 bg-white/5" 
       } shadow-lg`}
       whileHover={{
-        scale: 1.02,
+        scale: 1.04,
         y: -8,
-        boxShadow: plan.popular ? "0 20px 40px rgba(124, 252, 0, 0.4)" : "0 20px 40px rgba(0, 0, 0, 0.1)",
+        boxShadow: plan.popular || focus ? "0 20px 40px rgba(124, 252, 0, 0.4)" : "0 20px 40px rgba(0, 0, 0, 0.1)",
       }}
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -194,17 +179,24 @@ function PricingCard({ plan, index }: { plan: PricingPlan; index: number }) {
       </div>
 
       <ul className="space-y-3 mb-8">
-        {plan.features.map((feature, featureIndex) => (
-          <li key={featureIndex} className="flex items-start gap-3">
-            <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-            <span className="text-gray-300 text-sm">{feature}</span>
-          </li>
-        ))}
+        {displayedFeatures.map((feature, featureIndex) => {
+          const included = plan.features.includes(feature);
+          return (
+            <li key={featureIndex} className="flex items-start gap-3">
+              {included ? (
+                <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+              ) : (
+                <XIcon className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+              )}
+              <span className={`text-sm ${included ? "text-gray-300" : "text-gray-500 line-through"}`}>{feature}</span>
+            </li>
+          );
+        })}
       </ul>
 
       <motion.button
         className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${
-          plan.popular
+          plan.popular || focus
             ? "bg-gradient-to-r from-green-400 to-green-500 text-black hover:from-green-300 hover:to-green-400"
             : "border-2 border-white/30 text-white hover:bg-white/10"
         }`}
@@ -212,7 +204,7 @@ function PricingCard({ plan, index }: { plan: PricingPlan; index: number }) {
         whileTap={{ scale: 0.98 }}
       >
         {plan.buttonText}
-        {plan.popular && <ArrowRight className="w-4 h-4 inline-block ml-2" />}
+        {(plan.popular || focus) && <ArrowRight className="w-4 h-4 inline-block ml-2" />}
       </motion.button>
     </motion.div>
   )

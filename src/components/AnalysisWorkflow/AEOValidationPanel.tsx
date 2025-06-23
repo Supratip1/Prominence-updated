@@ -69,11 +69,11 @@ export default function AEOValidationPanel({
     >
       <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 sm:p-8 shadow-2xl">
         <div className="flex items-center gap-4 mb-6 sm:mb-8">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-2xl sm:text-3xl shadow-lg">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-2xl sm:text-3xl shadow-lg">
             ✅
           </div>
           <div>
-            <h3 className="text-xl sm:text-2xl font-bold text-white mb-1">
+            <h3 className="text-xl sm:text-2xl font-normal text-white mb-1">
               AEO Validation
             </h3>
             <p className="text-sm sm:text-base text-gray-400">
@@ -99,7 +99,7 @@ export default function AEOValidationPanel({
               >
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-white font-medium text-sm sm:text-base mb-1">
+                    <h4 className="text-white font-normal text-sm sm:text-base mb-1">
                       {asset.title}
                     </h4>
                     <div className="flex items-center gap-4 text-xs sm:text-sm text-gray-400">
@@ -150,7 +150,7 @@ export default function AEOValidationPanel({
                       </motion.button>
                       <motion.button
                         onClick={() => toggleNotes(score.assetId)}
-                        className="px-4 py-2 bg-blue-500/20 text-blue-400 border border-blue-400/50 rounded-lg hover:bg-blue-500/30 transition-all text-sm font-medium flex items-center gap-2"
+                        className="px-4 py-2 bg-purple-500/20 text-purple-400 border border-purple-400/50 rounded-lg hover:bg-purple-500/30 transition-all text-sm font-medium flex items-center gap-2"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -173,7 +173,7 @@ export default function AEOValidationPanel({
                       value={notes[score.assetId] || ''}
                       onChange={(e) => setNotes(prev => ({ ...prev, [score.assetId]: e.target.value }))}
                       placeholder="Add validation notes..."
-                      className="w-full h-20 p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm resize-none"
+                      className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 text-sm resize-none"
                     />
                   </motion.div>
                 )}

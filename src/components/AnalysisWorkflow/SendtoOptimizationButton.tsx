@@ -25,7 +25,7 @@ export default function SendToOptimizationButton({ assets }: Props) {
     console.log('Navigation called')
   }
 
-      return (
+  return (
     <motion.button
       type="button"
       onClick={sendToOptimization}
@@ -44,7 +44,7 @@ export default function SendToOptimizationButton({ assets }: Props) {
           Sending…
         </>
       ) : (
-      <>
+        <>
           <ArrowRight className="w-4 h-4 mr-2" />
           Send to Optimization ({assets.length})
         </>

@@ -48,8 +48,8 @@ export default function AssetFilterBar({ filters, sources, onChange, currentFilt
     >
       <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <h3 className="text-lg sm:text-xl font-semibold text-white flex items-center gap-3">
-            <Filter className="w-5 h-5 text-[#adff2f]" />
+          <h3 className="text-lg sm:text-xl font-normal text-white flex items-center gap-3">
+            <Filter className="w-5 h-5 text-purple-400" />
             Filter Assets
           </h3>
           {hasActiveFilters && (
@@ -97,7 +97,7 @@ export default function AssetFilterBar({ filters, sources, onChange, currentFilt
                   onClick={() => handleSourceChange('all')}
                   className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all border ${
                     currentFilters.source === 'all'
-                      ? 'bg-blue-500/20 text-blue-400 border-blue-400/50 shadow-lg shadow-blue-500/20'
+                      ? 'bg-purple-500/20 text-purple-400 border-purple-400/50 shadow-lg shadow-purple-500/20'
                       : 'bg-white/5 text-gray-300 hover:bg-white/10 border-white/10'
                   }`}
                   whileHover={{ scale: 1.05 }}
@@ -111,7 +111,7 @@ export default function AssetFilterBar({ filters, sources, onChange, currentFilt
                     onClick={() => handleSourceChange(source)}
                     className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all border ${
                       currentFilters.source === source
-                        ? 'bg-blue-500/20 text-blue-400 border-blue-400/50 shadow-lg shadow-blue-500/20'
+                        ? 'bg-purple-500/20 text-purple-400 border-purple-400/50 shadow-lg shadow-purple-500/20'
                         : 'bg-white/5 text-gray-300 hover:bg-white/10 border-white/10'
                     }`}
                     whileHover={{ scale: 1.05 }}

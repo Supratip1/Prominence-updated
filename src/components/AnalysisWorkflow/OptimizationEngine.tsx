@@ -152,14 +152,14 @@ export default function Optimization() {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 space-y-12">
       <header>
-        <h1 className="text-4xl font-bold mb-2">Optimization Workflow</h1>
+        <h1 className="text-4xl font-normal mb-2">Optimization Workflow</h1>
         <p className="text-gray-400">
           Step through AEO scoring, validation, and AI-powered suggestions.
         </p>
       </header>
 
       <section>
-        <h2 className="text-2xl font-semibold mb-4">1. AEO Scoring</h2>
+        <h2 className="text-2xl font-normal mb-4">1. AEO Scoring</h2>
         <AEOScorecard
           engine="chatgpt"
           assets={assets}
@@ -170,7 +170,7 @@ export default function Optimization() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold mb-4">2. Validate Results</h2>
+        <h2 className="text-2xl font-normal mb-4">2. Validate Results</h2>
         <AEOValidationPanel
           assets={assets}
           scores={scores}
@@ -180,7 +180,7 @@ export default function Optimization() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold mb-4">3. Generate Suggestions</h2>
+        <h2 className="text-2xl font-normal mb-4">3. Generate Suggestions</h2>
         <OptimizationEngine
           assets={assets}
           suggestions={suggestions}

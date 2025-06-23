@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef, useLayoutEffect, useMemo } from "react"
-import { motion, useScroll, useTransform, type Variants, useInView } from "framer-motion"
+import { motion, useScroll, useTransform, type Variants, useInView, AnimatePresence } from "framer-motion"
 import {
   ArrowRight,
   Check,
@@ -35,6 +35,10 @@ import ConveyorBelt from "../components/ConveyorBelt"
 import PortfolioScreenshotsSection from "../components/PortfolioScreenshotsSection"
 import ProminenceWorkflow from "../components/ProminenceWorkflow"
 import Header from "../components/Layout/Header"
+import ProminenceChatWidget from '../components/ProminenceChatWidget';
+import ProminenceEasterEgg from '../components/ProminenceEasterEgg';
+import ProminenceEmptyState from '../components/ProminenceEmptyState';
+import sparkleAnimation from '../lottie/Animation2.json';
 
 
 // Animation variants
@@ -454,21 +458,6 @@ interface PricingPlan {
 }
 const pricingPlans: PricingPlan[] = [
   {
-    name: "Starter",
-    price: 0,
-    period: "month",
-    description: "Perfect for individuals and small projects",
-    features: [
-      "5 keywords tracked",
-      "Weekly AI crawls",
-      "Basic visibility dashboard",
-      "Email notifications",
-      "Community support",
-    ],
-    buttonText: "Get Started Free",
-    popular: false,
-  },
-  {
     name: "Professional",
     price: 49,
     period: "month",
@@ -649,75 +638,88 @@ function HexagonOutlineOverlay({
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
   if (isMobile) return null;
 
-  const r = 100 // reduced from 170 - smaller hexagons
-  const gap = 80 // reduced from 120 - more hexagons
+  // Bigger hexagons, fewer in grid
+  const r = 180; // much bigger
+  const gap = 180; // much more spacing
 
-  const hexW = Math.sqrt(3) * r
-  const hexH = 2 * r
+  const hexW = Math.sqrt(3) * r;
+  const hexH = 2 * r;
 
-  const cellX = hexW + gap
-  const cellY = hexH * 0.75 + gap
+  const cellX = hexW + gap;
+  const cellY = hexH * 0.75 + gap;
 
-  const cols = Math.ceil(width / cellX) + 1
-  const rows = Math.ceil(height / cellY) + 1
+  const cols = Math.ceil(width / cellX) + 1;
+  const rows = Math.ceil(height / cellY) + 1;
 
   const hexagons = React.useMemo(() => {
-    const arr: { x: number; y: number; key: string }[] = []
+    const arr: { x: number; y: number; key: string }[] = [];
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        const x = col * cellX + (row % 2 ? cellX / 2 : 0)
-        const y = row * cellY
-        arr.push({ x, y, key: `${row}-${col}` })
+        const x = col * cellX + (row % 2 ? cellX / 2 : 0);
+        const y = row * cellY;
+        arr.push({ x, y, key: `${row}-${col}` });
       }
     }
-    return arr
-  }, [rows, cols, cellX, cellY])
+    return arr;
+  }, [rows, cols, cellX, cellY]);
 
-  // Dynamic glow radius based on velocity
-  const baseRadius = 150 // reduced from 220
-  const multiplier = 150 // reduced from 200
-  const glowRadius = baseRadius + (velocity || 0) * multiplier
+  const baseRadius = 180;
+  const multiplier = 120;
+  const glowRadius = baseRadius + (velocity || 0) * multiplier;
+
+  // Neon color: electric bright purple
+  const neonColor = '180,0,255'; // electric purple (rgb)
+  const neonHex = '#b400ff'; // electric purple (hex)
 
   return (
     <svg
       className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ 
-        left: 0, 
-        top: 0, 
-        width: "100%", 
+      style={{
+        left: 0,
+        top: 0,
+        width: "100%",
         height: "100%",
-        zIndex: -1 // ensure it stays behind animations
+        zIndex: -1,
       }}
     >
       {hexagons.map((h) => {
-        let intensity = 0
+        let intensity = 0;
         if (mouse) {
-          const d = Math.hypot(h.x - mouse.x, h.y - mouse.y)
-          intensity = Math.max(0, 1 - d / glowRadius)
+          const d = Math.hypot(h.x - mouse.x, h.y - mouse.y);
+          intensity = Math.max(0, 1 - d / glowRadius);
+          intensity = Math.pow(intensity, 2.5);
         }
 
-        const strokeWidth = 0.5 + intensity * 1.5 // increased from 0.5 + intensity * 1
-        // Only show stroke if intensity > 0, with increased opacity
-        const strokeOpacity = intensity > 0 ? 0.08 + intensity * 0.4 : 0.02 // increased opacity
-        const strokeColor = `rgba(167, 139, 250, ${strokeOpacity})`
+        // Glowing fill and border, both fade out if mouse is not moving
+        const strokeWidth = 1.5 + intensity * 4.5;
+        const strokeOpacity = intensity > 0 ? 0.7 + intensity * 0.7 : 0;
+        const strokeColor = `rgba(${neonColor}, ${strokeOpacity})`;
+        const fillOpacity = intensity > 0 ? 0.18 * intensity : 0;
+        const fillColor = `rgba(${neonColor}, ${fillOpacity})`;
 
         return (
-          <polygon
-            key={h.key}
-            points={getHexPoints(h.x, h.y, r)}
-            fill="none"
-            stroke={strokeColor}
-            strokeWidth={strokeWidth}
-            strokeLinejoin="round"
-            style={{
-              transition: "stroke 0.3s, stroke-width 0.3s, filter 0.3s",
-              filter: intensity > 0 ? `blur(${intensity * 2}px) drop-shadow(0 0 ${intensity * 10}px rgba(167, 139, 250, ${intensity * 0.8}))` : "none",
-            }}
-          />
-        )
+          <g key={h.key}>
+            {/* Neon border */}
+            <polygon
+              key={h.key}
+              points={getHexPoints(h.x, h.y, r)}
+              fill="none"
+              stroke={strokeColor}
+              strokeWidth={strokeWidth}
+              strokeLinejoin="round"
+              style={{
+                transition: "stroke 1s, stroke-width 1s, filter 1s",
+                filter: intensity > 0
+                  ? `drop-shadow(0 0 ${intensity * 60 + 10}px ${neonHex}) drop-shadow(0 0 ${intensity * 120 + 20}px ${neonHex}) blur(${intensity * 10 + 2}px)`
+                  : "none",
+                // double drop-shadow for extra neon punch
+              }}
+            />
+          </g>
+        );
       })}
     </svg>
-  )
+  );
 }
 
 function getRoundedHexPath(cx: number, cy: number, r: number, cornerRadius: number = 15): string {
@@ -1231,241 +1233,238 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="relative overflow-x-hidden overflow-y-visible bg-black text-white">
-      {/* Header */}
-      <Header />
-      
-      {/* Main content wrapper with higher z-index */}
-      <div className="relative z-10">
-        {/* New Hero Section */}
-        <div className="relative overflow-hidden bg-black text-white">
-          <div
-            className="absolute -inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent)",
-            }}
-          />
+    <>
+      {/* Main Dashboard content */}
+      <div className="relative overflow-x-hidden overflow-y-visible bg-black text-white">
+        {/* Header */}
+        <Header />
+        
+        {/* Main content wrapper with higher z-index */}
+        <div className="relative z-10">
+          {/* New Hero Section */}
+          <div className="relative overflow-hidden bg-black text-white">
+            <div
+              className="absolute -inset-0 pointer-events-none"
+              style={{
+                background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent)",
+              }}
+            />
 
-          <div
-            id="hero"
-            ref={heroRef}
-            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative min-h-[600px]"
-            onMouseMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              const y = e.clientY - rect.top;
-              setMouse({ x, y });
+            <div
+              id="hero"
+              ref={heroRef}
+              className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative min-h-[600px]"
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                setMouse({ x, y });
 
-              const now = Date.now();
-              const dt = now - lastPos.current.time;
-              const dist = Math.hypot(x - lastPos.current.x, y - lastPos.current.y);
+                const now = Date.now();
+                const dt = now - lastPos.current.time;
+                const dist = Math.hypot(x - lastPos.current.x, y - lastPos.current.y);
 
-              if (dt > 10) {
-                const speed = dist / dt;
-                // Use a smoothing factor (Exponential Moving Average)
-                setVelocity((prev) => prev * 0.7 + speed * 0.3);
-              }
+                if (dt > 10) {
+                  const speed = dist / dt;
+                  // Use a smoothing factor (Exponential Moving Average)
+                  setVelocity((prev) => prev * 0.7 + speed * 0.3);
+                }
 
-              lastPos.current = { x, y, time: now };
-            }}
-            onMouseLeave={() => setMouse(null)}
-          >
-            {/* Hexagon Outline Overlay (background, subtle, clean) */}
-            <div className="absolute inset-0 pointer-events-none z-0">
-              <HexagonOutlineOverlay
-                width={heroSize.width || 1200}
-                height={heroSize.height || 700}
-                mouse={mouse}
-                velocity={velocity}
-              />
-            </div>
-            {/* Hero content wrapper (above overlay) */}
-            <div className="relative z-10">
-              {/* Mobile Layout - Only applies to mobile */}
-              <div className="lg:hidden">
-                <div className="text-center pt-16 pb-8">
-                  <motion.h1
-                    className="text-4xl sm:text-5xl font-normal tracking-tighter mb-4 text-white"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    Increase your Ranking
-                    <br />
-                    in LLM Searches
-                  </motion.h1>
-                  <motion.p
-                    className="text-lg sm:text-xl font-medium text-gray-400 max-w-xl mx-auto mb-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  >
-                    Rise to the top in AI-powered search.
-                  </motion.p>
+                lastPos.current = { x, y, time: now };
+              }}
+              onMouseLeave={() => setMouse(null)}
+            >
+              {/* Hexagon Outline Overlay (background, subtle, clean) */}
+              <div className="absolute inset-0 pointer-events-none z-0">
+                <HexagonOutlineOverlay
+                  width={heroSize.width || 1200}
+                  height={heroSize.height || 700}
+                  mouse={mouse}
+                  velocity={velocity}
+                />
+              </div>
+              {/* Hero content wrapper (above overlay) */}
+              <div className="relative z-10">
+                {/* Mobile Layout - Only applies to mobile */}
+                <div className="lg:hidden">
+                  <div className="text-center pt-16 pb-8">
+                    <motion.h1
+                      className="text-4xl sm:text-5xl font-normal tracking-tighter mb-4 text-white"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      Increase your Ranking
+                      <br />
+                      in LLM Searches
+                    </motion.h1>
+                    <motion.p
+                      className="text-lg sm:text-xl font-medium text-gray-400 max-w-xl mx-auto mb-8"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                    >
+                      Rise to the top in AI-powered search.
+                    </motion.p>
+                    <motion.div
+                      className="flex flex-row justify-center items-center gap-2 sm:gap-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.4 }}
+                    >
+                      <motion.button
+                        whileHover={{ scale: 1.06, boxShadow: '0 0 24px #a855f7' }}
+                        whileTap={{ scale: 0.97 }}
+                        className="bg-purple-600 text-white font-display font-semibold rounded-2xl px-8 py-4 text-xl md:text-2xl shadow-lg transition-transform duration-200 relative overflow-hidden"
+                        onClick={() => navigate('/analysis')}
+                      >
+                        Start with AI
+                      </motion.button>
+                    </motion.div>
+                  </div>
+                  
+                  {/* Mobile: Tabbed Interface */}
+                  <div className="mt-8">
+                    {/* Tab Navigation */}
+                    <div className="flex border-b border-white/20 mb-6">
+                      <button 
+                        className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                          mobileActiveTab === 'video' 
+                            ? 'text-white border-b-2 border-white' 
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                        onClick={() => setMobileActiveTab('video')}
+                      >
+                        Demo Video
+                      </button>
+                      <button 
+                        className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                          mobileActiveTab === 'animation' 
+                            ? 'text-white border-b-2 border-white' 
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                        onClick={() => setMobileActiveTab('animation')}
+                      >
+                        Animation
+                      </button>
+                    </div>
+                    
+                    {/* Tab Content */}
+                    <div className="relative">
+                      {mobileActiveTab === 'animation' && (
+                        <motion.div
+                          key="animation"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 20 }}
+                          transition={{ duration: 0.3 }}
+                          className="flex justify-center"
+                        >
+                          {animationData && <Lottie animationData={animationData} loop={true} />}
+                        </motion.div>
+                      )}
+                      
+                      {mobileActiveTab === 'video' && (
+                        <motion.div
+                          key="video"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20">
+                            <video
+                              className="w-full h-full object-cover"
+                              src="/16296848-uhd_3840_2160_24fps.mp4"
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                            />
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout - Original unchanged */}
+                <div className="hidden lg:grid lg:grid-cols-2 gap-16 items-center pt-24 pb-8">
+                  {/* Left: Text Content */}
+                  <div className="text-left">
+                    <motion.h1
+                      className="text-5xl md:text-7xl font-normal tracking-tighter mb-4 text-white"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      Increase your Ranking
+                      <br />
+                      in LLM Searches
+                    </motion.h1>
+                    <motion.p
+                      className="text-xl md:text-2xl font-medium text-gray-400 max-w-xl mb-8"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                    >
+                      Rise to the top in AI-powered search.
+                    </motion.p>
+                    <motion.div
+                      className="flex items-center gap-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.4 }}
+                    >
+                      <motion.button
+                        whileHover={{ scale: 1.06, boxShadow: '0 0 24px #a855f7' }}
+                        whileTap={{ scale: 0.97 }}
+                        className="bg-purple-600 text-white font-display font-semibold rounded-2xl px-8 py-4 text-xl md:text-2xl shadow-lg transition-transform duration-200 relative overflow-hidden"
+                        onClick={() => navigate('/analysis')}
+                      >
+                        Start with AI
+                      </motion.button>
+                    </motion.div>
+                  </div>
+
+                  {/* Right: Lottie Animation */}
                   <motion.div
-                    className="flex flex-row justify-center items-center gap-2 sm:gap-4"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
+                    className="relative"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
                   >
-                    <button
-                      onClick={() => navigate('/analysis')}
-                      className="bg-white text-black font-semibold rounded-lg px-3 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-base transition-transform hover:scale-105 shadow-lg"
-                    >
-                      Start with AI
-                    </button>
-                    <button
-                      onClick={() => smoothScrollTo('pricing')}
-                      className="bg-transparent text-white font-semibold rounded-lg px-3 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-base transition-transform hover:scale-105 border border-white/30 hover:bg-white/10"
-                    >
-                      Start for free
-                    </button>
+                    {animationData && <Lottie animationData={animationData} loop={true} />}
                   </motion.div>
                 </div>
                 
-                {/* Mobile: Tabbed Interface */}
-                <div className="mt-8">
-                  {/* Tab Navigation */}
-                  <div className="flex border-b border-white/20 mb-6">
-                    <button 
-                      className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                        mobileActiveTab === 'video' 
-                          ? 'text-white border-b-2 border-white' 
-                          : 'text-gray-400 hover:text-white'
-                      }`}
-                      onClick={() => setMobileActiveTab('video')}
-                    >
-                      Demo Video
-                    </button>
-                    <button 
-                      className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                        mobileActiveTab === 'animation' 
-                          ? 'text-white border-b-2 border-white' 
-                          : 'text-gray-400 hover:text-white'
-                      }`}
-                      onClick={() => setMobileActiveTab('animation')}
-                    >
-                      Animation
-                    </button>
-                  </div>
-                  
-                  {/* Tab Content */}
-                  <div className="relative">
-                    {mobileActiveTab === 'animation' && (
-                      <motion.div
-                        key="animation"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        transition={{ duration: 0.3 }}
-                        className="flex justify-center"
-                      >
-                        {animationData && <Lottie animationData={animationData} loop={true} />}
-                      </motion.div>
-                    )}
-                    
-                    {mobileActiveTab === 'video' && (
-                      <motion.div
-                        key="video"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20">
-                          <video
-                            className="w-full h-full object-cover"
-                            src="/16296848-uhd_3840_2160_24fps.mp4"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Desktop Layout - Original unchanged */}
-              <div className="hidden lg:grid lg:grid-cols-2 gap-16 items-center pt-24 pb-8">
-                {/* Left: Text Content */}
-                <div className="text-left">
-                  <motion.h1
-                    className="text-5xl md:text-7xl font-normal tracking-tighter mb-4 text-white"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    Increase your Ranking
-                    <br />
-                    in LLM Searches
-                  </motion.h1>
-                  <motion.p
-                    className="text-xl md:text-2xl font-medium text-gray-400 max-w-xl mb-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  >
-                    Rise to the top in AI-powered search.
-                  </motion.p>
-                  <motion.div
-                    className="flex items-center gap-4"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                  >
-                    <button
-                      onClick={() => navigate('/analysis')}
-                      className="bg-white text-black font-semibold rounded-lg px-6 py-3 transition-transform hover:scale-105 shadow-lg"
-                    >
-                      Start with AI
-                    </button>
-                    <button
-                      onClick={() => smoothScrollTo('pricing')}
-                      className="bg-transparent text-white font-semibold rounded-lg px-6 py-3 transition-transform hover:scale-105 border border-white/30 hover:bg-white/10"
-                    >
-                      Start for free
-                    </button>
-                  </motion.div>
-                </div>
-
-                {/* Right: Lottie Animation */}
+                {/* Desktop: Video below heading and animation */}
                 <motion.div
-                  className="relative"
+                  className="hidden lg:block relative my-20"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
+                  transition={{ duration: 0.5, delay: 0.8 }}
                 >
-                  {animationData && <Lottie animationData={animationData} loop={true} />}
+                  <div className="relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-purple-500/20">
+                    <video
+                      className="w-full h-full object-cover"
+                      src="/16296848-uhd_3840_2160_24fps.mp4"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                    />
+                  </div>
                 </motion.div>
               </div>
-              
-              {/* Desktop: Video below heading and animation */}
-              <motion.div
-                className="hidden lg:block relative my-20"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.8 }}
-              >
-                <div className="relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-purple-500/20">
-                  <video
-                    className="w-full h-full object-cover"
-                    src="/16296848-uhd_3840_2160_24fps.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  />
-                </div>
-              </motion.div>
             </div>
           </div>
         </div>
+        {/* end main content wrapper */}
       </div>
-      {/* end main content wrapper */}
-    </div>
+      <ProminenceChatWidget />
+      <ProminenceEasterEgg />
+    </>
   )
 }
 
@@ -2038,97 +2037,6 @@ function BlogSection() {
         </motion.button>
       </div>
     </div>
-  )
-}
-
-// Testimonial Carousel Component
-function TestimonialCarousel({ testimonials }: { testimonials: Testimonial[] }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [containerWidth, setContainerWidth] = useState(0)
-
-  useLayoutEffect(() => {
-    function updateWidth() {
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth)
-      }
-    }
-    updateWidth()
-    window.addEventListener("resize", updateWidth)
-    return () => window.removeEventListener("resize", updateWidth)
-  }, [])
-
-  const cardWidth = 320 // Width of each testimonial card
-  const gap = 24 // Gap between cards
-  const totalWidth = testimonials.length * (cardWidth + gap)
-  const duration = totalWidth / 30 // Adjust speed as needed
-
-  return (
-    <div className="relative">
-      {/* Gradient overlays */}
-      <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
-
-      <div
-        ref={containerRef}
-        className="flex"
-        style={{
-          width: totalWidth * 2,
-          animation: `testimonial-scroll ${duration}s linear infinite`,
-        }}
-      >
-        {/* First set */}
-        <div className="flex" style={{ gap: `${gap}px` }}>
-          {testimonials.map((testimonial) => (
-            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-          ))}
-        </div>
-        {/* Duplicate set for seamless loop */}
-        <div className="flex" style={{ gap: `${gap}px`, marginLeft: `${gap}px` }}>
-          {testimonials.map((testimonial) => (
-            <TestimonialCard key={`dup-${testimonial.id}`} testimonial={testimonial} />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Individual Testimonial Card
-function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
-  return (
-    <motion.div
-      className="flex-shrink-0 w-80 p-6 rounded-2xl border border-white/10 bg-white/5 shadow-lg"
-      whileHover={{
-        scale: 1.02,
-        boxShadow: "0 12px 40px rgba(0,0,0,0.1)",
-      }}
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-    >
-      {/* Rating Stars */}
-      <div className="flex mb-4">
-        {Array.from({ length: testimonial.rating }).map((_, i) => (
-          <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-        ))}
-      </div>
-
-      {/* Content */}
-      <p className="text-gray-300 mb-6 leading-relaxed text-sm">"{testimonial.content}"</p>
-
-      {/* Author */}
-      <div className="flex items-center">
-        <img
-          src={testimonial.avatar || "/placeholder.svg"}
-          alt={testimonial.name}
-          className="w-10 h-10 rounded-full mr-3 object-cover"
-        />
-        <div>
-          <div className="text-white font-medium text-sm">{testimonial.name}</div>
-          <div className="text-gray-400 text-xs">
-            {testimonial.role} at {testimonial.company}
-          </div>
-        </div>
-      </div>
-    </motion.div>
   )
 }
 

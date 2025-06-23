@@ -11,6 +11,7 @@ import Footer from './components/Footer'
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Analysis = lazy(() => import('./pages/Analysis'))
 const Optimization = lazy(() => import('./pages/Optimization'))
+const Signup = lazy(() => import('./pages/Signup'))
 
 // Loading component
 const PageLoader = () => (
@@ -86,6 +87,7 @@ function App() {
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/analysis" element={<Analysis />} />
               <Route path="/optimization" element={<Optimization />} />
+              <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<HomePage />} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Routes>

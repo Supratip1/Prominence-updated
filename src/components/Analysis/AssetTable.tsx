@@ -112,11 +112,12 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
             >
               <td
                 onClick={() => onNameClick(asset)}
-                className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-200 underline"
+                className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-200 underline max-w-xs truncate cursor-pointer"
+                title={asset.title || 'Untitled'}
               >
                 {asset.title || 'Untitled'}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200">
+              <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200 max-w-xs truncate" title={asset.type}>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${
                     asset.type === 'webpage'
@@ -131,13 +132,13 @@ export default function AssetTable({ assets, onNameClick }: AssetTableProps) {
                   {asset.type}
                 </span>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200">
+              <td className="px-6 py-4 text-sm text-gray-700 border-r border-gray-200 max-w-xs truncate" title={asset.sourceDomain}>
                 {asset.sourceDomain}
               </td>
               <td className="px-6 py-4 text-sm text-gray-500 border-r border-gray-200">
                 {new Date(asset.createdAt).toLocaleDateString()}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-700">
+              <td className="px-6 py-4 text-sm text-gray-700 max-w-xs truncate" title={asset.url}>
                 <a
                   href={asset.url}
                   target="_blank"

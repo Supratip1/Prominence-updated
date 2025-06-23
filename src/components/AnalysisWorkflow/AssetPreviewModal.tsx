@@ -33,13 +33,12 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
     }
   };
 
-  const getTypeColor = (type: Asset['type']) => {
-    switch (type) {
+  const getTypeStyles = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'webpage': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
+      case 'image': return 'text-green-400 bg-green-400/10 border-green-400/20';
       case 'video': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'screenshot': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'webpage': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'document': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
-      case 'social': return 'text-orange-400 bg-orange-400/10 border-orange-400/20';
+      case 'document': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
       default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
@@ -72,11 +71,11 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
           {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg border ${getTypeColor(asset.type)}`}>
+              <div className={`p-2 rounded-lg border ${getTypeStyles(asset.type)}`}>
                 {getIcon(asset.type)}
               </div>
               <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-white">
+                <h3 className="text-lg sm:text-xl font-normal text-white">
                   Asset Preview
                 </h3>
                 <p className="text-sm text-gray-400 capitalize">
@@ -105,7 +104,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className={`p-8 rounded-xl ${getTypeColor(asset.type)}`}>
+                <div className={`p-8 rounded-xl ${getTypeStyles(asset.type)}`}>
                   {getIcon(asset.type)}
                 </div>
               )}
@@ -117,7 +116,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
             {/* Asset Details */}
             <div className="space-y-4 sm:space-y-6">
               <div>
-                <h4 className="text-lg sm:text-xl font-semibold text-white mb-2">
+                <h4 className="text-lg sm:text-xl font-normal text-white mb-2">
                   {asset.title}
                 </h4>
                 {asset.description && (
@@ -138,9 +137,9 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
                         href={asset.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 transition-colors text-sm break-all"
+                        className="hover:text-purple-600 transition-colors"
                       >
-                        {asset.url}
+                        <p className="text-sm text-gray-600 break-all">{asset.url}</p>
                       </a>
                     </div>
                   </div>
@@ -183,7 +182,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getTypeColor(asset.type)}`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getTypeStyles(asset.type)}`}>
                   {asset.type}
                 </span>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium border ${

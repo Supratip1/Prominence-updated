@@ -81,17 +81,6 @@ export const mockActionItems: ActionItem[] = [
 
 export const mockPricingPlans: PricingPlan[] = [
   {
-    name: 'Free',
-    price: 0,
-    period: 'month',
-    features: [
-      '5 keywords tracked',
-      'Weekly crawls',
-      'Basic visibility dashboard',
-      'Email notifications',
-    ],
-  },
-  {
     name: 'Pro',
     price: 49,
     period: 'month',

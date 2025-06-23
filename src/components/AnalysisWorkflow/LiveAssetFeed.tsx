@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { FileText, Video, Camera, File, Globe, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -32,13 +32,12 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
     }
   };
 
-  const getTypeColor = (type: Asset['type']) => {
-    switch (type) {
+  const getTypeStyles = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'webpage': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
+      case 'image': return 'text-green-400 bg-green-400/10 border-green-400/20';
       case 'video': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'screenshot': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'webpage': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'document': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
-      case 'social': return 'text-orange-400 bg-orange-400/10 border-orange-400/20';
+      case 'document': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
       default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
@@ -57,7 +56,7 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
       <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
           <div className="w-3 h-3 bg-[#adff2f] rounded-full animate-pulse"></div>
-          <h3 className="text-lg sm:text-xl font-semibold text-white">
+          <h3 className="text-lg sm:text-xl font-normal text-white">
             Live Asset Discovery
           </h3>
           <span className="text-sm text-gray-400">
@@ -76,14 +75,14 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
                 transition={{ delay: index * 0.1, duration: 0.4 }}
                 className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all group"
               >
-                <div className={`p-2 rounded-lg border ${getTypeColor(asset.type)} flex-shrink-0`}>
+                <div className={`p-2 rounded-lg border ${getTypeStyles(asset.type)} flex-shrink-0`}>
                   {getIcon(asset.type)}
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <h4 className="text-white font-medium text-sm sm:text-base truncate">
+                      <h4 className="text-white font-normal text-sm sm:text-base truncate">
                         {asset.title}
                       </h4>
                       <p className="text-gray-400 text-xs sm:text-sm truncate">
@@ -94,7 +93,7 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
                   </div>
                   
                   <div className="flex items-center gap-2 mt-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getTypeColor(asset.type)}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getTypeStyles(asset.type)}`}>
                       {asset.type}
                     </span>
                     {asset.size && (

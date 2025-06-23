@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Video, Camera, File, Globe, ExternalLink, Calendar, Activity } from 'lucide-react';
+import { FileText, Video, Camera, File, Globe, ExternalLink, Calendar, Activity, Loader2, Inbox } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Asset {
@@ -33,13 +33,12 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
     }
   };
 
-  const getTypeColor = (type: Asset['type']) => {
-    switch (type) {
+  const getTypeStyles = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'webpage': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
+      case 'image': return 'text-green-400 bg-green-400/10 border-green-400/20';
       case 'video': return 'text-red-400 bg-red-400/10 border-red-400/20';
-      case 'screenshot': return 'text-green-400 bg-green-400/10 border-green-400/20';
-      case 'webpage': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-      case 'document': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
-      case 'social': return 'text-orange-400 bg-orange-400/10 border-orange-400/20';
+      case 'document': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
       default: return 'text-gray-400 bg-gray-400/10 border-gray-400/20';
     }
   };
@@ -63,7 +62,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
       >
         <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8 sm:p-12 shadow-2xl">
           <FileText className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-400 opacity-50" />
-          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Assets Found</h3>
+          <h3 className="text-lg sm:text-xl font-normal text-white mb-2">No Assets Found</h3>
           <p className="text-sm sm:text-base text-gray-400">
             Try adjusting your filters or search terms to find more assets
           </p>
@@ -80,7 +79,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
       transition={{ duration: 0.6 }}
     >
       <div className="mb-6">
-        <h3 className="text-xl sm:text-2xl font-semibold text-white mb-2">
+        <h3 className="text-xl sm:text-2xl font-normal text-white mb-2">
           Discovered Assets
         </h3>
         <p className="text-sm sm:text-base text-gray-400">
@@ -110,4 +109,45 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
                   onError={e => { e.currentTarget.src = '/no-preview.png'; }}
                 />
               ) : (
-                <div className={`
+                <div className="text-gray-400 opacity-50">
+                  {getIcon(asset.type)}
+                </div>
+              )}
+              
+              {/* Status indicator */}
+              <div className={`absolute top-2 right-2 w-3 h-3 rounded-full ${getStatusColor(asset.status)}`} />
+            </div>
+
+            {/* Asset Info */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getTypeStyles(asset.type)}`}>
+                  {asset.type}
+                </span>
+                <ExternalLink className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              
+              <h4 className="font-normal text-white text-sm sm:text-base line-clamp-2">
+                {asset.title || 'Untitled Asset'}
+              </h4>
+              
+              <p className="text-xs text-gray-400 line-clamp-2">
+                {asset.description || 'No description available'}
+              </p>
+              
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <span className="flex items-center">
+                  <Calendar className="w-3 h-3 mr-1" />
+                  {new Date(asset.createdAt).toLocaleDateString()}
+                </span>
+                {asset.size && (
+                  <span>{asset.size}</span>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}

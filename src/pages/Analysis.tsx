@@ -99,6 +99,26 @@ const Analysis: React.FC = () => {
   const [lastDomain, setLastDomain] = useState<string|null>(null);
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
 
+  const loadingMessages = [
+    "Scanning your digital footprint...",
+    "Crawling every nook and cranny...",
+    "Uncovering hidden assets...",
+    "Analyzing metadata for AI optimization...",
+    "Almost there! Crunching the numbers...",
+    "Mapping your visibility in AI search...",
+    "Fetching screenshots and videos...",
+    "Optimizing for LLM discoverability..."
+  ];
+  const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+  useEffect(() => {
+    if (!isAnalyzing) return;
+    setLoadingMsgIndex(0);
+    const interval = setInterval(() => {
+      setLoadingMsgIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [isAnalyzing]);
+
   // Debounced validation
   const debouncedValidate = React.useMemo(
     () => debounce((val: string) => {
@@ -390,7 +410,7 @@ const Analysis: React.FC = () => {
         {isAnalyzing ? (
           <CrawlProgress 
             percent={crawlProgress}
-            message={`Analyzing ${analysisQuery}...`}
+            message={loadingMessages[loadingMsgIndex]}
           />
         ) : assets.length > 0 ? (
           <>
