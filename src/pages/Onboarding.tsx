@@ -25,7 +25,7 @@ export default function Onboarding() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
               <Target className="h-7 w-7 text-gray-900" />
-              <span className="text-xl font-semibold text-gray-900">
+              <span className="text-xl font-normal text-gray-900">
                 GEO Analytics
               </span>
             </div>
@@ -41,7 +41,7 @@ export default function Onboarding() {
         {/* Left Column */}
         <div className="flex-1 flex flex-col justify-center px-12 lg:px-24 py-16">
           <div className="max-w-lg">
-            <h1 className="text-5xl font-semibold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-5xl font-normal text-gray-900 mb-6 leading-tight">
               The AI visibility workspace that works for you.
             </h1>
             
@@ -84,7 +84,7 @@ export default function Onboarding() {
         <div className="flex-1 flex flex-col justify-center px-12 lg:px-24 py-16 bg-white border-l border-gray-200">
           <div className="max-w-md w-full">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-2xl font-normal text-gray-900 mb-2">
                 Create your workspace
               </h2>
               <p className="text-gray-600">

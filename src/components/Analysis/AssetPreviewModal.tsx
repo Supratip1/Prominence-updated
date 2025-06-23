@@ -109,7 +109,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
                 {getIcon(asset.type)}
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">{asset.title}</h2>
+                <h2 className="text-xl font-normal text-gray-900">{asset.title}</h2>
                 <p className="text-gray-600 text-sm">{asset.sourceDomain}</p>
               </div>
             </div>
@@ -202,7 +202,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-gray-600" />
-                <h3 className="text-lg font-medium text-gray-900">{asset.title}</h3>
+                <h3 className="text-lg font-normal text-gray-900">{asset.title}</h3>
               </div>
               {asset.description && (
                 <p className="text-gray-700 text-sm">{asset.description}</p>

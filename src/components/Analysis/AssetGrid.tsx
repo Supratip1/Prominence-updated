@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Video, Camera, ExternalLink } from 'lucide-react';
+import { FileText, Video, Camera, ExternalLink, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Asset {
@@ -99,7 +99,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
                   case 'canonical':
                     return <p className="p-4 text-sm w-full h-full">{asset.description}</p>;
                   case 'heading':
-                    return <h3 className="p-4 font-bold w-full h-full">{asset.title ?? ''}</h3>;
+                    return <h3 className="p-4 font-normal w-full h-full">{asset.title ?? ''}</h3>;
                   case 'link':
                   case 'og':
                   case 'twitter':
@@ -113,7 +113,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
             {/* Asset Info */}
             <div className="space-y-3">
               <div className="flex items-start justify-between">
-                <h4 className="text-white font-semibold text-sm line-clamp-2 flex-1">
+                <h4 className="text-white font-normal text-sm line-clamp-2 flex-1">
                   {asset.title}
                 </h4>
                 <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#adff2f] transition-colors ml-2 flex-shrink-0" />

@@ -11,7 +11,7 @@ const BenefitsSection = () => {
               Benefits
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-white tracking-tight">
             The Key Benefits of AI for Your Business Growth
           </h2>
           <p className="mt-6 text-base sm:text-lg text-gray-400">
@@ -26,7 +26,7 @@ const BenefitsSection = () => {
               <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h3 className="text-lg lg:text-xl font-bold text-white">Boost LLM & AI Search Rankings</h3>
+              <h3 className="text-lg lg:text-xl font-normal text-white">Boost LLM & AI Search Rankings</h3>
             </div>
             <p className="text-white text-sm lg:text-base">
               Track and improve your brand's ranking in AI-powered search engines.
@@ -39,7 +39,7 @@ const BenefitsSection = () => {
               <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
                 <Lightbulb className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h3 className="text-lg lg:text-xl font-bold text-white">AI-Optimized Content</h3>
+              <h3 className="text-lg lg:text-xl font-normal text-white">AI-Optimized Content</h3>
             </div>
             <p className="text-white text-sm lg:text-base">
               Get AI-driven recommendations to optimize your content.
@@ -52,7 +52,7 @@ const BenefitsSection = () => {
               <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
                 <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h3 className="text-lg lg:text-xl font-bold text-white">Continuous Brand Monitoring</h3>
+              <h3 className="text-lg lg:text-xl font-normal text-white">Continuous Brand Monitoring</h3>
             </div>
             <p className="text-white text-sm lg:text-base">
               Monitor AI responses and get alerts for new mentions.
@@ -65,7 +65,7 @@ const BenefitsSection = () => {
               <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
                 <Users className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h3 className="text-lg lg:text-xl font-bold text-white">Competitor Intelligence</h3>
+              <h3 className="text-lg lg:text-xl font-normal text-white">Competitor Intelligence</h3>
             </div>
             <p className="text-white text-sm lg:text-base">
               Benchmark your performance against competitors.
@@ -78,7 +78,7 @@ const BenefitsSection = () => {
               <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h3 className="text-lg lg:text-xl font-bold text-white">Actionable Analytics</h3>
+              <h3 className="text-lg lg:text-xl font-normal text-white">Actionable Analytics</h3>
             </div>
             <p className="text-white text-sm lg:text-base">
               Get clear insights and ROI tracking.
@@ -91,7 +91,7 @@ const BenefitsSection = () => {
               <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
                 <Search className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-              <h3 className="text-lg lg:text-xl font-bold text-white">Automated Asset Discovery</h3>
+              <h3 className="text-lg lg:text-xl font-normal text-white">Automated Asset Discovery</h3>
             </div>
             <p className="text-white text-sm lg:text-base">
               Automatically discover your brand's digital footprint.

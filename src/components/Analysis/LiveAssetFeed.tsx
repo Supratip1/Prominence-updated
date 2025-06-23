@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FileText, Video, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FrontendAsset } from '../../pages/Analysis';
@@ -38,7 +38,7 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+      <h3 className="text-xl font-normal text-gray-900 mb-6 flex items-center">
         <div className="w-3 h-3 bg-purple-600 rounded-full mr-3"></div>
         Live Asset Feed ({assets.length} discovered)
       </h3>

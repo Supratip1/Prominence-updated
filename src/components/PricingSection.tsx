@@ -185,10 +185,10 @@ function PricingCard({ plan, index }: { plan: PricingPlan; index: number }) {
       )}
 
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+        <h3 className="text-2xl font-normal text-white mb-2">{plan.name}</h3>
         <p className="text-gray-300 text-sm mb-4">{plan.description}</p>
         <div className="mb-2">
-          <span className="text-4xl font-bold text-white">${plan.price}</span>
+          <span className="text-4xl font-normal text-white">${plan.price}</span>
           <span className="text-gray-400">/{plan.period}</span>
         </div>
       </div>
@@ -223,7 +223,7 @@ const PricingSection = () => {
     <motion.section id="pricing" className="py-16 sm:py-20 relative z-10 bg-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
-          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 sm:mb-8 text-center"
+          className="text-2xl sm:text-3xl lg:text-4xl font-normal text-white mb-6 sm:mb-8 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

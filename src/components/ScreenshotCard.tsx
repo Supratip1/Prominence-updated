@@ -14,7 +14,7 @@ export default function ScreenshotCard({ src, alt, title }: ScreenshotCardProps)
       whileHover={{ scale: 1.02 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
     >
-      <div className="relative bg-white/5  border-white/10 p-4 overflow-hidden">
+      <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 overflow-hidden">
         {/* Screenshot Image */}
         <div className="relative overflow-hidden rounded-xl mb-4">
           <img

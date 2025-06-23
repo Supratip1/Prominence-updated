@@ -63,10 +63,11 @@ export interface FrontendAsset {
 
 function normalizeDomain(raw: string): string {
   try {
-    const withProto = raw.match(/^https?:\/\//) ? raw : `https://${raw}`;
+    const trimmed = raw.trim();
+    const withProto = trimmed.match(/^https?:\/\//) ? trimmed : `https://${trimmed}`;
     return new URL(withProto).host;
   } catch {
-    return raw.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    return raw.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
   }
 }
 
@@ -357,7 +358,7 @@ const Analysis: React.FC = () => {
         />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center pt-24 pb-8">
           <motion.h1
-            className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
+            className="text-5xl md:text-7xl font-normal tracking-tighter mb-4 text-white"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}

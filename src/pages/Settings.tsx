@@ -41,7 +41,7 @@ export default function Settings() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-graphite tracking-tight">
+        <h1 className="text-2xl font-normal text-graphite tracking-tight">
           Settings
         </h1>
         <p className="text-gray-600 mt-1">
@@ -76,7 +76,7 @@ export default function Settings() {
             <div className="p-6">
               {activeTab === 'profile' && (
                 <div className="space-y-6">
-                  <h2 className="text-lg font-semibold text-graphite">
+                  <h2 className="text-lg font-normal text-graphite">
                     Profile Settings
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -127,14 +127,14 @@ export default function Settings() {
 
               {activeTab === 'api' && (
                 <div className="space-y-6">
-                  <h2 className="text-lg font-semibold text-graphite">
+                  <h2 className="text-lg font-normal text-graphite">
                     API Keys
                   </h2>
                   <div className="space-y-4">
                     <div className="p-4 bg-purple-50 rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-medium text-purple-900 mb-2">
+                          <h3 className="font-normal text-purple-900 mb-2">
                             API Key
                           </h3>
                           <p className="text-sm text-purple-700 mt-1">
@@ -149,7 +149,7 @@ export default function Settings() {
                     <div className="p-4 border border-platinum rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-medium text-graphite">
+                          <h3 className="font-normal text-graphite">
                             Test API Key
                           </h3>
                           <p className="text-sm text-gray-600 mt-1">
@@ -167,7 +167,7 @@ export default function Settings() {
 
               {activeTab === 'domain' && (
                 <div className="space-y-6">
-                  <h2 className="text-lg font-semibold text-graphite">
+                  <h2 className="text-lg font-normal text-graphite">
                     Custom Domain
                   </h2>
                   <div className="space-y-4">
@@ -182,7 +182,7 @@ export default function Settings() {
                       />
                     </div>
                     <div className="p-4 bg-blue-50 rounded-lg">
-                      <h3 className="font-medium text-blue-900 mb-2">
+                      <h3 className="font-normal text-blue-900 mb-2">
                         DNS Configuration
                       </h3>
                       <p className="text-sm text-blue-700">
@@ -199,7 +199,7 @@ export default function Settings() {
 
               {activeTab === 'reports' && (
                 <div className="space-y-6">
-                  <h2 className="text-lg font-semibold text-graphite">
+                  <h2 className="text-lg font-normal text-graphite">
                     Weekly Video Reports
                   </h2>
                   <div className="space-y-4">
@@ -209,7 +209,7 @@ export default function Settings() {
                         className="flex items-center justify-between p-4 border border-platinum rounded-lg"
                       >
                         <div>
-                          <h3 className="font-medium text-graphite">
+                          <h3 className="font-normal text-graphite">
                             {integration.name}
                           </h3>
                           <p className="text-sm text-gray-600 mt-1">
@@ -243,13 +243,13 @@ export default function Settings() {
 
               {activeTab === 'voice' && (
                 <div className="space-y-6">
-                  <h2 className="text-lg font-semibold text-graphite">
+                  <h2 className="text-lg font-normal text-graphite">
                     Voice Summaries
                   </h2>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between p-4 border border-platinum rounded-lg">
                       <div>
-                        <h3 className="font-medium text-graphite">
+                        <h3 className="font-normal text-graphite">
                           Weekly Voice Summaries
                         </h3>
                         <p className="text-sm text-gray-600 mt-1">

@@ -1,242 +1,176 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  Target,
-  User,
-  BarChart2,
-  Menu,
-  X,
-  Home,
-  Star,
-  DollarSign,
-  FileText,
-  Search,
-  Code,
-  BookOpen
-} from 'lucide-react';
-import Button from '../UI/Button';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+
+// Desktop NavLink
+const NavLink = ({ onClick, children, isActive }: { onClick: () => void, children: React.ReactNode, isActive?: boolean }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center text-base font-normal transition-colors duration-200 px-3 py-2 rounded-md ${
+      isActive ? 'text-white' : 'text-gray-400 hover:text-white'
+    }`}
+  >
+    {isActive && <span className="w-1.5 h-1.5 bg-white rounded-full mr-2.5"></span>}
+    {children}
+  </button>
+);
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Handle scroll effect with throttling
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.scrollY > 10;
-      setIsScrolled(scrolled);
-    };
-
-    // Throttle scroll events for better performance
-    let ticking = false;
-    const throttledHandleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', throttledHandleScroll);
-  }, []);
-
-  // Handle body scroll lock
-  useEffect(() => {
-    if (open) {
-      document.body.classList.add('overflow-hidden');
-      // Focus trap for mobile menu
-      const focusableElements = document.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      const firstElement = focusableElements[0] as HTMLElement;
-      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-      
-      if (firstElement) firstElement.focus();
-      
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Tab') {
-          if (e.shiftKey) {
-            if (document.activeElement === firstElement) {
-              e.preventDefault();
-              lastElement?.focus();
-            }
-          } else {
-            if (document.activeElement === lastElement) {
-              e.preventDefault();
-              firstElement?.focus();
-            }
-          }
-        } else if (e.key === 'Escape') {
-          setOpen(false);
-        }
-      };
-      
-      document.addEventListener('keydown', handleKeyDown);
-      return () => {
-        document.removeEventListener('keydown', handleKeyDown);
-        document.body.classList.remove('overflow-hidden');
-      };
-    } else {
-      document.body.classList.remove('overflow-hidden');
-    }
-  }, [open]);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const smoothScrollTo = useCallback((elementId: string) => {
+    setMobileMenuOpen(false);
     const element = document.getElementById(elementId);
     if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
+      const headerOffset = 100;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+      window.scrollTo({
+         top: offsetPosition,
+         behavior: "smooth"
       });
+    } else {
+        navigate(`/#${elementId}`);
     }
-    setOpen(false);
+  }, [navigate]);
+
+  // Scroll detection and active section highlighting
+  useEffect(() => {
+    const sections = ['hero', 'our-services', 'key-benefits', 'pricing'];
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+      
+      const scrollPosition = window.scrollY + 120; // Increased offset for better accuracy
+
+      // Find active section
+      const currentSection = sections.find(id => {
+        const section = document.getElementById(id);
+        if (!section) return false;
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        return scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight;
+      });
+
+      if (currentSection) {
+        setActiveSection(currentSection);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Helper to navigate to home and scroll to section
-  const goToSection = useCallback((sectionId: string) => {
-    if (window.location.pathname !== '/dashboard' && window.location.pathname !== '/') {
-      window.location.href = `/dashboard#${sectionId}`;
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
     } else {
-      smoothScrollTo(sectionId);
+      document.body.style.overflow = 'unset';
     }
-    setOpen(false);
-  }, [smoothScrollTo]);
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
 
   const links = [
     { 
       label: 'Dashboard', 
-      icon: <Home className="h-5 w-5 inline-block mr-1" />, 
-      href: '#hero', 
-      onClick: () => goToSection('hero'),
-      'aria-label': 'Go to dashboard section'
+      sectionId: 'hero'
     },
     { 
       label: 'Features', 
-      icon: <Target className="h-5 w-5 inline-block mr-1" />, 
-      href: '#our-services', 
-      onClick: () => goToSection('our-services'),
-      'aria-label': 'Go to features section'
+      sectionId: 'our-services'
+    },
+    { 
+      label: 'Benefits', 
+      sectionId: 'key-benefits'
     },
     { 
       label: 'Pricing', 
-      icon: <DollarSign className="h-5 w-5 inline-block mr-1" />, 
-      href: '#pricing', 
-      onClick: () => goToSection('pricing'),
-      'aria-label': 'Go to pricing section'
+      sectionId: 'pricing'
     },
   ];
 
-  // Dynamic text color classes
-  const textColorClass = 'text-white';
-  const textHoverClass = 'hover:text-white';
-  const textOpacityClass = 'text-white/80';
-
   return (
     <>
-      {/* Skip link for accessibility */}
-      <a href="#main-content" className="skip-link">
-        Skip to main content
-      </a>
-      
-      <header
-        ref={headerRef}
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-black' : 'bg-transparent'}`}
-        role="banner"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <button
-              onClick={() => goToSection('hero')}
-              className="font-bold text-xl text-white hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
-              aria-label="Go to homepage"
-            >
-              Prominance.ai
-            </button>
-
-            {/* Desktop Navigation - Right aligned */}
-            <nav className="hidden md:flex items-center space-x-6" role="navigation" aria-label="Main navigation">
-              {links.map((link) => (
-                <button
-                  key={link.label}
-                  onClick={link.onClick}
-                  className="text-base font-medium text-gray-400 hover:text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-2 py-1"
-                  aria-label={link['aria-label']}
-                >
-                  {link.label}
-                </button>
-              ))}
-            </nav>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button
-                ref={menuButtonRef}
-                onClick={() => setOpen(!open)}
-                className={`${textColorClass} hover:opacity-80 transition-colors duration-200 p-2 rounded focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black`}
-                aria-label={open ? 'Close menu' : 'Open menu'}
-                aria-expanded={open}
-                aria-controls="mobile-menu"
+      {/* Desktop Header */}
+      <div className="hidden sm:block fixed top-6 left-8 z-50">
+          <button onClick={() => smoothScrollTo('hero')} className="text-white font-normal text-2xl">Prominence</button>
+      </div>
+      <header className="hidden sm:block fixed top-4 left-1/2 -translate-x-1/2 z-50">
+        <div className={`
+          flex items-center gap-x-4
+          px-4 py-2
+          bg-black/50 backdrop-blur-lg
+          border border-white/10
+          rounded-full
+          shadow-lg
+          transition-all duration-300
+          ${isScrolled ? 'shadow-purple-500/10' : 'shadow-none'}
+        `}>
+          <nav className="flex items-center gap-x-1">
+            {links.map((link) => (
+              <NavLink 
+                key={link.sectionId}
+                onClick={() => smoothScrollTo(link.sectionId)} 
+                isActive={activeSection === link.sectionId}
               >
-                {open ? (
-                  <X className="h-6 w-6" aria-hidden="true" />
-                ) : (
-                  <Menu className="h-6 w-6" aria-hidden="true" />
-                )}
-              </button>
-            </div>
-          </div>
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+          <button
+            onClick={() => navigate('/analysis')}
+            className="flex items-center text-sm font-normal text-black bg-white hover:bg-gray-200 transition-colors px-4 py-2 rounded-full shadow-md ml-2"
+          >
+            Get started
+          </button>
         </div>
       </header>
       
-      {/* Mobile Menu */}
-      {open && (
-        <div 
-          className="fixed inset-0 z-50 bg-black flex flex-col md:hidden"
-          id="mobile-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="mobile-menu-title"
-        >
-          <div className="flex justify-end p-4">
-            <button
-              onClick={() => setOpen(false)}
-              className="text-white hover:text-white/80 transition-colors duration-200 p-2 rounded focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-              aria-label="Close menu"
-            >
-              <X className="h-7 w-7" aria-hidden="true" />
-            </button>
-          </div>
-          <div className="flex-1 flex flex-col justify-center px-2 pb-8 space-y-1">
-            <h2 id="mobile-menu-title" className="sr-only">Mobile menu</h2>
-            {links.map((link) =>
-              link.onClick ? (
+      {/* Mobile Header */}
+      <header className={`sm:hidden fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-black/80 backdrop-blur-sm' : 'bg-transparent'}`}>
+         <div className="flex items-center justify-between h-16 px-4">
+             <button onClick={() => smoothScrollTo('hero')} className="text-white font-normal">Prominence</button>
+             <div className="flex items-center gap-x-2">
                 <button
-                  key={link.label}
-                  onClick={link.onClick}
-                  className="block w-full text-left px-3 py-4 text-xl text-white/80 hover:text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
-                  aria-label={link['aria-label']}
+                  onClick={() => navigate('/analysis')}
+                  className="flex items-center text-xs font-normal text-black bg-white hover:bg-gray-200 transition-colors px-3 py-1.5 rounded-full shadow-sm"
                 >
-                  {link.icon}
-                  {link.label}
+                  Get started
                 </button>
-              ) : (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="block w-full text-left px-3 py-4 text-xl text-white/80 hover:text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded"
-                  aria-label={link['aria-label']}
+                <button
+                  onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+                  className="p-2 text-white"
+                  aria-label="Toggle menu"
                 >
-                  {link.icon}
-                  {link.label}
-                </a>
-              )
-            )}
-          </div>
+                  {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+             </div>
+         </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="sm:hidden fixed inset-0 bg-black/95 backdrop-blur-md z-40 flex flex-col items-center justify-center pt-20"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+           <nav className="flex flex-col items-center gap-y-8">
+            {links.map((link) => (
+              <button
+                key={link.sectionId}
+                onClick={() => smoothScrollTo(link.sectionId)} 
+                className={`text-2xl font-normal ${activeSection === link.sectionId ? 'text-white' : 'text-gray-400'}`}
+              >
+                {link.label}
+              </button>
+            ))}
+          </nav>
         </div>
       )}
     </>

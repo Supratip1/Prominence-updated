@@ -36,8 +36,8 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
       transition={{ duration: 0.6 }}
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-white flex items-center">
-          <Filter className="w-5 h-5 mr-3 text-purple-600" />
+        <h3 className="text-xl font-normal text-white flex items-center">
+          <Filter className="w-5 h-5 mr-3 text-purple-400" />
           Filter Assets
         </h3>
         {(selectedType !== 'all' || selectedSource !== 'all') && (
@@ -108,17 +108,6 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
           </div>
         )}
       </div>
-
-      {selectedType !== 'all' && (
-        <span className="px-3 py-1 bg-purple-500/20 text-purple-400 border border-purple-400/50 shadow-lg shadow-purple-500/20 rounded-lg text-sm">
-          Type: {selectedType}
-        </span>
-      )}
-      {selectedSource !== 'all' && (
-        <span className="px-3 py-1 bg-purple-500/20 text-purple-400 border border-purple-400/50 shadow-lg shadow-purple-500/20 rounded-lg text-sm">
-          Source: {selectedSource}
-        </span>
-      )}
     </motion.div>
   );
 } 

@@ -30,7 +30,7 @@ export default function Keywords() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-graphite tracking-tight">
+          <h1 className="text-2xl font-normal text-graphite tracking-tight">
             Keyword Manager
           </h1>
           <p className="text-gray-600 mt-1">
@@ -135,7 +135,7 @@ export default function Keywords() {
         // Empty State
         <div className="text-center py-16">
           <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-graphite mb-2">
+          <h3 className="text-lg font-normal text-graphite mb-2">
             No keywords yet
           </h3>
           <p className="text-gray-600 mb-6">
@@ -160,7 +160,7 @@ export default function Keywords() {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h2 className="text-xl font-semibold text-graphite mb-4">
+            <h2 className="text-xl font-normal text-graphite mb-4">
               Add Keyword
             </h2>
             <form className="space-y-4">

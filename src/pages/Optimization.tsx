@@ -104,7 +104,7 @@ const ScoreCard = ({
       className={`bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+        <h3 className="text-sm font-normal text-gray-700">{title}</h3>
         <div className="flex items-center space-x-1">
           {delta > 0 ? (
             <TrendingUp className="w-4 h-4 text-green-600" strokeWidth={2} />
@@ -152,7 +152,7 @@ const ScoreCard = ({
 const OpportunityTable = ({ opportunities }: { opportunities: OpportunityRow[] }) => (
   <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
     <div className="px-6 py-4 border-b border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900">Optimization Opportunities</h3>
+      <h3 className="text-lg font-normal text-gray-900">Optimization Opportunities</h3>
       <p className="text-sm text-gray-600 mt-1">Ranked by potential impact</p>
     </div>
     <div className="overflow-x-auto">
@@ -385,14 +385,14 @@ const MarketShareChart = ({ data, historicalData }: { data: Series[], historical
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-800">Market Share Analysis</h3>
+        <h3 className="text-lg font-normal text-gray-800">Market Share Analysis</h3>
         <p className="text-sm text-gray-600 mt-1">Current distribution and 6-month trend</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Pie Chart Section */}
         <div>
-          <h4 className="text-md font-semibold text-gray-700 mb-4 text-center">Current Market Share</h4>
+          <h4 className="text-md font-normal text-gray-700 mb-4 text-center">Current Market Share</h4>
           <div className="relative h-64">
             <Doughnut data={doughnutChartData} options={doughnutChartOptions} />
               </div>
@@ -400,7 +400,7 @@ const MarketShareChart = ({ data, historicalData }: { data: Series[], historical
 
         {/* Line Chart Section */}
         <div>
-          <h4 className="text-md font-semibold text-gray-700 mb-4 text-center">Market Share Trend</h4>
+          <h4 className="text-md font-normal text-gray-700 mb-4 text-center">Market Share Trend</h4>
            <div className="relative h-64">
             <Line data={lineChartData} options={lineChartOptions} />
           </div>
@@ -548,7 +548,7 @@ export default function Optimization() {
         />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center pt-24 pb-8">
           <motion.h1
-            className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
+            className="text-5xl md:text-7xl font-normal tracking-tighter mb-4 text-white"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -662,12 +662,12 @@ const IntegrationTab = () => {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-8">
       <div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">Connect Your Tools</h3>
+        <h3 className="text-2xl font-normal text-gray-900 mb-4">Connect Your Tools</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {integrations.map(integration => (
             <div key={integration.name} className="bg-gray-50 p-6 rounded-xl border border-gray-200 flex flex-col items-center text-center hover:bg-gray-100 transition-colors">
               <div className="text-purple-600 mb-4">{integration.icon}</div>
-              <h4 className="font-semibold text-gray-900 mb-2">{integration.name}</h4>
+              <h4 className="font-normal text-gray-900 mb-2">{integration.name}</h4>
               <p className="text-sm text-gray-600 mb-4">{integration.description}</p>
               <button className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition-colors mt-auto">
                 Connect
@@ -677,7 +677,7 @@ const IntegrationTab = () => {
         </div>
       </div>
       <div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">Recommendation Fixes</h3>
+        <h3 className="text-2xl font-normal text-gray-900 mb-4">Recommendation Fixes</h3>
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <table className="w-full text-sm text-left text-gray-500">
             <thead className="bg-gray-50 text-xs text-gray-700 uppercase">

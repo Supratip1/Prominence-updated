@@ -60,6 +60,7 @@ const ProminenceWorkflow = () => {
 
   return (
     <section 
+      id="our-services"
       className="text-white w-full transition-colors duration-500"
       style={{ backgroundColor: getBackgroundColor() }}
     >
@@ -73,7 +74,7 @@ const ProminenceWorkflow = () => {
       
       {/* Header */}
       <div className="container mx-auto px-6 py-8 text-center relative z-10">
-        <h2 className="text-5xl md:text-6xl font-bold mb-6">
+        <h2 className="text-5xl md:text-6xl font-normal mb-6">
           How Prominence Works
         </h2>
         <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -119,7 +120,7 @@ const ProminenceWorkflow = () => {
                       </div>
                       
                       <div>
-                        <h3 className="text-2xl font-bold mb-3 text-white">
+                        <h3 className="text-2xl font-normal mb-3 text-white">
                           {feature.title}
                         </h3>
                         <p className="text-gray-300 leading-relaxed text-sm">
@@ -142,11 +143,11 @@ const ProminenceWorkflow = () => {
                     
                     {/* Screenshot Section */}
                     <div className="flex-1 relative">
-                      <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20">
+                      <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20 bg-black h-full">
                         <img 
                           src={feature.screenshot} 
                           alt={`${feature.title} interface`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                         
                         {/* Subtle overlay */}
@@ -196,7 +197,7 @@ const ProminenceWorkflow = () => {
                     </div>
                     
                     <div>
-                        <h3 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+                        <h3 className="text-4xl md:text-5xl font-normal mb-6 text-white">
                         {feature.title}
                       </h3>
                         <p className="text-xl text-gray-300 leading-relaxed">
@@ -219,11 +220,11 @@ const ProminenceWorkflow = () => {
                   
                   {/* Screenshot/Video Placeholder Section - RIGHT */}
                     <div className="flex-1 relative lg:block hidden">
-                      <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20">
+                      <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20 bg-black h-full">
                       <img 
                         src={feature.screenshot} 
                         alt={`${feature.title} interface`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                       />
                       
                       {/* Subtle overlay */}

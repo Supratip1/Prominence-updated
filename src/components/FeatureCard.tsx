@@ -42,7 +42,7 @@ export default function FeatureCard({
               {icon}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-black">{title}</h3>
+              <h3 className="text-xl font-normal text-black">{title}</h3>
               <div className="w-8 h-0.5 bg-gradient-to-r from-green-400 to-purple-500 rounded-full mt-1" />
             </div>
           </div>

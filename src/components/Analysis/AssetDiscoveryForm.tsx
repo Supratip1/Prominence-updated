@@ -39,7 +39,7 @@ export default function AssetDiscoveryForm({ value, onChange, onSubmit, disableS
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Enter domain or URL (e.g., example.com)"
-            className="w-full h-12 sm:h-16 px-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 disabled:opacity-50 text-lg"
+            className="w-full h-12 sm:h-16 pl-14 pr-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 disabled:opacity-50 text-lg"
           />
           {value && (
             <button

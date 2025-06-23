@@ -621,6 +621,189 @@ const footerItemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { type: "spring" } },
 }
+
+// --- HEXAGON OUTLINE OVERLAY ---
+function getHexPoints(cx: number, cy: number, r: number): string {
+  const points = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.PI / 3 * i - Math.PI / 2; // Pointed top
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    points.push(`${x},${y}`);
+  }
+  return points.join(' ');
+}
+
+function HexagonOutlineOverlay({
+  width,
+  height,
+  mouse,
+  velocity,
+}: {
+  width: number
+  height: number
+  mouse: { x: number; y: number } | null
+  velocity: number
+}) {
+  // Don't render on mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+  if (isMobile) return null;
+
+  const r = 100 // reduced from 170 - smaller hexagons
+  const gap = 80 // reduced from 120 - more hexagons
+
+  const hexW = Math.sqrt(3) * r
+  const hexH = 2 * r
+
+  const cellX = hexW + gap
+  const cellY = hexH * 0.75 + gap
+
+  const cols = Math.ceil(width / cellX) + 1
+  const rows = Math.ceil(height / cellY) + 1
+
+  const hexagons = React.useMemo(() => {
+    const arr: { x: number; y: number; key: string }[] = []
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const x = col * cellX + (row % 2 ? cellX / 2 : 0)
+        const y = row * cellY
+        arr.push({ x, y, key: `${row}-${col}` })
+      }
+    }
+    return arr
+  }, [rows, cols, cellX, cellY])
+
+  // Dynamic glow radius based on velocity
+  const baseRadius = 150 // reduced from 220
+  const multiplier = 150 // reduced from 200
+  const glowRadius = baseRadius + (velocity || 0) * multiplier
+
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ 
+        left: 0, 
+        top: 0, 
+        width: "100%", 
+        height: "100%",
+        zIndex: -1 // ensure it stays behind animations
+      }}
+    >
+      {hexagons.map((h) => {
+        let intensity = 0
+        if (mouse) {
+          const d = Math.hypot(h.x - mouse.x, h.y - mouse.y)
+          intensity = Math.max(0, 1 - d / glowRadius)
+        }
+
+        const strokeWidth = 0.5 + intensity * 1.5 // increased from 0.5 + intensity * 1
+        // Only show stroke if intensity > 0, with increased opacity
+        const strokeOpacity = intensity > 0 ? 0.08 + intensity * 0.4 : 0.02 // increased opacity
+        const strokeColor = `rgba(167, 139, 250, ${strokeOpacity})`
+
+        return (
+          <polygon
+            key={h.key}
+            points={getHexPoints(h.x, h.y, r)}
+            fill="none"
+            stroke={strokeColor}
+            strokeWidth={strokeWidth}
+            strokeLinejoin="round"
+            style={{
+              transition: "stroke 0.3s, stroke-width 0.3s, filter 0.3s",
+              filter: intensity > 0 ? `blur(${intensity * 2}px) drop-shadow(0 0 ${intensity * 10}px rgba(167, 139, 250, ${intensity * 0.8}))` : "none",
+            }}
+          />
+        )
+      })}
+    </svg>
+  )
+}
+
+function getRoundedHexPath(cx: number, cy: number, r: number, cornerRadius: number = 15): string {
+  const points = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.PI / 3 * i - Math.PI / 2; // Pointed top
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    points.push({ x, y });
+  }
+
+  // Create rounded path using quadratic curves
+  let path = '';
+  for (let i = 0; i < points.length; i++) {
+    const current = points[i];
+    const next = points[(i + 1) % points.length];
+    
+    if (i === 0) {
+      path += `M ${current.x} ${current.y}`;
+    }
+    
+    // Calculate the midpoint between current and next point
+    const midX = (current.x + next.x) / 2;
+    const midY = (current.y + next.y) / 2;
+    
+    // Calculate the vector from current to next
+    const dx = next.x - current.x;
+    const dy = next.y - current.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    
+    // Normalize and scale by corner radius
+    const unitX = dx / length;
+    const unitY = dy / length;
+    
+    const offsetX = unitX * cornerRadius;
+    const offsetY = unitY * cornerRadius;
+    
+    // Create rounded corner
+    const cp1x = current.x + offsetX;
+    const cp1y = current.y + offsetY;
+    const cp2x = next.x - offsetX;
+    const cp2y = next.y - offsetY;
+    
+    path += ` L ${cp1x} ${cp1y}`;
+    path += ` Q ${midX} ${midY} ${cp2x} ${cp2y}`;
+  }
+  
+  path += ' Z'; // Close the path
+  return path;
+}
+
+function getCurvedHexPath(
+  cx: number,
+  cy: number,
+  r: number,
+  curvature = 0.085,   // keep this positive
+) {
+  // vertices, clockwise, pointy-top
+  const verts = Array.from({ length: 6 }, (_, i) => {
+    const a = Math.PI / 3 * i - Math.PI / 2;
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  });
+
+  let d = `M ${verts[0].x} ${verts[0].y}`;
+  for (let i = 0; i < 6; i++) {
+    const p1 = verts[i];
+    const p2 = verts[(i + 1) % 6];
+
+    const mx = (p1.x + p2.x) / 2;
+    const my = (p1.y + p2.y) / 2;
+
+    // Correct outward normal for clockwise order
+    const dx =  p2.x - p1.x;
+    const dy =  p2.y - p1.y;
+    const len = Math.hypot(dx, dy);
+    const nx  =  dy / len;
+    const ny  = -dx / len;
+
+    const cpx = mx + nx * r * curvature;
+    const cpy = my + ny * r * curvature;
+
+    d += ` Q ${cpx} ${cpy} ${p2.x} ${p2.y}`;
+  }
+  return d + " Z";
+}
+
 export default function Dashboard() {
   const location = typeof window !== "undefined" ? window.location : { hash: "" }
   useEffect(() => {
@@ -697,7 +880,6 @@ export default function Dashboard() {
   const [mobileActiveTab, setMobileActiveTab] = useState<'animation' | 'video'>('video')
 
   // Lottie animation rotation system
-  const lottieAnimations = ["/lottie/Animation1.json", "/lottie/Animation2.json", "/lottie/Animation3.json"]
   const animationIntervals = [240000, 300000, 270000] // 4 min, 5 min, 4.5 min intervals
 
   // Load and rotate Lottie animations
@@ -929,6 +1111,125 @@ export default function Dashboard() {
     return impacts[type]
   }
 
+  // Hero section ref and size
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [heroSize, setHeroSize] = useState({ width: 0, height: 0 });
+  useLayoutEffect(() => {
+    function updateSize() {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        setHeroSize({ width: rect.width, height: rect.height });
+      }
+    }
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  React.useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (!document.head.querySelector("style[data-premium-animations]")) {
+      const style = document.createElement("style");
+      style.setAttribute("data-premium-animations", "true");
+      style.innerHTML = `
+        @keyframes conveyor-seamless {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes testimonial-scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes scroll-screenshots {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes dash {
+          to { stroke-dashoffset: -1000; }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float 3s ease-in-out infinite;
+          animation-delay: 1.5s;
+        }
+        .animate-scroll-screenshots {
+          animation: scroll-screenshots 60s linear infinite;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        /* Mobile responsive improvements */
+        @media (max-width: 640px) {
+          .container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+          .text-responsive {
+            font-size: clamp(0.875rem, 2.5vw, 1rem);
+          }
+          .heading-responsive {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  // In Dashboard component, add state for mouse position over hero
+  const [mouse, setMouse] = React.useState<{x: number, y: number} | null>(null);
+  const [velocity, setVelocity] = React.useState(0);
+  const lastPos = React.useRef({ x: 0, y: 0, time: Date.now() });
+
+  React.useEffect(() => {
+    const decayInterval = setInterval(() => {
+      setVelocity((prev) => Math.max(0, prev * 0.85)); // Decay by 15%
+    }, 50);
+    return () => clearInterval(decayInterval);
+  }, []);
+
+  React.useEffect(() => {
+    const heroElement = heroRef.current;
+    if (!heroElement) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = heroElement.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      setMouse({ x, y });
+
+      const now = Date.now();
+      const dt = now - lastPos.current.time;
+      const dist = Math.hypot(x - lastPos.current.x, y - lastPos.current.y);
+
+      if (dt > 10) {
+        const speed = dist / dt;
+        // Use a smoothing factor (Exponential Moving Average)
+        setVelocity((prev) => prev * 0.7 + speed * 0.3);
+      }
+
+      lastPos.current = { x, y, time: now };
+    }
+
+    heroElement.addEventListener('mousemove', handleMouseMove);
+    return () => heroElement.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
     <div className="relative overflow-x-hidden overflow-y-visible bg-black text-white">
       {/* Header */}
@@ -945,186 +1246,221 @@ export default function Dashboard() {
             }}
           />
 
-          <div id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            {/* Mobile Layout - Only applies to mobile */}
-            <div className="lg:hidden">
-              <div className="text-center pt-16 pb-8">
-                <motion.h1
-                  className="text-4xl sm:text-5xl font-bold tracking-tighter mb-4 text-white"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  Increase your Ranking
-                  <br />
-                  in LLM Searches
-                </motion.h1>
-                <motion.p
-                  className="text-lg sm:text-xl font-medium text-gray-400 max-w-xl mx-auto mb-8"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                >
-                  Rise to the top in AI-powered search.
-                </motion.p>
+          <div
+            id="hero"
+            ref={heroRef}
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative min-h-[600px]"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              setMouse({ x, y });
+
+              const now = Date.now();
+              const dt = now - lastPos.current.time;
+              const dist = Math.hypot(x - lastPos.current.x, y - lastPos.current.y);
+
+              if (dt > 10) {
+                const speed = dist / dt;
+                // Use a smoothing factor (Exponential Moving Average)
+                setVelocity((prev) => prev * 0.7 + speed * 0.3);
+              }
+
+              lastPos.current = { x, y, time: now };
+            }}
+            onMouseLeave={() => setMouse(null)}
+          >
+            {/* Hexagon Outline Overlay (background, subtle, clean) */}
+            <div className="absolute inset-0 pointer-events-none z-0">
+              <HexagonOutlineOverlay
+                width={heroSize.width || 1200}
+                height={heroSize.height || 700}
+                mouse={mouse}
+                velocity={velocity}
+              />
+            </div>
+            {/* Hero content wrapper (above overlay) */}
+            <div className="relative z-10">
+              {/* Mobile Layout - Only applies to mobile */}
+              <div className="lg:hidden">
+                <div className="text-center pt-16 pb-8">
+                  <motion.h1
+                    className="text-4xl sm:text-5xl font-normal tracking-tighter mb-4 text-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    Increase your Ranking
+                    <br />
+                    in LLM Searches
+                  </motion.h1>
+                  <motion.p
+                    className="text-lg sm:text-xl font-medium text-gray-400 max-w-xl mx-auto mb-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    Rise to the top in AI-powered search.
+                  </motion.p>
+                  <motion.div
+                    className="flex flex-row justify-center items-center gap-2 sm:gap-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                  >
+                    <button
+                      onClick={() => navigate('/analysis')}
+                      className="bg-white text-black font-semibold rounded-lg px-3 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-base transition-transform hover:scale-105 shadow-lg"
+                    >
+                      Start with AI
+                    </button>
+                    <button
+                      onClick={() => smoothScrollTo('pricing')}
+                      className="bg-transparent text-white font-semibold rounded-lg px-3 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-base transition-transform hover:scale-105 border border-white/30 hover:bg-white/10"
+                    >
+                      Start for free
+                    </button>
+                  </motion.div>
+                </div>
+                
+                {/* Mobile: Tabbed Interface */}
+                <div className="mt-8">
+                  {/* Tab Navigation */}
+                  <div className="flex border-b border-white/20 mb-6">
+                    <button 
+                      className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                        mobileActiveTab === 'video' 
+                          ? 'text-white border-b-2 border-white' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      onClick={() => setMobileActiveTab('video')}
+                    >
+                      Demo Video
+                    </button>
+                    <button 
+                      className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                        mobileActiveTab === 'animation' 
+                          ? 'text-white border-b-2 border-white' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      onClick={() => setMobileActiveTab('animation')}
+                    >
+                      Animation
+                    </button>
+                  </div>
+                  
+                  {/* Tab Content */}
+                  <div className="relative">
+                    {mobileActiveTab === 'animation' && (
+                      <motion.div
+                        key="animation"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex justify-center"
+                      >
+                        {animationData && <Lottie animationData={animationData} loop={true} />}
+                      </motion.div>
+                    )}
+                    
+                    {mobileActiveTab === 'video' && (
+                      <motion.div
+                        key="video"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20">
+                          <video
+                            className="w-full h-full object-cover"
+                            src="/16296848-uhd_3840_2160_24fps.mp4"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Layout - Original unchanged */}
+              <div className="hidden lg:grid lg:grid-cols-2 gap-16 items-center pt-24 pb-8">
+                {/* Left: Text Content */}
+                <div className="text-left">
+                  <motion.h1
+                    className="text-5xl md:text-7xl font-normal tracking-tighter mb-4 text-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    Increase your Ranking
+                    <br />
+                    in LLM Searches
+                  </motion.h1>
+                  <motion.p
+                    className="text-xl md:text-2xl font-medium text-gray-400 max-w-xl mb-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    Rise to the top in AI-powered search.
+                  </motion.p>
+                  <motion.div
+                    className="flex items-center gap-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                  >
+                    <button
+                      onClick={() => navigate('/analysis')}
+                      className="bg-white text-black font-semibold rounded-lg px-6 py-3 transition-transform hover:scale-105 shadow-lg"
+                    >
+                      Start with AI
+                    </button>
+                    <button
+                      onClick={() => smoothScrollTo('pricing')}
+                      className="bg-transparent text-white font-semibold rounded-lg px-6 py-3 transition-transform hover:scale-105 border border-white/30 hover:bg-white/10"
+                    >
+                      Start for free
+                    </button>
+                  </motion.div>
+                </div>
+
+                {/* Right: Lottie Animation */}
                 <motion.div
-                  className="flex flex-row justify-center items-center gap-2 sm:gap-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="relative"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
                 >
-                  <button
-                    onClick={() => navigate('/analysis')}
-                    className="bg-white text-black font-semibold rounded-lg px-3 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-base transition-transform hover:scale-105 shadow-lg"
-                  >
-                    Start with AI
-                  </button>
-                  <button
-                    onClick={() => smoothScrollTo('pricing')}
-                    className="bg-transparent text-white font-semibold rounded-lg px-3 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-base transition-transform hover:scale-105 border border-white/30 hover:bg-white/10"
-                  >
-                    Start for free
-                  </button>
+                  {animationData && <Lottie animationData={animationData} loop={true} />}
                 </motion.div>
               </div>
               
-              {/* Mobile: Tabbed Interface */}
-              <div className="mt-8">
-                {/* Tab Navigation */}
-                <div className="flex border-b border-white/20 mb-6">
-                  <button 
-                    className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                      mobileActiveTab === 'video' 
-                        ? 'text-white border-b-2 border-white' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setMobileActiveTab('video')}
-                  >
-                    Demo Video
-                  </button>
-                  <button 
-                    className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                      mobileActiveTab === 'animation' 
-                        ? 'text-white border-b-2 border-white' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setMobileActiveTab('animation')}
-                  >
-                    Animation
-                  </button>
-                </div>
-                
-                {/* Tab Content */}
-                <div className="relative">
-                  {mobileActiveTab === 'animation' && (
-                    <motion.div
-                      key="animation"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex justify-center"
-                    >
-                      {animationData && <Lottie animationData={animationData} loop={true} />}
-                    </motion.div>
-                  )}
-                  
-                  {mobileActiveTab === 'video' && (
-                    <motion.div
-                      key="video"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20">
-                        <video
-                          className="w-full h-full object-cover"
-                          src="/16296848-uhd_3840_2160_24fps.mp4"
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                        />
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Desktop Layout - Original unchanged */}
-            <div className="hidden lg:grid lg:grid-cols-2 gap-16 items-center pt-24 pb-8">
-              {/* Left: Text Content */}
-              <div className="text-left">
-                <motion.h1
-                  className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-white"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  Increase your Ranking
-                  <br />
-                  in LLM Searches
-                </motion.h1>
-                <motion.p
-                  className="text-xl md:text-2xl font-medium text-gray-400 max-w-xl mb-8"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                >
-                  Rise to the top in AI-powered search.
-                </motion.p>
-                <motion.div
-                  className="flex items-center gap-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                >
-                  <button
-                    onClick={() => navigate('/analysis')}
-                    className="bg-white text-black font-semibold rounded-lg px-6 py-3 transition-transform hover:scale-105 shadow-lg"
-                  >
-                    Start with AI
-                  </button>
-                  <button
-                    onClick={() => smoothScrollTo('pricing')}
-                    className="bg-transparent text-white font-semibold rounded-lg px-6 py-3 transition-transform hover:scale-105 border border-white/30 hover:bg-white/10"
-                  >
-                    Start for free
-                  </button>
-                </motion.div>
-              </div>
-
-              {/* Right: Lottie Animation */}
+              {/* Desktop: Video below heading and animation */}
               <motion.div
-                className="relative"
+                className="hidden lg:block relative my-20"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
               >
-                {animationData && <Lottie animationData={animationData} loop={true} />}
+                <div className="relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-purple-500/20">
+                  <video
+                    className="w-full h-full object-cover"
+                    src="/16296848-uhd_3840_2160_24fps.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
+                </div>
               </motion.div>
             </div>
-            
-            {/* Desktop: Video below heading and animation */}
-            <motion.div
-              className="hidden lg:block relative mt-8"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
-            >
-              <div className="relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-purple-500/20">
-                <video
-                  className="w-full h-full object-cover"
-                  src="/16296848-uhd_3840_2160_24fps.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                />
-              </div>
-            </motion.div>
           </div>
         </div>
       </div>
@@ -1179,7 +1515,7 @@ function StackedScreenshotCard({
                 {icon}
               </div>
               <div>
-                <h3 className="text-3xl font-bold text-white mb-2">{title}</h3>
+                <h3 className="text-3xl font-normal text-white mb-2">{title}</h3>
                   <div className="w-12 h-1 bg-gradient-to-r from-green-400 to-purple-500 rounded-full" />
               </div>
             </div>
@@ -1250,7 +1586,7 @@ function MobileScreenshotCard({
               {icon}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-black">{title}</h3>
+              <h3 className="text-xl font-normal text-black">{title}</h3>
               <div className="w-8 h-0.5 bg-gradient-to-r from-green-400 to-purple-500 rounded-full mt-1" />
             </div>
           </div>
@@ -1322,7 +1658,7 @@ function FeaturesGrid() {
             <div className={`w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-4 text-white`}>
               {feature.icon}
             </div>
-            <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+            <h3 className="text-xl font-normal text-white mb-3">{feature.title}</h3>
             <p className="text-gray-300 leading-relaxed">{feature.description}</p>
           </div>
         </motion.div>
@@ -1336,7 +1672,7 @@ function ContentAnalyzerSection() {
   return (
     <div className="text-center">
       <motion.h2
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+        className="text-3xl sm:text-4xl lg:text-5xl font-normal text-white mb-4"
         style={{
           background: "linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)",
           WebkitBackgroundClip: "text",
@@ -1364,7 +1700,7 @@ function ContentAnalyzerSection() {
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <FileText className="w-6 h-6 text-purple-400" />
-                <h3 className="text-xl font-semibold text-white">AI-Optimized Content</h3>
+                <h3 className="text-xl font-normal text-white">AI-Optimized Content</h3>
               </div>
               <p className="text-gray-300">
                 Analyze your content to see how well it performs in AI search results. Get recommendations for
@@ -1431,7 +1767,7 @@ function KeywordResearchSection() {
   return (
     <div className="text-center">
       <motion.h2
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+        className="text-3xl sm:text-4xl lg:text-5xl font-normal text-white mb-4"
         style={{
           background: "linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)",
           WebkitBackgroundClip: "text",
@@ -1460,7 +1796,7 @@ function KeywordResearchSection() {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <Search className="w-6 h-6 text-green-400" />
-                  <h3 className="text-xl font-semibold text-white">AI Keyword Discovery</h3>
+                  <h3 className="text-xl font-normal text-white">AI Keyword Discovery</h3>
                 </div>
                 <p className="text-gray-300">
                   Find keywords that AI engines love. Our research tool analyzes millions of AI responses to identify
@@ -1493,7 +1829,7 @@ function KeywordResearchSection() {
 
             <div className="space-y-6">
               <div className="bg-white/10 rounded-xl p-6">
-                <h4 className="text-white font-semibold mb-4">Research Features</h4>
+                <h4 className="text-white font-normal mb-4">Research Features</h4>
                 <ul className="space-y-3">
                   {[
                     "AI trend analysis",
@@ -1529,7 +1865,7 @@ function ApiDocsSection() {
   return (
     <div className="text-center">
       <motion.h2
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+        className="text-3xl sm:text-4xl lg:text-5xl font-normal text-white mb-4"
         style={{
           background: "linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)",
           WebkitBackgroundClip: "text",
@@ -1557,7 +1893,7 @@ function ApiDocsSection() {
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <Code className="w-6 h-6 text-purple-400" />
-                <h3 className="text-xl font-semibold text-white">Developer-First API</h3>
+                <h3 className="text-xl font-normal text-white">Developer-First API</h3>
               </div>
               <p className="text-gray-300">
                 RESTful API with comprehensive documentation, SDKs, and real-time webhooks for seamless integration.
@@ -1643,7 +1979,7 @@ function BlogSection() {
   return (
     <div className="text-center">
       <motion.h2
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+        className="text-3xl sm:text-4xl lg:text-5xl font-normal text-white mb-4"
         style={{
           background: "linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)",
           WebkitBackgroundClip: "text",
@@ -1676,7 +2012,7 @@ function BlogSection() {
                 <BookOpen className="w-4 h-4 text-purple-400" />
                 <span className="text-purple-400 text-sm font-medium">{post.category}</span>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2">{post.title}</h3>
+              <h3 className="text-xl font-normal text-white mb-3 line-clamp-2">{post.title}</h3>
               <p className="text-gray-300 mb-4 line-clamp-3">{post.excerpt}</p>
               <div className="flex items-center justify-between text-sm text-white/60">
                 <span>{post.date}</span>
@@ -1914,10 +2250,10 @@ function PricingCard({ plan, index }: { plan: PricingPlan; index: number }) {
       )}
 
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+        <h3 className="text-2xl font-normal text-white mb-2">{plan.name}</h3>
         <p className="text-gray-300 text-sm mb-4">{plan.description}</p>
         <div className="mb-2">
-          <span className="text-4xl font-bold text-white">${plan.price}</span>
+          <span className="text-4xl font-normal text-white">${plan.price}</span>
           <span className="text-gray-400">/{plan.period}</span>
         </div>
       </div>
@@ -1945,78 +2281,6 @@ function PricingCard({ plan, index }: { plan: PricingPlan; index: number }) {
       </motion.button>
     </motion.div>
   )
-}
-
-// Enhanced CSS animations
-const style = document.createElement("style")
-style.innerHTML = `
-@keyframes conveyor-seamless {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes testimonial-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes scroll-screenshots {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-float-delayed {
-  animation: float 3s ease-in-out infinite;
-  animation-delay: 1.5s;
-}
-
-.animate-scroll-screenshots {
-  animation: scroll-screenshots 60s linear infinite;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Mobile responsive improvements */
-@media (max-width: 640px) {
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  
-  .text-responsive {
-    font-size: clamp(0.875rem, 2.5vw, 1rem);
-  }
-  
-  .heading-responsive {
-    font-size: clamp(1.5rem, 5vw, 2.5rem);
-  }
-}
-`
-
-if (!document.head.querySelector("style[data-premium-animations]")) {
-  style.setAttribute("data-premium-animations", "true")
-  document.head.appendChild(style)
 }
 
 // Screenshot Card Component
@@ -2108,7 +2372,7 @@ function HorizontalScreenshotCard({
                 {icon}
               </div>
               <div>
-                <h3 className="text-3xl font-bold text-black mb-2">{title}</h3>
+                <h3 className="text-3xl font-normal text-black mb-2">{title}</h3>
                 <div className="w-12 h-1 bg-gradient-to-r from-green-400 to-purple-500 rounded-full" />
               </div>
             </div>
@@ -2173,7 +2437,7 @@ function FeatureCard({
               {icon}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-black">{title}</h3>
+              <h3 className="text-xl font-normal text-black">{title}</h3>
               <div className="w-8 h-0.5 bg-gradient-to-r from-green-400 to-purple-500 rounded-full mt-1" />
             </div>
           </div>
