@@ -879,7 +879,6 @@ export default function Dashboard() {
   const [isGridVisible, setIsGridVisible] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const mouseTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const [mobileActiveTab, setMobileActiveTab] = useState<'animation' | 'video'>('video')
 
   // Lottie animation rotation system
   const animationIntervals = [240000, 300000, 270000] // 4 min, 5 min, 4.5 min intervals
@@ -1249,6 +1248,12 @@ export default function Dashboard() {
                 background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent)",
               }}
             />
+            <div
+              className="absolute -inset-0 pointer-events-none"
+              style={{
+                background: "linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.05) 50%, rgba(236, 72, 153, 0.1) 100%)",
+              }}
+            />
 
             <div
               id="hero"
@@ -1323,68 +1328,9 @@ export default function Dashboard() {
                     </motion.div>
                   </div>
                   
-                  {/* Mobile: Tabbed Interface */}
-                  <div className="mt-8">
-                    {/* Tab Navigation */}
-                    <div className="flex border-b border-white/20 mb-6">
-                      <button 
-                        className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                          mobileActiveTab === 'video' 
-                            ? 'text-white border-b-2 border-white' 
-                            : 'text-gray-400 hover:text-white'
-                        }`}
-                        onClick={() => setMobileActiveTab('video')}
-                      >
-                        Demo Video
-                      </button>
-                      <button 
-                        className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                          mobileActiveTab === 'animation' 
-                            ? 'text-white border-b-2 border-white' 
-                            : 'text-gray-400 hover:text-white'
-                        }`}
-                        onClick={() => setMobileActiveTab('animation')}
-                      >
-                        Animation
-                      </button>
-                    </div>
-                    
-                    {/* Tab Content */}
-                    <div className="relative">
-                      {mobileActiveTab === 'animation' && (
-                        <motion.div
-                          key="animation"
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 20 }}
-                          transition={{ duration: 0.3 }}
-                          className="flex justify-center"
-                        >
-                          {animationData && <Lottie animationData={animationData} loop={true} />}
-                        </motion.div>
-                      )}
-                      
-                      {mobileActiveTab === 'video' && (
-                        <motion.div
-                          key="video"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <div className="relative rounded-xl border border-white/10 overflow-hidden shadow-xl shadow-purple-500/20">
-                            <video
-                              className="w-full h-full object-cover"
-                              src="/16296848-uhd_3840_2160_24fps.mp4"
-                              autoPlay
-                              loop
-                              muted
-                              playsInline
-                            />
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
+                  {/* Mobile: Animation Only */}
+                  <div className="mt-8 flex justify-center">
+                    {animationData && <Lottie animationData={animationData} loop={true} />}
                   </div>
                 </div>
 
@@ -1437,30 +1383,65 @@ export default function Dashboard() {
                     {animationData && <Lottie animationData={animationData} loop={true} />}
                   </motion.div>
                 </div>
-                
-                {/* Desktop: Video below heading and animation */}
-                <motion.div
-                  className="hidden lg:block relative my-20"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.8 }}
-                >
-                  <div className="relative rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-purple-500/20">
-                    <video
-                      className="w-full h-full object-cover"
-                      src="/16296848-uhd_3840_2160_24fps.mp4"
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                    />
-                  </div>
-                </motion.div>
               </div>
             </div>
           </div>
         </div>
-        {/* end main content wrapper */}
+
+        {/* Introduction Video Section */}
+        <section className="relative py-24 bg-black">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              viewport={{ once: true, margin: "-100px" }}
+            >
+              <motion.h2
+                className="text-3xl sm:text-4xl lg:text-5xl font-normal text-white mb-4"
+                style={{
+                  background: "linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  textShadow: "0 0 30px rgba(255, 255, 255, 0.5)",
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                Introduction Video
+              </motion.h2>
+              <motion.div
+                className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto"
+                initial={{ width: 0 }}
+                whileInView={{ width: 96 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                viewport={{ once: true }}
+              />
+            </motion.div>
+
+            <motion.div
+              className="relative rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/20 border border-white/10"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              viewport={{ once: true, margin: "-50px" }}
+            >
+              <video
+                className="w-full h-full object-cover"
+                src="/16296848-uhd_3840_2160_24fps.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                controls
+              />
+            </motion.div>
+          </div>
+        </section>
       </div>
       <ProminenceChatWidget />
       <ProminenceEasterEgg />
@@ -2417,4 +2398,3 @@ const featureCardsData = [
     isVideo: false,
   },
 ];
-

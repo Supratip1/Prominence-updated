@@ -184,14 +184,36 @@ const Analysis: React.FC = () => {
       if (!currentJobId || !isAnalyzing) return;
 
       try {
-        const response = await fetch(`http://localhost:8000/status/${currentJobId}`);
+        console.log('Polling job status for job ID:', currentJobId);
+        
+        const response = await fetch(`https://domain-scraper-api-1057830450124.us-central1.run.app/status/${currentJobId}`);
+        
+        console.log('Status response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Status API Error Response:', errorText);
+          throw new Error(`Status API request failed with status ${response.status}: ${errorText}`);
+        }
+        
         const data: ScrapeJob = await response.json();
+        console.log('Status response data:', data);
 
         setCrawlProgress(data.progress.percentage);
 
         if (data.status === 'completed') {
-          const resultsResponse = await fetch(`http://localhost:8000/results/${currentJobId}`);
+          console.log('Job completed, fetching results...');
+          
+          const resultsResponse = await fetch(`https://domain-scraper-api-1057830450124.us-central1.run.app/results/${currentJobId}`);
+          
+          if (!resultsResponse.ok) {
+            const errorText = await resultsResponse.text();
+            console.error('Results API Error Response:', errorText);
+            throw new Error(`Results API request failed with status ${resultsResponse.status}: ${errorText}`);
+          }
+          
           const results: ScrapeResults = await resultsResponse.json();
+          console.log('Results response data:', results);
           
           // Improved asset type classification
           const convertedAssets = results.pages.flatMap(page =>
@@ -238,6 +260,7 @@ const Analysis: React.FC = () => {
             })
           );
 
+          console.log('Converted assets:', convertedAssets);
           setAssets(convertedAssets);
           setCachedAssets(initialDomain, convertedAssets);
           setFilterOptions({ type: 'all', source: 'all' });
@@ -245,13 +268,14 @@ const Analysis: React.FC = () => {
           setIsAnalyzing(false);
           clearInterval(intervalId);
         } else if (data.status === 'failed') {
+          console.error('Job failed:', data.error_message);
           setError(data.error_message || 'Analysis failed');
           setIsAnalyzing(false);
           clearInterval(intervalId);
         }
       } catch (err) {
         console.error('Error polling job status:', err);
-        setError('Failed to check analysis status');
+        setError(`Failed to check analysis status: ${err instanceof Error ? err.message : 'Unknown error'}`);
         setIsAnalyzing(false);
         clearInterval(intervalId);
       }
@@ -312,31 +336,51 @@ const Analysis: React.FC = () => {
     }
 
     try {
+      console.log('Starting analysis for domain:', domain);
+      console.log('Full URL being sent:', fullUrl);
+      
+      const requestBody = {
+        domain: fullUrl, // send full URL
+        max_pages: 5,
+        options: {
+          extract_media: true,
+          include_metadata: true
+        }
+      };
+      
+      console.log('Request body:', JSON.stringify(requestBody, null, 2));
+      
       // Start backend scraping with full URL
-      const response = await fetch('http://localhost:8000/scrape', {
+      const response = await fetch('https://domain-scraper-api-1057830450124.us-central1.run.app/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: JSON.stringify({
-          domain: fullUrl, // send full URL
-          max_pages: 50,
-          options: {
-            extract_media: true,
-            include_metadata: true
-          }
-        })
+        body: JSON.stringify(requestBody)
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error('Failed to start analysis');
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('API Response data:', data);
+      
+      if (!data.job_id) {
+        throw new Error('No job_id received from API');
+      }
+      
       setCurrentJobId(data.job_id);
+      console.log('Job ID set:', data.job_id);
     } catch (err) {
       console.error('Error starting analysis:', err);
-      setError('Failed to start analysis');
+      setError(`Failed to start analysis: ${err instanceof Error ? err.message : 'Unknown error'}`);
       setIsAnalyzing(false);
     }
   };
