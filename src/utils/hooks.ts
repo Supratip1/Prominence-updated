@@ -257,4 +257,15 @@ export function useOnlineStatus() {
   }, [])
 
   return isOnline
+}
+
+export function normalizeUrl(url: string): string {
+  try {
+    let u = url.trim().toLowerCase();
+    if (!u.startsWith('http')) u = 'https://' + u;
+    if (u.endsWith('/')) u = u.slice(0, -1);
+    return u;
+  } catch {
+    return url.trim().toLowerCase();
+  }
 } 

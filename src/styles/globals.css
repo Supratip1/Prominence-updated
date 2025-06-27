@@ -8,7 +8,5 @@
 }
 
 body {
-  background: linear-gradient(45deg, #0f0f0f, #1a1a1a, #0f0f0f);
-  background-size: 300% 300%;
-  animation: morph 20s ease infinite;
+  background: #fff;
 } 

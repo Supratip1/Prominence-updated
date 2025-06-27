@@ -1,102 +1,180 @@
-import React from "react"
-import { TrendingUp, Lightbulb, Calendar, Users, BarChart3, Search } from "lucide-react"
+import React, { useState, useRef } from "react"
+import { TrendingUp, Lightbulb, Calendar, Users, BarChart3, Search, ArrowRight, ArrowLeft, Sparkles } from "lucide-react"
+
+const benefits = [
+  {
+    id: 1,
+    icon: TrendingUp,
+    title: "Boost LLM & AI Search Rankings",
+    description: "Track and improve your brand's ranking in AI-powered search engines.",
+    potential: "Early mover advantage",
+    color: "from-green-500 to-emerald-600",
+    bgColor: "bg-green-50",
+    borderColor: "border-green-200",
+    badgeBg: "bg-green-100",
+    badgeText: "text-green-700"
+  },
+  {
+    id: 2,
+    icon: Lightbulb,
+    title: "AI-Optimized Content",
+    description: "Get AI-driven recommendations to optimize your content.",
+    potential: "Future-proof strategy",
+    color: "from-blue-500 to-indigo-600",
+    bgColor: "bg-blue-50",
+    borderColor: "border-blue-200",
+    badgeBg: "bg-blue-100",
+    badgeText: "text-blue-700"
+  },
+  {
+    id: 3,
+    icon: Calendar,
+    title: "Continuous Brand Monitoring",
+    description: "Monitor AI responses and get alerts for new mentions.",
+    potential: "Real-time insights",
+    color: "from-purple-500 to-violet-600",
+    bgColor: "bg-purple-50",
+    borderColor: "border-purple-200",
+    badgeBg: "bg-purple-100",
+    badgeText: "text-purple-700"
+  },
+  {
+    id: 4,
+    icon: Users,
+    title: "Competitor Intelligence",
+    description: "Benchmark your performance against competitors.",
+    potential: "Strategic advantage",
+    color: "from-orange-500 to-red-600",
+    bgColor: "bg-orange-50",
+    borderColor: "border-orange-200",
+    badgeBg: "bg-orange-100",
+    badgeText: "text-orange-700"
+  },
+  {
+    id: 5,
+    icon: BarChart3,
+    title: "Actionable Analytics",
+    description: "Get clear insights and ROI tracking.",
+    potential: "Data-driven decisions",
+    color: "from-teal-500 to-cyan-600",
+    bgColor: "bg-teal-50",
+    borderColor: "border-teal-200",
+    badgeBg: "bg-teal-100",
+    badgeText: "text-teal-700"
+  },
+  {
+    id: 6,
+    icon: Search,
+    title: "Automated Asset Discovery",
+    description: "Automatically discover your brand's digital footprint.",
+    potential: "Complete visibility",
+    color: "from-pink-500 to-rose-600",
+    bgColor: "bg-pink-50",
+    borderColor: "border-pink-200",
+    badgeBg: "bg-pink-100",
+    badgeText: "text-pink-700"
+  }
+];
 
 const BenefitsSection = () => {
+  const [hoveredBenefit, setHoveredBenefit] = useState<number | null>(null);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Carousel scroll handler
+  const scrollToIndex = (idx: number) => {
+    if (carouselRef.current) {
+      const cardWidth = carouselRef.current.firstChild instanceof HTMLElement ? carouselRef.current.firstChild.offsetWidth + 16 : 260;
+      carouselRef.current.scrollTo({ left: idx * cardWidth, behavior: 'smooth' });
+      setCarouselIndex(idx);
+    }
+  };
+
+  const handleLeft = () => {
+    if (carouselIndex > 0) scrollToIndex(carouselIndex - 1);
+  };
+  const handleRight = () => {
+    if (carouselIndex < benefits.length - 1) scrollToIndex(carouselIndex + 1);
+  };
+
   return (
-    <section id="key-benefits" className="py-20 sm:py-32 bg-black text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-block mb-4">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20">
-              Benefits
+    <section id="key-benefits" className="relative py-10 sm:py-24 bg-[#181A20] text-white">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-16">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white mb-4 sm:mb-6">
+            The Future of AI Search
+            <span className="block text-xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-300 mt-2">
+              Optimization is Here
             </span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-white tracking-tight">
-            The Key Benefits of AI for Your Business Growth
           </h2>
-          <p className="mt-6 text-base sm:text-lg text-gray-400">
-            Discover how our platform enhances your online presence, reduces costs, and drives business growth with smarter, faster processes.
+          <p className="text-base sm:text-lg text-gray-200 mb-6 sm:mb-8">
+            Be among the first to optimize your brand for the AI-powered search revolution.
           </p>
         </div>
 
-        <div className="mt-16 lg:mt-20 grid grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Benefit 1: Boost LLM & AI Search Rankings */}
-          <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
-            <div className="flex items-center gap-3 lg:gap-4 mb-4">
-              <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-              </div>
-              <h3 className="text-lg lg:text-xl font-normal text-white">Boost LLM & AI Search Rankings</h3>
+        {/* Mobile Carousel */}
+        <div className="block sm:hidden relative">
+          <div className="flex items-center">
+            {/* Left Arrow */}
+            <button
+              className={`z-20 mr-2 p-2 rounded-full shadow bg-white/10 border border-gray-700 transition hover:bg-gray-800 ${carouselIndex === 0 ? 'opacity-30 cursor-default' : 'hover:scale-110'}`}
+              onClick={handleLeft}
+              disabled={carouselIndex === 0}
+              aria-label="Scroll left"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-200" />
+            </button>
+            <div ref={carouselRef} className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-2 px-2 snap-x snap-mandatory">
+              {benefits.map((benefit, index) => (
+                <div
+                  key={benefit.id}
+                  className={`relative min-w-[85vw] max-w-xs snap-center group cursor-pointer transition-all duration-300 hover:scale-105 ${hoveredBenefit === index ? 'z-10' : ''}`}
+                  onMouseEnter={() => setHoveredBenefit(index)}
+                  onMouseLeave={() => setHoveredBenefit(null)}
+                >
+                  <div className={`bg-[#23242a] p-3 rounded-xl border border-gray-700 text-white h-full transition-all duration-300 hover:shadow-xl flex flex-col items-center relative`}>
+                    <h3 className="text-base font-semibold text-white text-center mb-2">{benefit.title}</h3>
+                    <p className="text-gray-300 text-xs mb-2 leading-relaxed text-center">
+                      {benefit.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <p className="text-white text-sm lg:text-base">
-              Track and improve your brand's ranking in AI-powered search engines.
-            </p>
+            {/* Right Arrow */}
+            <button
+              className={`z-20 ml-2 p-2 rounded-full shadow bg-white/10 border border-gray-700 transition hover:bg-gray-800 ${carouselIndex === benefits.length - 1 ? 'opacity-30 cursor-default' : 'hover:scale-110'}`}
+              onClick={handleRight}
+              disabled={carouselIndex === benefits.length - 1}
+              aria-label="Scroll right"
+            >
+              <ArrowRight className="w-5 h-5 text-gray-200" />
+            </button>
           </div>
+        </div>
 
-          {/* Benefit 2: AI-Optimized Content */}
-          <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
-            <div className="flex items-center gap-3 lg:gap-4 mb-4">
-              <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
-                <Lightbulb className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+        {/* Zig-Zag Layout for sm+ screens */}
+        <div className="hidden sm:flex flex-col gap-12">
+          {benefits.map((benefit, index) => (
+            <div
+              key={benefit.id}
+              className={`flex flex-col lg:flex-row items-center gap-10 lg:gap-20 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}
+              onMouseEnter={() => setHoveredBenefit(index)}
+              onMouseLeave={() => setHoveredBenefit(null)}
+            >
+              {/* Icon and Text */}
+              <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
+                <h3 className="text-2xl sm:text-3xl font-semibold text-white mb-2">{benefit.title}</h3>
+                <p className="text-gray-300 text-base max-w-md">{benefit.description}</p>
               </div>
-              <h3 className="text-lg lg:text-xl font-normal text-white">AI-Optimized Content</h3>
-            </div>
-            <p className="text-white text-sm lg:text-base">
-              Get AI-driven recommendations to optimize your content.
-            </p>
-          </div>
-
-          {/* Benefit 3: Continuous Brand Monitoring */}
-          <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
-            <div className="flex items-center gap-3 lg:gap-4 mb-4">
-              <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
-                <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+              {/* Zig-Zag Placeholder (for future image or illustration) */}
+              <div className="flex-1 w-full flex items-center justify-center">
+                <div className="w-full max-w-md aspect-video bg-[#23242a] rounded-2xl border border-gray-700 flex items-center justify-center text-gray-400 text-lg font-medium relative">
+                  <span className="absolute">Screenshot coming soon</span>
+                </div>
               </div>
-              <h3 className="text-lg lg:text-xl font-normal text-white">Continuous Brand Monitoring</h3>
             </div>
-            <p className="text-white text-sm lg:text-base">
-              Monitor AI responses and get alerts for new mentions.
-            </p>
-          </div>
-
-          {/* Benefit 4: Competitor Intelligence */}
-          <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
-            <div className="flex items-center gap-3 lg:gap-4 mb-4">
-              <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-              </div>
-              <h3 className="text-lg lg:text-xl font-normal text-white">Competitor Intelligence</h3>
-            </div>
-            <p className="text-white text-sm lg:text-base">
-              Benchmark your performance against competitors.
-            </p>
-          </div>
-
-          {/* Benefit 5: Actionable Analytics */}
-          <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
-            <div className="flex items-center gap-3 lg:gap-4 mb-4">
-              <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-              </div>
-              <h3 className="text-lg lg:text-xl font-normal text-white">Actionable Analytics</h3>
-            </div>
-            <p className="text-white text-sm lg:text-base">
-              Get clear insights and ROI tracking.
-            </p>
-          </div>
-
-          {/* Benefit 6: Automated Asset Discovery */}
-          <div className="bg-gradient-to-b from-black to-purple-900/20 p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-purple-800/30">
-            <div className="flex items-center gap-3 lg:gap-4 mb-4">
-              <div className="w-8 h-8 lg:w-6 lg:h-6 bg-white/10 rounded-lg flex items-center justify-center">
-                <Search className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-              </div>
-              <h3 className="text-lg lg:text-xl font-normal text-white">Automated Asset Discovery</h3>
-            </div>
-            <p className="text-white text-sm lg:text-base">
-              Automatically discover your brand's digital footprint.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
     </section>

@@ -20,7 +20,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-[#181824] to-[#0f0f23] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#f5f3ff] via-[#ede9fe] to-white px-4">
       <div className="w-full max-w-md bg-white/5 rounded-2xl shadow-2xl p-8 md:p-12 border border-white/10 flex flex-col items-center">
         {/* Optional logo */}
         {/* <img src="/logo.svg" alt="Prominence Logo" className="h-10 mb-6" /> */}

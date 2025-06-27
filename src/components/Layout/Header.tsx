@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { useNavigate, useLocation, NavLink as RouterNavLink } from 'react-router-dom';
+import { Menu, X, User, LogIn } from 'lucide-react';
 
 // Desktop NavLink
 const NavLink = ({ onClick, children, isActive }: { onClick: () => void, children: React.ReactNode, isActive?: boolean }) => (
   <button
     onClick={onClick}
-    className={`flex items-center text-base font-normal transition-colors duration-200 px-3 py-2 rounded-md ${
-      isActive ? 'text-white' : 'text-gray-400 hover:text-white'
+    className={`flex items-center text-base font-semibold transition-all duration-200 px-3 py-2 rounded-md ${
+      isActive 
+        ? 'text-black bg-gray-100 shadow-sm' 
+        : 'text-gray-600 hover:text-black hover:bg-gray-50'
     }`}
   >
-    {isActive && <span className="w-1.5 h-1.5 bg-white rounded-full mr-2.5"></span>}
+    {isActive && <span className="w-1.5 h-1.5 bg-black rounded-full mr-2.5"></span>}
     {children}
   </button>
 );
@@ -20,6 +22,7 @@ export default function Header() {
   const [activeSection, setActiveSection] = useState('hero');
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const smoothScrollTo = useCallback((elementId: string) => {
     setMobileMenuOpen(false);
@@ -40,7 +43,7 @@ export default function Header() {
 
   // Scroll detection and active section highlighting
   useEffect(() => {
-    const sections = ['hero', 'our-services', 'key-benefits', 'pricing'];
+    const sections = ['hero', 'our-services', 'key-benefits', 'book-a-call'];
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
       
@@ -77,102 +80,98 @@ export default function Header() {
 
 
   const links = [
-    { 
-      label: 'Dashboard', 
-      sectionId: 'hero'
-    },
-    { 
-      label: 'Features', 
-      sectionId: 'our-services'
-    },
-    { 
-      label: 'Benefits', 
-      sectionId: 'key-benefits'
-    },
-    { 
-      label: 'Pricing', 
-      sectionId: 'pricing'
-    },
+    { label: 'Dashboard', to: 'hero' },
+    { label: 'Features', to: 'our-services' },
+    { label: 'Benefits', to: 'key-benefits' },
+    { label: 'Book a Call', to: 'book-a-call' },
   ];
 
   return (
-    <>
-      {/* Desktop Header */}
-      <div className="hidden sm:block fixed top-6 left-8 z-50">
-          <button onClick={() => smoothScrollTo('hero')} className="text-white font-normal text-2xl">Prominence</button>
-      </div>
-      <header className="hidden sm:block fixed top-4 left-1/2 -translate-x-1/2 z-50">
-        <div className={`
-          flex items-center gap-x-4
-          px-4 py-2
-          bg-black/50 backdrop-blur-lg
-          border border-white/10
-          rounded-full
-          shadow-lg
-          transition-all duration-300
-          ${isScrolled ? 'shadow-purple-500/10' : 'shadow-none'}
-        `}>
-          <nav className="flex items-center gap-x-1">
+    <header className={`fixed top-0 left-0 w-full py-6 px-8 z-[100] transition-all duration-300 ${
+      isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100' : 'bg-white'
+    }`}>
+      <div className="relative flex items-center w-full">
+        {/* Left: Logo (text only) */}
+        <button
+          className="cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none p-0 m-0"
+          style={{ background: 'none' }}
+          onClick={() => smoothScrollTo('hero')}
+          aria-label="Go to top / hero section"
+        >
+          <div className="flex items-end">
+            <img 
+              src="/logos/mainlogo.png" 
+              alt="Prominence Logo" 
+              className="h-8 w-auto"
+            />
+          </div>
+        </button>
+        
+        {/* Centered Nav Pill */}
+        <nav className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="flex gap-2 px-6 py-2 rounded-full shadow-lg border border-gray-200 bg-white/80 backdrop-blur-md">
             {links.map((link) => (
-              <NavLink 
-                key={link.sectionId}
-                onClick={() => smoothScrollTo(link.sectionId)} 
-                isActive={activeSection === link.sectionId}
+              <NavLink
+                key={link.to}
+                onClick={() => smoothScrollTo(link.to)}
+                isActive={activeSection === link.to}
               >
                 {link.label}
               </NavLink>
             ))}
-          </nav>
-          <button
-            onClick={() => navigate('/analysis')}
-            className="flex items-center text-sm font-normal text-black bg-white hover:bg-gray-200 transition-colors px-4 py-2 rounded-full shadow-md ml-2"
-          >
-            Get started
+          </div>
+        </nav>
+
+        {/* Right: Auth Actions */}
+        <div className="hidden md:flex items-center gap-3 ml-auto">
+          <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-black transition-colors duration-200">
+            <LogIn className="w-4 h-4" />
+            <span className="text-sm font-medium">Log In</span>
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200">
+            <User className="w-4 h-4" />
+            <span className="text-sm font-medium">Sign Up</span>
           </button>
         </div>
-      </header>
-      
-      {/* Mobile Header */}
-      <header className={`sm:hidden fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-black/80 backdrop-blur-sm' : 'bg-transparent'}`}>
-         <div className="flex items-center justify-between h-16 px-4">
-             <button onClick={() => smoothScrollTo('hero')} className="text-white font-normal">Prominence</button>
-             <div className="flex items-center gap-x-2">
-                <button
-                  onClick={() => navigate('/analysis')}
-                  className="flex items-center text-xs font-normal text-black bg-white hover:bg-gray-200 transition-colors px-3 py-1.5 rounded-full shadow-sm"
-                >
-                  Get started
-                </button>
-                <button
-                  onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-                  className="p-2 text-white"
-                  aria-label="Toggle menu"
-                >
-                  {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
-             </div>
-         </div>
-      </header>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          className="sm:hidden fixed inset-0 bg-black/95 backdrop-blur-md z-40 flex flex-col items-center justify-center pt-20"
-          onClick={() => setMobileMenuOpen(false)}
+        {/* Hamburger for mobile */}
+        <button
+          className="md:hidden p-2 rounded focus:outline-none ml-auto"
+          onClick={() => setMobileMenuOpen((v) => !v)}
+          aria-label="Open navigation menu"
         >
-           <nav className="flex flex-col items-center gap-y-8">
-            {links.map((link) => (
-              <button
-                key={link.sectionId}
-                onClick={() => smoothScrollTo(link.sectionId)} 
-                className={`text-2xl font-normal ${activeSection === link.sectionId ? 'text-white' : 'text-gray-400'}`}
-              >
-                {link.label}
-              </button>
-            ))}
-          </nav>
+          {isMobileMenuOpen ? <X className="w-7 h-7 text-black" /> : <Menu className="w-7 h-7 text-black" />}
+        </button>
+      </div>
+      
+      {/* Mobile Nav Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-lg z-40 flex flex-col items-center py-4 md:hidden animate-fade-in">
+          {links.map((link) => (
+            <button
+              key={link.to}
+              onClick={() => { setMobileMenuOpen(false); smoothScrollTo(link.to); }}
+              className={`w-full text-lg py-3 px-4 text-center transition-colors duration-200 ${
+                activeSection === link.to 
+                  ? 'text-black bg-gray-50 font-semibold' 
+                  : 'text-gray-600 hover:text-black'
+              }`}
+            >
+              {link.label}
+            </button>
+          ))}
+          
+          {/* Mobile Auth Actions */}
+          <div className="w-full border-t border-gray-200 mt-4 pt-4 flex flex-col gap-2 px-4">
+            <button className="w-full py-3 text-center text-gray-600 hover:text-black transition-colors duration-200">
+              Log In
+            </button>
+            <button className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200">
+              Sign Up
+            </button>
+          </div>
         </div>
       )}
-    </>
+    </header>
   );
 }

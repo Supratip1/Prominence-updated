@@ -105,7 +105,7 @@ function OverlayUI({ images, titles }: { images: string[], titles: string[] }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <h2 className="text-4xl font-bold mb-4">How Prominence Works</h2>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white mb-4">How Prominence Works</h2>
           <p className="text-xl opacity-80 max-w-md">
             Scroll to explore our platform's powerful features in 3D
           </p>

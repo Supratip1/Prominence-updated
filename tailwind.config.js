@@ -59,6 +59,7 @@ export default {
       spacing: {
         '18': '4.5rem',
         '88': '22rem',
+        'header': '88px',
       },
       boxShadow: {
         'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',

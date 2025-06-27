@@ -9,7 +9,7 @@ export default function Billing() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-semibold text-graphite tracking-tight">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-graphite">
           Billing and Plans
         </h1>
         <p className="text-gray-600 mt-2">

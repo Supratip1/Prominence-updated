@@ -180,7 +180,7 @@ export default function PortfolioScreenshotsSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <motion.h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
+          <motion.h2 className="text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white mb-6">
             How Prominence Works
           </motion.h2>
           <motion.p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">

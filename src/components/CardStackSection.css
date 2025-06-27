@@ -18,17 +18,21 @@
 .stack-container {
   position: relative;
   overflow: hidden;
+  min-height: 100vh;
 }
 
 .stack-inner {
   height: calc(100vh * 5); /* <-- replace 5 with your cards.length */
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stack-card {
   position: sticky;
-  top: 20vh;          /* how far down from top you want the stack */
-  margin-top: -60vh;  /* negative overlap so cards stack on top of each other */
+  top: 50%;          /* center vertically */
+  transform: translateY(-50%); /* perfect vertical centering */
   z-index: 10;        /* base z-index; we reset below */
   width: 90%;
   max-width: 1000px;
@@ -43,6 +47,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto; /* center horizontally */
 }
 
 .card-content {
@@ -113,6 +118,7 @@
 @media (max-width: 768px) {
   .stack-card {
     height: 80vh;
+    width: 95%;
   }
   
   .card-content {

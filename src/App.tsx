@@ -2,16 +2,23 @@ import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AnalysisProvider } from './contexts/AnalysisContext'
 import Onboarding from './pages/Onboarding'
-import ProminenceWorkflow from './components/ProminenceWorkflow'
+import HowItWorksSection from './components/HowItWorksSection'
 import BenefitsSection from './components/BenefitsSection'
+import EarlyAdopterSection from './components/EarlyAdopterSection'
 import PricingSection from './components/PricingSection'
 import Footer from './components/Footer'
+import ProminenceChatWidget from './components/ProminenceChatWidget'
+import BoltWidget from './components/ChartWidget'
+import ModelScores from './pages/ModelScores'
+import TrackCompetitors from './pages/TrackCompetitors'
+import IntegrateBoards from './pages/IntegrateBoards'
 
 // Lazy load pages for better performance
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Analysis = lazy(() => import('./pages/Analysis'))
 const Optimization = lazy(() => import('./pages/Optimization'))
 const Signup = lazy(() => import('./pages/Signup'))
+const AEOAnalysis = lazy(() => import('./pages/AEOAnalysis'))
 
 // Loading component
 const PageLoader = () => (
@@ -69,8 +76,9 @@ function HomePage() {
   return (
     <>
       <Dashboard />
-      <ProminenceWorkflow />
+      <HowItWorksSection />
       <BenefitsSection />
+      <EarlyAdopterSection />
       <PricingSection />
       <Footer />
     </>
@@ -88,9 +96,15 @@ function App() {
               <Route path="/analysis" element={<Analysis />} />
               <Route path="/optimization" element={<Optimization />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/aeo-analysis" element={<AEOAnalysis />} />
+              <Route path="/model-scores" element={<ModelScores />} />
+              <Route path="/track-competitors" element={<TrackCompetitors />} />
+              <Route path="/integrate-boards" element={<IntegrateBoards />} />
               <Route path="/dashboard" element={<HomePage />} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Routes>
+            <ProminenceChatWidget />
+            <BoltWidget />
           </Suspense>
         </Router>
       </AnalysisProvider>

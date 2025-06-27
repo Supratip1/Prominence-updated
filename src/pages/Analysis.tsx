@@ -408,7 +408,7 @@ const Analysis: React.FC = () => {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-[#f5f3ff] via-[#ede9fe] to-white pt-16 md:pt-32">
       {/* Header */}
       <Header />
       
@@ -420,7 +420,7 @@ const Analysis: React.FC = () => {
             background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent)",
           }}
         />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center pt-24 pb-8">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center pt-8 md:pt-24 pb-8">
           <motion.h1
             className="text-5xl md:text-7xl font-normal tracking-tighter mb-4 text-white"
             initial={{ opacity: 0, y: 20 }}

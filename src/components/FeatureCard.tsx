@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react"
 import { motion, useInView } from "framer-motion"
+import { ChevronDown } from "lucide-react"
 
 export default function FeatureCard({
   icon,
@@ -66,6 +67,24 @@ export default function FeatureCard({
               className="w-full h-full object-contain"
             />
           )}
+        </div>
+        
+        {/* Blinking down arrow footer */}
+        <div className="flex justify-center mt-4">
+          <motion.div
+            animate={{ 
+              opacity: [0.3, 1, 0.3],
+              y: [0, 4, 0]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="text-black"
+          >
+            <ChevronDown className="w-6 h-6" />
+          </motion.div>
         </div>
       </div>
     </motion.div>

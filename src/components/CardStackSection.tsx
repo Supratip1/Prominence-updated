@@ -5,6 +5,8 @@ import { Eye, Activity, BarChart3, Zap, Target } from "lucide-react"
 import FeatureCard from "./FeatureCard"
 import "./CardStackSection.css"
 
+const placeholderImg = "/placeholder-screenshot.svg";
+
 const featureCardsData = [
   {
     key: "discover",
@@ -12,7 +14,7 @@ const featureCardsData = [
     title: "Discover",
     description:
       "Automatically discover and fetch your digital assets from websites, social media, and other online sources.",
-    imageSrc: "/screenshots/Assetfetching.png",
+    imageSrc: placeholderImg,
     isVideo: false,
   },
   {
@@ -21,7 +23,7 @@ const featureCardsData = [
     title: "Track",
     description:
       "Monitor your discovered assets in real-time with comprehensive tracking and status monitoring.",
-    imageSrc: "/screenshots/fetched.png",
+    imageSrc: placeholderImg,
     isVideo: false,
   },
   {
@@ -30,7 +32,7 @@ const featureCardsData = [
     title: "Integrate",
     description:
       "Seamlessly integrate with your existing workflow tools like Jira for project management and collaboration.",
-    imageSrc: "/screenshots/jira.png",
+    imageSrc: placeholderImg,
     isVideo: false,
   },
   {
@@ -39,7 +41,7 @@ const featureCardsData = [
     title: "Optimize",
     description:
       "Get intelligent optimization suggestions to improve your content's AI search visibility and performance.",
-    imageSrc: "/screenshots/optimization.png",
+    imageSrc: placeholderImg,
     isVideo: false,
   },
   {
@@ -48,7 +50,7 @@ const featureCardsData = [
     title: "Analyze",
     description:
       "View comprehensive analytics and scoring dashboards to track your AI visibility performance over time.",
-    imageSrc: "/screenshots/score.png",
+    imageSrc: placeholderImg,
     isVideo: false,
   },
 ]

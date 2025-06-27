@@ -1,231 +1,157 @@
-import React from "react"
-import { motion } from "framer-motion"
-import { ArrowRight, Check, Star, X as XIcon } from "lucide-react"
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Clock, ArrowRight } from "lucide-react";
 
-// Pricing plans data
-interface PricingPlan {
-  name: string
-  price: number
-  period: string
-  description: string
-  features: string[]
-  buttonText: string
-  popular: boolean
-}
+const BookACallSection = () => {
+  const [form, setForm] = useState({ name: '', email: '', company: '', message: '' });
+  const [submitted, setSubmitted] = useState(false);
 
-// Only show the first 6 features for brevity
-const displayedFeatures = [
-  "5 keywords tracked",
-  "Weekly AI crawls",
-  "Basic visibility dashboard",
-  "Email notifications",
-  "Community support",
-  "100 keywords tracked"
-];
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-const pricingPlans: PricingPlan[] = [
-  {
-    name: "Professional",
-    price: 49,
-    period: "month",
-    description: "Ideal for growing businesses and teams",
-    features: displayedFeatures.slice(0, 4),
-    buttonText: "Start Free Trial",
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: 199,
-    period: "month",
-    description: "For large organizations with advanced needs",
-    features: displayedFeatures,
-    buttonText: "Contact Sales",
-    popular: false,
-  },
-];
-
-// Build a master feature list from all plans
-const allFeatures = Array.from(new Set(pricingPlans.flatMap(plan => plan.features)));
-
-// Pricing Cards Component
-function PricingCards({ plans }: { plans: PricingPlan[] }) {
-  // On desktop, reorder so Professional is first
-  const desktopPlans = [plans[0], plans[1]];
-  // On mobile, start carousel at Professional
-  const [currentIndex, setCurrentIndex] = React.useState(0);
-  React.useEffect(() => { setCurrentIndex(0); }, []);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % plans.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + plans.length) % plans.length)
-  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    // Here you would integrate with your backend or email service
+  };
 
   return (
-    <div className="relative">
-      {/* Desktop Grid */}
-      <div className="hidden md:grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        {desktopPlans.map((plan, index) => (
-          <PricingCard key={plan.name} plan={plan} index={index} focus={index === 0} />
-        ))}
-      </div>
+    <section id="book-a-call" className="relative py-10 sm:py-16 md:py-32 bg-gradient-to-b from-white via-gray-50 to-white text-black">
+      <div className="container mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+          {/* Left: Heading and Professional Text */}
+          <div className="w-full lg:w-1/2 flex flex-col justify-center items-center lg:items-start text-center lg:text-left">
+            <motion.h2
+              className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-normal tracking-tight text-black mb-4 sm:mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              Book a Call With Us
+            </motion.h2>
+            
+            <motion.div
+              className="space-y-6 text-left"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <p className="text-lg sm:text-xl text-gray-800 leading-relaxed">
+                Ready to be an early adopter? Get a personalized strategy session with our AI visibility experts.
+              </p>
+              
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
+                During this 15-minute discovery call, we'll analyze your current AI search presence and provide a custom strategy to improve your brand's visibility in AI-powered search engines.
+              </p>
+              
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
+                Early access users receive lifetime pricing, priority support, and the opportunity to shape the future of AI visibility tools before they become mainstream.
+              </p>
+            </motion.div>
+          </div>
 
-      {/* Mobile Carousel */}
-      <div className="md:hidden relative">
-        <div className="overflow-hidden">
-          <div
-            className="flex transition-transform duration-300 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+          {/* Right: Enhanced Form */}
+          <motion.div
+            className="w-full lg:w-1/2 bg-white/80 rounded-2xl shadow-lg p-4 sm:p-8 md:p-12 border border-gray-200"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
           >
-            {plans.map((plan, index) => (
-              <div key={plan.name} className="w-full flex-shrink-0 px-4">
-                <PricingCard plan={plan} index={index} focus={index === 0} />
+            {submitted ? (
+              <div className="text-center py-8 sm:py-12">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2">Thank you!</h3>
+                <p className="text-gray-600 mb-4">We'll be in touch within 24 hours to schedule your call.</p>
+                <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700">
+                  <p className="font-medium">What's next?</p>
+                  <ul className="mt-2 space-y-1">
+                    <li>• Check your email for confirmation</li>
+                    <li>• Prepare your AI visibility questions</li>
+                    <li>• We'll send calendar link within 24 hours</li>
+                  </ul>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-6">
+                <div className="text-center mb-2 sm:mb-4">
+                  <h3 className="text-lg sm:text-xl font-semibold text-black mb-1 sm:mb-2">Schedule Your Free Strategy Session</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">No commitment required - just valuable insights</p>
+                </div>
 
-        {/* Navigation Buttons */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm"
-          aria-label="Previous pricing plan"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm"
-          aria-label="Next pricing plan"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+                <div>
+                  <label htmlFor="name" className="block text-xs sm:text-sm font-medium mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none bg-white text-black"
+                    placeholder="Your full name"
+                  />
+                </div>
 
-        {/* Dots Indicator */}
-        <div className="flex justify-center mt-6 gap-2">
-          {plans.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                currentIndex === index ? "bg-white w-4" : "bg-white/50"
-              }`}
-              aria-label={`Go to pricing plan ${index + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
+                <div>
+                  <label htmlFor="email" className="block text-xs sm:text-sm font-medium mb-1">Work Email *</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none bg-white text-black"
+                    placeholder="you@company.com"
+                  />
+                </div>
 
-// Individual Pricing Card Component
-function PricingCard({ plan, index, focus = false }: { plan: PricingPlan; index: number; focus?: boolean }) {
-  // Always show only the first 6 features for every plan
-  return (
-    <motion.div
-      className={`relative p-8 pt-12 md:pt-8 rounded-2xl border ${
-        plan.popular || focus ? "border-green-400 bg-green-900/20 scale-105 z-20 shadow-2xl" : "border-white/10 bg-white/5" 
-      } shadow-lg`}
-      whileHover={{
-        scale: 1.04,
-        y: -8,
-        boxShadow: plan.popular || focus ? "0 20px 40px rgba(124, 252, 0, 0.4)" : "0 20px 40px rgba(0, 0, 0, 0.1)",
-      }}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        type: "spring",
-        stiffness: 300,
-        damping: 25,
-        delay: index * 0.1,
-      }}
-    >
-      {plan.popular && (
-        <div className="absolute top-2 md:-top-4 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="bg-gradient-to-r from-green-400 to-green-500 text-black px-4 py-1 rounded-full text-sm font-bold flex items-center gap-1 shadow-lg">
-            <Star className="w-3 h-3 fill-current" />
-            Most Popular
-          </div>
-        </div>
-      )}
+                <div>
+                  <label htmlFor="company" className="block text-xs sm:text-sm font-medium mb-1">Company</label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    value={form.company}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none bg-white text-black"
+                    placeholder="Your company name"
+                  />
+                </div>
 
-      <div className="text-center mb-8">
-        <h3 className="text-2xl font-normal text-white mb-2">{plan.name}</h3>
-        <p className="text-gray-300 text-sm mb-4">{plan.description}</p>
-        <div className="mb-2">
-          <span className="text-4xl font-normal text-white">${plan.price}</span>
-          <span className="text-gray-400">/{plan.period}</span>
+                <div>
+                  <label htmlFor="message" className="block text-xs sm:text-sm font-medium mb-1">What are your main AI visibility goals?</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:outline-none bg-white text-black"
+                    placeholder="e.g., Improve rankings in ChatGPT, track competitor mentions, optimize content for AI search..."
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-4 rounded-xl font-semibold bg-black text-white hover:bg-gray-900 transition-colors text-base sm:text-lg mt-2 shadow-lg flex items-center justify-center gap-2 group"
+                >
+                  <span>Book Free Strategy Call</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                </button>
+
+                <div className="text-center text-xs text-gray-500">
+                  <Clock className="w-4 h-4 inline mr-1" />
+                  Calls typically last 15-20 minutes
+                </div>
+              </form>
+            )}
+          </motion.div>
         </div>
       </div>
+    </section>
+  );
+};
 
-      <ul className="space-y-3 mb-8">
-        {displayedFeatures.map((feature, featureIndex) => {
-          const included = plan.features.includes(feature);
-          return (
-            <li key={featureIndex} className="flex items-start gap-3">
-              {included ? (
-                <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              ) : (
-                <XIcon className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-              )}
-              <span className={`text-sm ${included ? "text-gray-300" : "text-gray-500 line-through"}`}>{feature}</span>
-            </li>
-          );
-        })}
-      </ul>
-
-      <motion.button
-        className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${
-          plan.popular || focus
-            ? "bg-gradient-to-r from-green-400 to-green-500 text-black hover:from-green-300 hover:to-green-400"
-            : "border-2 border-white/30 text-white hover:bg-white/10"
-        }`}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        {plan.buttonText}
-        {(plan.popular || focus) && <ArrowRight className="w-4 h-4 inline-block ml-2" />}
-      </motion.button>
-    </motion.div>
-  )
-}
-
-const PricingSection = () => {
-  return (
-    <motion.section id="pricing" className="py-16 sm:py-20 relative z-10 bg-black">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.h2
-          className="text-2xl sm:text-3xl lg:text-4xl font-normal text-white mb-6 sm:mb-8 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          Simple, Transparent Pricing
-        </motion.h2>
-        <PricingCards plans={pricingPlans} />
-      </div>
-    </motion.section>
-  )
-}
-
-export default PricingSection 
+export default BookACallSection; 

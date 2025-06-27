@@ -1,50 +1,79 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { 
-  BarChart3, 
-  Search, 
-  Settings, 
-  CreditCard, 
-  Target 
-} from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Home, BarChart2, Users, Settings } from 'lucide-react';
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-  { name: 'Keywords', href: '/keywords', icon: Search },
-  { name: 'Billing', href: '/billing', icon: CreditCard },
-  { name: 'Settings', href: '/settings', icon: Settings },
-];
+interface SidebarProps {
+  onClose?: () => void;
+}
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }: SidebarProps) {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    if (onClose) onClose();
+  };
   return (
-    <div className="w-64 bg-white border-r border-platinum h-screen fixed left-0 top-0 z-40">
-      <div className="p-6">
-        <div className="flex items-center space-x-2">
-          <Target className="h-8 w-8 text-primary" />
-          <span className="text-xl font-semibold text-graphite tracking-tight">
-            GEO Analytics
-          </span>
+    <div className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 flex flex-col">
+      <div className="p-8 pb-4">
+        <div className="flex items-end">
+          <img 
+            src="/logos/mainlogo.png" 
+            alt="Prominence Logo" 
+            className="h-8 w-auto select-none"
+          />
         </div>
       </div>
-      
-      <nav className="px-4 space-y-1">
-        {navigation.map((item) => (
-          <NavLink
-            key={item.name}
-            to={item.href}
-            className={({ isActive }) =>
-              `flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-graphite'
-              }`
-            }
-          >
-            <item.icon className="h-5 w-5 mr-3" />
-            {item.name}
-          </NavLink>
-        ))}
+      <nav className="flex flex-col gap-3 mt-2 px-4">
+        <NavLink
+          to="/aeo-analysis"
+          onClick={handleClick}
+          className={({ isActive }) =>
+            isActive ? 'bg-black text-white flex items-center gap-3 px-4 py-3 rounded-xl font-semibold' : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
+          }
+        >
+          <Home className="w-5 h-5" />
+          <span>Dashboard</span>
+        </NavLink>
+        <NavLink
+          to="/optimization"
+          onClick={handleClick}
+          className={({ isActive }) =>
+            isActive ? 'bg-black text-white flex items-center gap-3 px-4 py-3 rounded-xl font-semibold' : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
+          }
+        >
+          <BarChart2 className="w-5 h-5" />
+          <span>Optimization</span>
+        </NavLink>
+        <NavLink
+          to="/track-competitors"
+          onClick={handleClick}
+          className={({ isActive }) =>
+            isActive ? 'bg-black text-white flex items-center gap-3 px-4 py-3 rounded-xl font-semibold' : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
+          }
+        >
+          <Users className="w-5 h-5" />
+          <span>Track Competitors</span>
+        </NavLink>
+        <NavLink
+          to="/integrate-boards"
+          onClick={handleClick}
+          className={({ isActive }) =>
+            isActive ? 'bg-black text-white flex items-center gap-3 px-4 py-3 rounded-xl font-semibold' : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
+          }
+        >
+          <Settings className="w-5 h-5" />
+          <span>Integrate with your boards</span>
+        </NavLink>
       </nav>
+      <div className="flex-1" />
+      <div className="p-4 mb-20">
+        <button
+          className="flex items-center gap-2 px-4 py-3 text-lg font-normal font-display tracking-tight text-gray-500 hover:text-black hover:bg-gray-50 rounded-l-xl transition-all"
+          onClick={() => { navigate('/dashboard'); handleClick(); }}
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back
+        </button>
+      </div>
     </div>
   );
 }

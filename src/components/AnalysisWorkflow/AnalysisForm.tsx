@@ -36,7 +36,7 @@ export default function AnalysisForm({ value, onChange, onSubmit, disabled }: An
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-[#adff2f]" />
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white">
               <span className="bg-gradient-to-r from-[#adff2f] to-[#7cfc00] bg-clip-text text-transparent">
                 Complete Analysis
               </span>{' '}
