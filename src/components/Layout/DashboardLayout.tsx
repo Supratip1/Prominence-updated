@@ -23,8 +23,8 @@ const DashboardLayout: React.FC<{ children: React.ReactNode; pageTitle: string }
       {/* Main Content */}
       <div className="flex-1 md:ml-64 min-h-screen flex flex-col">
         {/* Header */}
-        <div className="border-b border-gray-200 bg-white sticky top-0 z-30">
-          <div className="max-w-6xl mx-auto px-4 py-10 flex items-center justify-center relative">
+        <div className={`${['/optimization', '/track-competitors', '/integrate-boards'].includes(location.pathname) ? '' : 'border-b border-gray-200'} bg-white sticky top-0 z-30`}>
+          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-center relative">
             {/* Sidebar toggle for mobile (PanelLeft icon) is now in Header */}
             {/* Page title absolutely centered */}
             <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl md:text-4xl font-normal text-black text-center font-display tracking-tight w-full pointer-events-none select-none">

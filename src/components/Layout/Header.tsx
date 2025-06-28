@@ -97,7 +97,7 @@ export default function Header() {
   const links = [
     { label: 'Dashboard', to: 'hero' },
     { label: 'Features', to: 'our-services' },
-    { label: 'Benefits', to: 'key-benefits' },
+    { label: 'FAQ', to: 'key-benefits' },
     { label: 'Book a Call', to: 'book-a-call' },
   ];
 

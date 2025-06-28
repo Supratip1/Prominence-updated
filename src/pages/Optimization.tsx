@@ -20,6 +20,20 @@ interface AnalysisData {
   optimization_recommendations?: {
     optimizations?: Recommendation[];
   };
+  audit_report?: {
+    snippet_optimization?: {
+      featured_snippet_readiness?: number;
+      overall_findings?: {
+        readability_score?: number;
+      };
+    };
+    crawlability?: {
+      score?: number;
+    };
+    structured_data?: {
+      aeo_schemas_found?: string[];
+    };
+  };
 }
 
 const Optimization = () => {
@@ -81,12 +95,9 @@ const Optimization = () => {
     <>
       <Header />
       <div className="pt-20">
-        <DashboardLayout pageTitle="Optimization Recommendations">
+        <DashboardLayout>
           <div className="max-w-5xl mx-auto mt-16 px-4">
             <div className="flex items-center justify-between mb-6">
-              <div className="text-2xl md:text-3xl font-normal text-black font-display tracking-tight">
-                Recommendations
-              </div>
               <div className="relative">
                 <button
                   className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white shadow-sm hover:bg-gray-50"
@@ -111,6 +122,56 @@ const Optimization = () => {
                 )}
               </div>
             </div>
+            
+            {/* Advanced Metrics Section */}
+            {safeData?.audit_report && (
+              <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 mb-8">
+                <h3 className="text-xl font-semibold text-black mb-4">Advanced Optimization Metrics</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Featured Snippet Readiness */}
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-blue-600 mb-1">
+                      {safeData.audit_report.snippet_optimization?.featured_snippet_readiness || 0}/10
+                    </div>
+                    <div className="text-sm text-gray-600">Featured Snippet Ready</div>
+                    <div className="text-xs text-gray-500 mt-1">Optimized for AI search results</div>
+                  </div>
+                  
+                  {/* Content Quality Score */}
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-600 mb-1">
+                      {safeData.audit_report.snippet_optimization?.overall_findings?.readability_score || 'N/A'}
+                    </div>
+                    <div className="text-sm text-gray-600">Content Quality</div>
+                    <div className="text-xs text-gray-500 mt-1">AI-powered content assessment</div>
+                  </div>
+                  
+                  {/* Technical SEO Score */}
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-600 mb-1">
+                      {safeData.audit_report.crawlability?.score || 0}/10
+                    </div>
+                    <div className="text-sm text-gray-600">Technical SEO</div>
+                    <div className="text-xs text-gray-500 mt-1">Crawlability & indexing</div>
+                  </div>
+                </div>
+                
+                {/* Additional Insights */}
+                {safeData.audit_report.structured_data?.aeo_schemas_found && safeData.audit_report.structured_data.aeo_schemas_found.length > 0 && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">AEO Schemas Found</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {safeData.audit_report.structured_data.aeo_schemas_found.map((schema: string, idx: number) => (
+                        <span key={idx} className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                          {schema}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            
             {/* Desktop grid */}
             <div className="hidden md:grid grid-cols-3 gap-8">
               {filtered.map(cat => (

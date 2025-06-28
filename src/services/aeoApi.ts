@@ -44,6 +44,13 @@ export class AEOApiService {
     });
   }
 
+  static async analyzeWebsiteWithCompetitors(request: AnalysisRequest): Promise<AnalysisResponse> {
+    return this.makeRequest('/analyze_with_competitors', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
   static async healthCheck(): Promise<{ status: string; service: string }> {
     return this.makeRequest('/health');
   }

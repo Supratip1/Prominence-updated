@@ -10,6 +10,8 @@ import extruct
 from w3lib.html import get_base_url
 import google.generativeai as genai
 from dotenv import load_dotenv
+import aiohttp
+import asyncio
 
 # Load environment variables from .env file
 load_dotenv()
@@ -371,6 +373,20 @@ def run_audit_only(target_url):
     # Final validation to ensure all scores are within bounds
     results = validate_scores(results)
 
+    # Add model_scores based on chatbot_access
+    model_scores = {}
+    chatbot_access = results['crawlability']['robots_txt'].get('chatbot_access', {})
+    for model, info in chatbot_access.items():
+        allowed = info.get('allowed', False)
+        disallowed = info.get('disallowed_paths', [])
+        if allowed and not disallowed:
+            model_scores[model] = 100
+        elif allowed and disallowed:
+            model_scores[model] = 70
+        else:
+            model_scores[model] = 0
+    results['model_scores'] = model_scores
+
     return results
 
 
@@ -419,38 +435,67 @@ Here is the AEO audit output:
     # Combine audit and optimizations
     return {
         "audit_report": audit_results,
-        "optimization_recommendations": optimizations
+        "optimization_recommendations": optimizations,
+        "model_scores": audit_results.get("model_scores", {})
     }
 
     
-def get_competitor_links(domain):
-    """Get competitor links using Gemini"""
-    if not api_key:
-        # Return empty list if no API key
-        return []
-        
-    prompt = f"""
-Given the domain "{domain}", return a list of 3 to 5 competing websites in the same space. Just output a JSON list of the root URLs, no extra explanation.
-Example output:
-["https://competitor1.com", "https://competitor2.com"]
+async def fetch_title_and_desc(session, url):
+    try:
+        async with session.get(url, timeout=5) as resp:
+            html = await resp.text()
+            soup = BeautifulSoup(html, 'html.parser')
+            title = soup.title.string if soup.title else ''
+            desc_tag = soup.find('meta', attrs={'name': 'description'})
+            desc = desc_tag['content'] if desc_tag and 'content' in desc_tag.attrs else ''
+            return {"url": url, "title": title, "desc": desc}
+    except Exception:
+        return {"url": url, "title": "", "desc": ""}
 
+async def filter_competitors_by_domain(main_url, candidate_urls):
+    async with aiohttp.ClientSession() as session:
+        main_res = await fetch_title_and_desc(session, main_url)
+        main_keywords = set(main_res["title"].lower().split() + main_res["desc"].lower().split())
+        tasks = [fetch_title_and_desc(session, url) for url in candidate_urls]
+        results = await asyncio.gather(*tasks)
+    filtered = []
+    for res in results:
+        comp_keywords = set(res["title"].lower().split() + res["desc"].lower().split())
+        # Relaxed: accept if at least 1 keyword overlaps
+        if len(main_keywords & comp_keywords) >= 1:
+            filtered.append(res["url"])
+    print("Main site keywords:", main_keywords)
+    print("LLM candidates:", candidate_urls)
+    print("Filtered competitors:", filtered)
+    # Fallback: if no filtered, return first 3 candidates
+    if not filtered:
+        print("No filtered competitors, falling back to LLM candidates.")
+        return candidate_urls[:3]
+    return filtered[:3]
+
+def get_competitor_links(domain):
+    """Get competitor links using Gemini and filter by domain similarity"""
+    if not api_key:
+        return []
+    prompt = f"""
+Given the domain \"{domain}\", return a list of 5 competing websites in the same space. Just output a JSON list of the root URLs, no extra explanation.
+Example output:
+[\"https://competitor1.com\", \"https://competitor2.com\"]
 Respond only with the JSON array, no additional text.
 """
     try:
         model = genai.GenerativeModel("gemini-2.5-flash-lite-preview-06-17")
         response = model.generate_content(prompt)
         raw = response.text.strip()
-        
-        # Extract JSON from response
         start = raw.find('[')
         end = raw.rfind(']') + 1
-        
         if start == -1 or end == 0:
             return []
-            
         json_str = raw[start:end]
-        competitors = json.loads(json_str)
-        return [url for url in competitors if url.startswith("http") or url.startswith("https")]
+        candidates = json.loads(json_str)
+        # Advanced: filter by domain similarity using asyncio
+        filtered = asyncio.run(filter_competitors_by_domain(domain, [url for url in candidates if url.startswith("http") or url.startswith("https")]))
+        return filtered
     except Exception as e:
         return []
 

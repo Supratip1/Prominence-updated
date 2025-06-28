@@ -4,7 +4,7 @@ import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn, SignIn, SignUp } 
 import { AnalysisProvider } from './contexts/AnalysisContext'
 import Onboarding from './pages/Onboarding'
 import HowItWorksSection from './components/HowItWorksSection'
-import BenefitsSection from './components/BenefitsSection'
+import FAQSection from './components/BenefitsSection'
 import EarlyAdopterSection from './components/EarlyAdopterSection'
 import PricingSection from './components/PricingSection'
 import Footer from './components/Footer'
@@ -80,7 +80,7 @@ function HomePage() {
     <>
       <Dashboard />
       <HowItWorksSection />
-      <BenefitsSection />
+      <FAQSection />
       <EarlyAdopterSection />
       <PricingSection />
       <Footer />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardLayout from '../components/Layout/DashboardLayout';
-import { Info, ShieldCheck, ShieldX, BarChart2, FileText, Globe, Star } from 'lucide-react';
+import { Info, ShieldCheck, ShieldX, BarChart2, FileText, Globe, Star, Target, Settings, Tag, AlertTriangle, Bot, BookOpen, ListChecks } from 'lucide-react';
 import Modal from '../components/UI/Modal';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUrl } from '../utils/hooks';
@@ -103,6 +103,15 @@ const AEOAnalysis = () => {
   const overall = safeData?.aeo_score_pct || safeData?.audit_report?.aeo_score_pct;
   const chatbotAccess = (safeData?.crawlability?.robots_txt?.chatbot_access || safeData?.audit_report?.crawlability?.robots_txt?.chatbot_access) || {};
   const modelScores = safeData?.model_scores || safeData?.audit_report?.model_scores || {};
+  
+  // Extract new advanced fields from enhanced backend
+  const featuredSnippetReadiness = snippet?.featured_snippet_readiness || 0;
+  const contentQualityScore = snippet?.overall_findings?.readability_score || 0;
+  const technicalSeoScore = crawlability?.score || 0;
+  const aeoSchemasFound = structured?.aeo_schemas_found || [];
+  const totalPagesAnalyzed = snippet?.overall_findings?.total_pages || snippet?.pages_evaluated?.length || 0;
+  const issuesCount = (structured?.issues?.length || 0) + (snippet?.issues?.length || 0) + (crawlability?.issues?.length || 0);
+  
   // Use real trend data if available
   const realTrends = safeData?.trends || safeData?.audit_report?.trends || [];
   const trendData = Array.isArray(realTrends) && realTrends.length > 0
@@ -125,6 +134,11 @@ const AEOAnalysis = () => {
   // Prepare model scores for donut
   const modelScoreData = Object.entries(modelScores).map(([model, score]) => ({ name: model, value: score }));
   const donutColors = ['#000', '#666', '#999', '#ccc', '#333', '#bbb'];
+
+  // Debug logging
+  console.log('modelScores:', modelScores);
+  console.log('modelScoreData:', modelScoreData);
+  console.log('safeData:', safeData);
 
   // Extract per-page details for the new line chart
   const pageDetails = snippet?.overall_findings?.pages_details || snippet?.pages_evaluated || [];
@@ -150,12 +164,98 @@ const AEOAnalysis = () => {
   }
 
   const [loading, setLoading] = useState(false);
-  const [activeModal, setActiveModal] = useState<null | 'structured' | 'snippet' | 'crawlability' | string>(null);
+  const [activeModal, setActiveModal] = useState<null | 'structured' | 'snippet' | 'crawlability' | 'featured-snippet' | 'content-quality' | 'technical-seo' | 'pages-analyzed' | 'aeo-schemas' | 'issues' | 'model-access' | string>(null);
+
+  // Modal keys for all possible modals
+  const modalKeys = [
+    'structured', 'snippet', 'crawlability',
+    'featured-snippet', 'content-quality', 'technical-seo', 'pages-analyzed',
+    'aeo-schemas', 'issues', 'model-access'
+  ];
+
+  // After extracting other fields:
+  const recommendations =
+    safeData?.optimization_recommendations?.optimizations ||
+    safeData?.audit_report?.optimization_recommendations?.optimizations ||
+    [];
+
+  // Helper functions for modal content
+  function getModalTitle(key: string | null) {
+    switch (key) {
+      case 'structured': return 'Structured Data Details';
+      case 'snippet': return 'Snippet Optimization Details';
+      case 'crawlability': return 'Crawlability Details';
+      case 'featured-snippet': return 'Featured Snippet Readiness';
+      case 'content-quality': return 'Content Quality';
+      case 'technical-seo': return 'Technical SEO';
+      case 'pages-analyzed': return 'Pages Analyzed';
+      case 'aeo-schemas': return 'AEO Schemas Found';
+      case 'issues': return 'Issues Found';
+      case 'model-access': return 'AI Model Access';
+      default: return '';
+    }
+  }
+
+  function getModalContent(key: string | null) {
+    switch (key) {
+      case 'structured':
+        return (
+          <div>
+            <div className="font-semibold mb-2">Score: {structured?.score ?? '-'}/10</div>
+            <div className="mb-2">Schema Types Found: {Object.keys(structured?.schema_types_found || {}).join(', ') || '-'}</div>
+            <div className="mb-2">AEO Schemas: {Array.isArray(structured?.aeo_schemas_found) ? structured.aeo_schemas_found.join(', ') : '-'}</div>
+            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{structured?.issues?.length ? structured.issues.map((iss: any, i: number) => <li key={i}>{iss}</li>) : <li>None</li>}</ul></div>
+          </div>
+        );
+      case 'snippet':
+        return (
+          <div>
+            <div className="font-semibold mb-2">Score: {snippet?.score ?? '-'}/10</div>
+            <div className="mb-2">Featured Snippet Readiness: {snippet?.featured_snippet_readiness ?? '-'}/10</div>
+            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{snippet?.issues?.length ? snippet.issues.map((iss: any, i: number) => <li key={i}>{iss}</li>) : <li>None</li>}</ul></div>
+          </div>
+        );
+      case 'crawlability':
+        return (
+          <div>
+            <div className="font-semibold mb-2">Score: {crawlability?.score ?? '-'}/10</div>
+            <div className="mb-2">Robots.txt Accessible: {crawlability?.robots_txt?.accessible ? 'Yes' : 'No'}</div>
+            <div className="mb-2">Sitemap Found: {crawlability?.sitemap?.found ? 'Yes' : 'No'}</div>
+            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{crawlability?.issues?.length ? crawlability.issues.map((iss: any, i: number) => <li key={i}>{iss}</li>) : <li>None</li>}</ul></div>
+          </div>
+        );
+      case 'featured-snippet':
+        return <div>Featured Snippet Readiness: {snippet?.featured_snippet_readiness ?? '-'}/10</div>;
+      case 'content-quality':
+        return <div>Content Quality Score: {contentQualityScore ?? '-'}</div>;
+      case 'technical-seo':
+        return <div>Technical SEO Score: {technicalSeoScore ?? '-'}/10</div>;
+      case 'pages-analyzed':
+        return <div>Total Pages Analyzed: {totalPagesAnalyzed}</div>;
+      case 'aeo-schemas':
+        return <div>AEO Schemas Found: {Array.isArray(aeoSchemasFound) ? aeoSchemasFound.join(', ') : '-'}</div>;
+      case 'issues':
+        return <div>Total Issues: {issuesCount}</div>;
+      case 'model-access':
+        return (
+          <div>
+            <div className="mb-2">AI Model Access:</div>
+            <ul className="list-disc ml-6 text-sm">
+              {Object.entries(chatbotAccess).map(([model, access]: any, i) => (
+                <li key={i}>{model}: {access.allowed ? 'Allowed' : 'Blocked'}</li>
+              ))}
+            </ul>
+          </div>
+        );
+      default:
+        return null;
+    }
+  }
 
   return (
     <>
       <Header />
-      <DashboardLayout pageTitle="AEO Analysis">
+      <DashboardLayout pageTitle={`Analytics for ${analyzedDomain || 'your site'}`}>
         <div className="pt-20">
           {loading && (
             <div className="flex justify-center items-center py-10">
@@ -170,53 +270,13 @@ const AEOAnalysis = () => {
           {!loading && analysisData && (
             <>
               {/* Top: Page Title */}
-              <div className="max-w-6xl mx-auto mt-12 mb-8 flex items-center justify-between">
-                <h2 className="text-2xl md:text-3xl font-normal text-black font-display tracking-tight text-center sm:text-left w-full">
-                  Score for {analyzedDomain || 'your site'}
-                </h2>
-                {/* (Optional) User info or actions can go here */}
-              </div>
-              {/* Row 1: Four stat cards (Overall Score first) */}
-              <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                {/* Overall Score Card (dark, premium) */}
-                <div className="bg-black rounded-2xl border border-gray-900 shadow p-6 flex flex-col items-center min-h-[120px]">
-                  <Star className="w-8 h-8 mb-2 text-white" />
-                  <h3 className="text-lg font-normal text-white mb-1">Overall AEO Score</h3>
-                  <div className="text-2xl font-bold text-white">{overall !== undefined ? overall : '-'}</div>
-                </div>
-                {/* Structured Data Card */}
-                <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
-                  <button onClick={() => setActiveModal('structured')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Structured Data Details">
-                    <Info className="w-5 h-5" />
-                  </button>
-                  <FileText className="w-8 h-8 mb-2 text-gray-500" />
-                  <h3 className="text-lg font-normal text-black mb-1">Structured Data</h3>
-                  <div className="text-2xl font-bold text-black">{structured?.score !== undefined ? structured.score : '-'}/10</div>
-                </div>
-                {/* Snippet Optimization Card */}
-                <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
-                  <button onClick={() => setActiveModal('snippet')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Snippet Optimization Details">
-                    <Info className="w-5 h-5" />
-                  </button>
-                  <BarChart2 className="w-8 h-8 mb-2 text-gray-500" />
-                  <h3 className="text-lg font-normal text-black mb-1">Snippet Optimization</h3>
-                  <div className="text-2xl font-bold text-black">{snippet?.score !== undefined ? snippet.score : '-'}/10</div>
-                </div>
-                {/* Crawlability Card */}
-                <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
-                  <button onClick={() => setActiveModal('crawlability')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Crawlability Details">
-                    <Info className="w-5 h-5" />
-                  </button>
-                  <Globe className="w-8 h-8 mb-2 text-gray-500" />
-                  <h3 className="text-lg font-normal text-black mb-1">Crawlability</h3>
-                  <div className="text-2xl font-bold text-black">{crawlability?.score !== undefined ? crawlability.score : '-'}/10</div>
-                </div>
-              </div>
-              {/* Row 2: Line chart and donut chart side by side */}
+              {/* (Optional) User info or actions can go here */}
+
+              {/* Charts Row: Always show Page Content Metrics and Model Scores side by side */}
               <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                 {/* Line Graph: Per-page metrics */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow p-8 flex flex-col">
-                  <h3 className="text-xl font-normal text-black mb-6 text-center">Page Content Metrics</h3>
+                  <h3 className="text-xl font-normal text-black mb-6">Page Content Metrics</h3>
                   <ResponsiveContainer width="100%" height={320}>
                     <LineChart data={pageChartData} margin={{ left: 10, right: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -241,9 +301,10 @@ const AEOAnalysis = () => {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                {/* Donut Chart */}
+                {/* Donut Chart: Model Scores */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow p-8 flex flex-col">
-                  <h3 className="text-xl font-normal text-black mb-6 text-center">Model Scores</h3>
+                  <h3 className="text-xl font-normal text-black mb-6">Model Scores</h3>
+                    {modelScoreData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={320}>
                     <PieChart>
                       <Pie
@@ -264,72 +325,141 @@ const AEOAnalysis = () => {
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400" style={{ minHeight: 200 }}>
+                        <span>No model scores available</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              {/* Row 3: Recommendations or Validation (remove this section) */}
-              {/* Modals for details */}
-              <Modal isOpen={activeModal === 'structured'} onClose={() => setActiveModal(null)}>
-                <div className="p-6 min-w-[320px] max-w-md">
-                  <h2 className="text-xl font-bold mb-4">Structured Data Details</h2>
-                  <div className="mb-2"><span className="font-semibold">Score:</span> {structured?.score ?? '-'}/10</div>
-                  <div className="mb-2"><span className="font-semibold">Schema Types Found:</span> {structured?.schema_types_found && Object.keys(structured.schema_types_found).length > 0 ? (
-                    <ul className="list-disc ml-6">
-                      {Object.entries(structured.schema_types_found).map(([type, count]) => (
-                        <li key={type}>{type} <span className="text-gray-500">({count as number})</span></li>
-                      ))}
-                    </ul>
-                  ) : <span className="text-gray-500">None</span>}</div>
-                  <div className="mb-2"><span className="font-semibold">Pages with Errors:</span> {structured?.pages_with_errors && structured.pages_with_errors.length > 0 ? (
-                    <ul className="list-disc ml-6">
-                      {structured.pages_with_errors.map((err: any, idx: number) => (
-                        <li key={idx}>{typeof err === 'string' ? err : JSON.stringify(err)}</li>
-                      ))}
-                    </ul>
-                  ) : <span className="text-gray-500">None</span>}</div>
-                  <div className="mb-2"><span className="font-semibold">Issues:</span> {structured?.issues && structured.issues.length > 0 ? (
-                    <ul className="list-disc ml-6">
-                      {structured.issues.map((issue: string, idx: number) => (
-                        <li key={idx}>{issue}</li>
-                      ))}
-                    </ul>
-                  ) : <span className="text-gray-500">None</span>}</div>
+
+                {/* Metric Cards: All rows below charts */}
+                {/* Row 1: Four stat cards (Overall Score first) */}
+                <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                  {/* Overall Score Card (dark, premium) */}
+                  <div className="bg-black rounded-2xl border border-gray-900 shadow p-6 flex flex-col items-center min-h-[120px]">
+                    <Star className="w-8 h-8 mb-2 text-white" />
+                    <h3 className="text-lg font-normal text-white mb-1">Overall AEO Score</h3>
+                    <div className="text-2xl font-bold text-white">{overall !== undefined ? overall : '-'}</div>
+                  </div>
+                  {/* Structured Data Card */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('structured')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Structured Data Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <FileText className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">Structured Data</h3>
+                    <div className="text-2xl font-bold text-black">{structured?.score !== undefined ? structured.score : '-'}/10</div>
+                  </div>
+                  {/* Snippet Optimization Card */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('snippet')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Snippet Optimization Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <BarChart2 className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">Snippet Optimization</h3>
+                    <div className="text-2xl font-bold text-black">{snippet?.score !== undefined ? snippet.score : '-'}/10</div>
+                  </div>
+                  {/* Crawlability Card */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('crawlability')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Crawlability Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <Globe className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">Crawlability</h3>
+                    <div className="text-2xl font-bold text-black">{crawlability?.score !== undefined ? crawlability.score : '-'}/10</div>
+                  </div>
                 </div>
-              </Modal>
-              <Modal isOpen={activeModal === 'snippet'} onClose={() => setActiveModal(null)}>
-                <div className="p-6 min-w-[320px] max-w-md">
-                  <h2 className="text-xl font-bold mb-4">Snippet Optimization Details</h2>
-                  <div className="mb-2"><span className="font-semibold">Score:</span> {snippet?.score ?? '-'}/10</div>
-                  <div className="mb-2"><span className="font-semibold">Pages Evaluated:</span> {snippet?.overall_findings?.total_pages ?? '-'}</div>
-                  <div className="mb-2"><span className="font-semibold">Issues:</span> {snippet?.issues && snippet.issues.length > 0 ? (
-                    <ul className="list-disc ml-6">
-                      {snippet.issues.map((issue: string, idx: number) => (
-                        <li key={idx}>{issue}</li>
-                      ))}
-                    </ul>
-                  ) : <span className="text-gray-500">None</span>}</div>
+                
+                {/* Row 2: Advanced metrics from enhanced backend */}
+                <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                  {/* Featured Snippet Readiness */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('featured-snippet')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Featured Snippet Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <Target className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">Featured Snippet Ready</h3>
+                    <div className="text-2xl font-bold text-black">{featuredSnippetReadiness}/10</div>
+                  </div>
+                  
+                  {/* Content Quality Score */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('content-quality')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Content Quality Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <BookOpen className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">Content Quality</h3>
+                    <div className="text-2xl font-bold text-black">{contentQualityScore > 0 ? contentQualityScore : '-'}</div>
+                  </div>
+                  
+                  {/* Technical SEO Score */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('technical-seo')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Technical SEO Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <Settings className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">Technical SEO</h3>
+                    <div className="text-2xl font-bold text-black">{technicalSeoScore}/10</div>
+                  </div>
+                  
+                  {/* Pages Analyzed */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('pages-analyzed')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Pages Analyzed Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <BarChart2 className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">Pages Analyzed</h3>
+                    <div className="text-2xl font-bold text-black">{totalPagesAnalyzed}</div>
+                  </div>
                 </div>
-              </Modal>
-              <Modal isOpen={activeModal === 'crawlability'} onClose={() => setActiveModal(null)}>
-                <div className="p-6 min-w-[320px] max-w-md">
-                  <h2 className="text-xl font-bold mb-4">Crawlability Details</h2>
-                  <div className="mb-2"><span className="font-semibold">Score:</span> {crawlability?.score ?? '-'}/10</div>
-                  <div className="mb-2"><span className="font-semibold">Robots.txt Accessible:</span> {crawlability?.robots_txt?.accessible ? 'Yes' : 'No'}</div>
-                  <div className="mb-2"><span className="font-semibold">Sitemap Found:</span> {crawlability?.sitemap?.found ? 'Yes' : 'No'}</div>
-                  <div className="mb-2"><span className="font-semibold">Issues:</span> {crawlability?.issues && crawlability.issues.length > 0 ? (
-                    <ul className="list-disc ml-6">
-                      {crawlability.issues.map((issue: string, idx: number) => (
-                        <li key={idx}>{issue}</li>
-                      ))}
-                    </ul>
-                  ) : <span className="text-gray-500">None</span>}</div>
+                
+                {/* Row 3: Additional metrics row */}
+                <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                  {/* AEO Schemas Found */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('aeo-schemas')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="AEO Schemas Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <Tag className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">AEO Schemas</h3>
+                    <div className="text-2xl font-bold text-black">{aeoSchemasFound.length}</div>
+                  </div>
+                  
+                  {/* Total Issues */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('issues')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Issues Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <AlertTriangle className="w-8 h-8 mb-2 text-yellow-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">Total Issues</h3>
+                    <div className="text-2xl font-bold text-black">{issuesCount}</div>
+                  </div>
+                  
+                  {/* Model Access Score */}
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                    <button onClick={() => setActiveModal('model-access')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Model Access Details">
+                      <Info className="w-5 h-5" />
+                    </button>
+                    <Bot className="w-8 h-8 mb-2 text-gray-500" />
+                    <h3 className="text-lg font-normal text-black mb-1">AI Model Access</h3>
+                    <div className="text-2xl font-bold text-black">
+                      {Object.values(chatbotAccess).filter((access: any) => access.allowed).length}/{Object.keys(chatbotAccess).length}
+                    </div>
+                  </div>
                 </div>
-              </Modal>
-            </>
-          )}
-        </div>
-      </DashboardLayout>
-    </>
-  );
+              </>
+            )}
+          </div>
+        </DashboardLayout>
+        <Modal isOpen={!!activeModal} onClose={() => setActiveModal(null)}>
+          <div>
+            <div className="text-xl font-semibold mb-4">{getModalTitle(activeModal)}</div>
+            {getModalContent(activeModal)}
+          </div>
+        </Modal>
+      </>
+    );
 };
 
 export default AEOAnalysis; 

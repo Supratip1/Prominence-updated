@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Optional
 import uvicorn
 import logging
-from aeo_analysis import run_full_aeo_pipeline
+from enhanced_aeo_analysis import run_full_aeo_pipeline, run_with_competitors
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -64,6 +64,26 @@ async def analyze_website(request: AnalysisRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Analysis failed: {str(e)}"
+        )
+
+@app.post("/analyze_with_competitors", response_model=AnalysisResponse)
+async def analyze_website_with_competitors(request: AnalysisRequest):
+    """
+    Analyze a website for AEO optimization and competitor comparison
+    """
+    try:
+        logger.info(f"Starting AEO analysis with competitors for URL: {request.url}")
+        results = run_with_competitors(request.url)
+        logger.info(f"AEO analysis with competitors completed successfully for: {request.url}")
+        return AnalysisResponse(
+            success=True,
+            data=results
+        )
+    except Exception as e:
+        logger.error(f"Error during AEO analysis with competitors: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Analysis with competitors failed: {str(e)}"
         )
 
 @app.get("/health")

@@ -32,7 +32,7 @@ const Footer = () => {
             onClick={() => smoothScrollTo("key-benefits")}
             className="px-2 py-1"
           >
-            Benefits
+            FAQ
           </button>
           <button
             onClick={() => smoothScrollTo("book-a-call")}
