@@ -27,7 +27,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
           to="/aeo-analysis"
           onClick={handleClick}
           className={({ isActive }) =>
-            isActive ? 'bg-black text-white flex items-center gap-3 px-4 py-3 rounded-xl font-semibold' : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
+            isActive
+              ? 'bg-gray-100 text-black shadow-sm border border-gray-200 flex items-center gap-3 px-4 py-3 rounded-xl font-semibold relative after:content-[" "] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-2 after:bg-black after:rounded-r-xl'
+              : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
           }
         >
           <Home className="w-5 h-5" />
@@ -37,7 +39,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
           to="/optimization"
           onClick={handleClick}
           className={({ isActive }) =>
-            isActive ? 'bg-black text-white flex items-center gap-3 px-4 py-3 rounded-xl font-semibold' : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
+            isActive
+              ? 'bg-gray-100 text-black shadow-sm border border-gray-200 flex items-center gap-3 px-4 py-3 rounded-xl font-semibold relative after:content-[" "] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-2 after:bg-black after:rounded-r-xl'
+              : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
           }
         >
           <BarChart2 className="w-5 h-5" />
@@ -47,7 +51,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
           to="/track-competitors"
           onClick={handleClick}
           className={({ isActive }) =>
-            isActive ? 'bg-black text-white flex items-center gap-3 px-4 py-3 rounded-xl font-semibold' : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
+            isActive
+              ? 'bg-gray-100 text-black shadow-sm border border-gray-200 flex items-center gap-3 px-4 py-3 rounded-xl font-semibold relative after:content-[" "] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-2 after:bg-black after:rounded-r-xl'
+              : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
           }
         >
           <Users className="w-5 h-5" />
@@ -57,7 +63,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
           to="/integrate-boards"
           onClick={handleClick}
           className={({ isActive }) =>
-            isActive ? 'bg-black text-white flex items-center gap-3 px-4 py-3 rounded-xl font-semibold' : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
+            isActive
+              ? 'bg-gray-100 text-black shadow-sm border border-gray-200 flex items-center gap-3 px-4 py-3 rounded-xl font-semibold relative after:content-[" "] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-2 after:bg-black after:rounded-r-xl'
+              : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
           }
         >
           <Settings className="w-5 h-5" />

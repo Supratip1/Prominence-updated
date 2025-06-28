@@ -1,169 +1,153 @@
-# AEO Analysis Integration
+# Enhanced AEO Analysis Tool
 
-This project integrates Answer Engine Optimization (AEO) analysis into your React web app using a Python backend with Gemini AI.
+A Python tool that analyzes websites for Answer Engine Optimization (AEO) and compares them with competitors.
 
-## 🚀 Quick Start
+## 🚀 What It Does
 
-### 1. Backend Setup
+This tool analyzes a website and gives it an AEO score (0-100%) based on three main factors:
+- **Structured Data** (0-10 points): JSON-LD markup, schema types
+- **Snippet Optimization** (0-10 points): Content quality, readability, lists, questions
+- **Crawlability** (0-10 points): robots.txt, sitemap, bot access
 
-#### Install Dependencies
+Then it finds competitors and ranks all sites together.
+
+## 📁 Files
+
+- `enhanced_aeo_analysis.py` - Main analysis tool
+- `test_fixes.py` - Tests to verify everything works
+- `README.md` - This file
+
+## 🔧 How to Use
+
+### Basic Setup
 ```bash
-cd src/python
-pip install -r requirements.txt
+# Install dependencies
+pip install requests beautifulsoup4 extruct google-generativeai python-dotenv
+
+# Set your API key (optional - tool works without it)
+echo "GEMINI_API_KEY=your_key_here" > .env
 ```
 
-#### Set up Environment Variables
-Create a `.env` file in the project root with your Gemini API key:
+### Run Analysis
+```python
+from enhanced_aeo_analysis import run_with_competitors
 
-```env
-GEMINI_API_KEY=your_actual_gemini_api_key_here
+# Full analysis with competitors
+result = run_with_competitors("https://example.com")
+print(result)
+
+# Just audit without competitors
+from enhanced_aeo_analysis import run_audit_only
+audit = run_audit_only("https://example.com")
+print(audit)
 ```
 
-#### Get a Gemini API Key
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the generated key
-5. Paste it in your `.env` file
+## 📊 Output Structure
 
-#### Start the Backend Server
-```bash
-cd src/python
-python start_server.py
-```
-
-The server will be available at:
-- **API Server**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
-
-### 2. Frontend Setup
-
-#### Start the React Development Server
-```bash
-# In a new terminal, from the project root
-npm run dev
-```
-
-The frontend will be available at http://localhost:5173
-
-## 🎯 How It Works
-
-### User Flow
-1. User visits the dashboard and clicks "Try Beta"
-2. Frontend calls the backend API with a target URL
-3. Backend runs the AEO analysis using the Python script
-4. Gemini AI generates optimization recommendations
-5. Results are displayed on a dedicated analysis page
-
-### API Endpoints
-
-#### POST /analyze
-Analyzes a website for AEO optimization
-
-**Request:**
 ```json
 {
-  "url": "https://example.com",
-  "max_pages": 10
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "audit_report": {
-      "aeo_score_pct": 75.5,
-      "structured_data": { ... },
-      "snippet_optimization": { ... },
-      "crawlability": { ... }
-    },
-    "optimization_recommendations": {
-      "optimizations": [
-        {
-          "description": "Add FAQ schema markup",
-          "impact_level": "High",
-          "category": "Structured Data"
-        }
-      ]
-    }
+  "status": "success",
+  "target_domain": "https://example.com",
+  "audit_report": {
+    "aeo_score": 73.33,           // Overall score (0-100%)
+    "aeo_score_raw": 22,          // Raw points (0-30)
+    "structured_data": { /* structured data analysis */ },
+    "snippet_optimization": { /* content analysis */ },
+    "crawlability": { /* technical analysis */ }
+  },
+  "optimization_recommendations": { /* AI suggestions */ },
+  "competitor_analysis": {
+    "your_ranking": 3,            // Your position (1 = best)
+    "ranking": [                  // All sites ranked
+      {
+        "rank": 1,
+        "domain": "competitor.com",
+        "score": 85.0,
+        "is_user_site": false,
+        "key_advantages": ["Better structured data (8/10 vs 2/10)"],
+        "key_disadvantages": []
+      },
+      {
+        "rank": 3,
+        "domain": "yoursite.com",
+        "score": 73.33,
+        "is_user_site": true,
+        "key_advantages": [],
+        "key_disadvantages": []
+      }
+    ]
   }
 }
 ```
 
-## 📁 Project Structure
+## 🧠 How It Works
 
+### 1. Website Analysis
+- Fetches robots.txt and sitemap
+- Crawls pages (up to 10 by default)
+- Extracts structured data (JSON-LD)
+- Analyzes content (paragraphs, lists, questions)
+- Calculates scores for each category
+
+### 2. Competitor Discovery
+- Uses Gemini AI to find 3-5 competitors
+- Runs same analysis on each competitor
+- Compares scores and generates insights
+
+### 3. Ranking & Insights
+- Ranks all sites by score (highest first)
+- Identifies key advantages/disadvantages
+- Provides actionable recommendations
+
+## ⚙️ Configuration
+
+```python
+CONFIG = {
+    "max_pages": 10,              # Max pages to analyze
+    "timeout": 10,                # Request timeout
+    "snippet_thresholds": {
+        "avg_paragraph": 60,      # Max avg words per paragraph
+        "max_paragraph": 120,     # Max words in any paragraph
+        "min_listed_pages_ratio": 0.5  # Min % of pages with lists
+    }
+}
 ```
-src/
-├── python/
-│   ├── aeo_analysis.py          # Main AEO analysis script
-│   ├── api_server.py            # FastAPI server
-│   ├── start_server.py          # Server startup script
-│   ├── requirements.txt         # Python dependencies
-│   └── README.md               # This file
-├── services/
-│   └── aeoApi.ts               # Frontend API service
-├── pages/
-│   ├── Dashboard.tsx           # Main dashboard with Try Beta button
-│   └── AEOAnalysis.tsx         # Results display page
-└── App.tsx                     # React router configuration
+
+## 🔍 Key Functions
+
+- `run_audit_only(url)` - Basic website analysis
+- `run_full_aeo_pipeline(url)` - Analysis + AI recommendations
+- `run_with_competitors(url)` - Full analysis with competitor comparison
+- `validate_scores(results)` - Ensures scores are within bounds
+
+## 🚨 Error Handling
+
+- Works without API key (limited functionality)
+- Graceful handling of network errors
+- Continues analysis even if some pages fail
+- Validates all scores to prevent impossible values
+
+## 🧪 Testing
+
+```bash
+python test_fixes.py
 ```
 
-## 🔧 Configuration
+Tests score validation and basic functionality.
 
-### Backend Configuration
-Modify the `CONFIG` dictionary in `aeo_analysis.py` to:
-- Change default target URL
-- Adjust number of pages to analyze
-- Modify timeout settings
-- Update snippet optimization thresholds
+## 💡 Tips for Developers
 
-### Frontend Configuration
-Update `src/services/aeoApi.ts` to:
-- Change API base URL
-- Modify request/response handling
-- Add custom error handling
+1. **API Key**: Set `GEMINI_API_KEY` in `.env` for full functionality
+2. **Customization**: Modify `CONFIG` to adjust analysis parameters
+3. **Integration**: Use `run_audit_only()` for basic analysis without AI
+4. **Error Handling**: All functions return valid JSON even on errors
+5. **Performance**: Analysis takes 30-60 seconds per site
 
-## 🐛 Troubleshooting
+## 🔧 Troubleshooting
 
-### Common Issues
+- **No competitors found**: Check API key or network connection
+- **Empty recommendations**: API key missing or invalid
+- **Scores seem wrong**: Check `validate_scores()` function
+- **Slow performance**: Reduce `max_pages` in config
 
-1. **"AEO analysis server is not running"**
-   - Make sure you've started the backend server with `python start_server.py`
-   - Check that the server is running on http://localhost:8000
-
-2. **"GEMINI_API_KEY environment variable not found"**
-   - Ensure your `.env` file exists in the project root
-   - Verify the API key is correctly set
-
-3. **CORS errors**
-   - The backend is configured to allow requests from localhost:5173 and localhost:3000
-   - If using a different port, update the CORS configuration in `api_server.py`
-
-4. **Analysis takes too long**
-   - Reduce `max_pages` in the analysis request
-   - Check your internet connection
-   - Verify the target website is accessible
-
-## 🚀 Deployment
-
-### Backend Deployment
-- Deploy the Python backend to a cloud service (Heroku, Railway, etc.)
-- Set environment variables on the deployment platform
-- Update the frontend API base URL
-
-### Frontend Deployment
-- Build the React app with `npm run build`
-- Deploy to Vercel, Netlify, or your preferred hosting service
-- Update the API base URL to point to your deployed backend
-
-## 📊 Features
-
-- **Real-time AEO Analysis**: Analyze websites for AI search optimization
-- **AI-Powered Recommendations**: Get intelligent suggestions from Gemini AI
-- **Comprehensive Scoring**: Structured data, snippet optimization, and crawlability scores
-- **Beautiful UI**: Modern, responsive interface for results display
-- **Error Handling**: Robust error handling and user feedback
-- **API Documentation**: Auto-generated API docs with FastAPI 
+That's it! The tool is designed to be simple to use and understand. 🎯 

@@ -9,6 +9,7 @@ import { normalizeUrl } from '../utils/hooks';
 import Player from 'lottie-react';
 import animationData from '../../public/lottie/Animation2.json';
 import Lottie from 'lottie-react';
+import { useUser } from '@clerk/clerk-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ export default function Dashboard() {
   const [isInputAnalyzing, setIsInputAnalyzing] = useState(false);
   const [spiderAnimation, setSpiderAnimation] = useState(null);
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false);
+  const { isSignedIn } = useUser();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Load spider animation data
   useEffect(() => {
@@ -40,6 +43,31 @@ export default function Dashboard() {
       setHasPlayedOnce(false);
     }
   }, [isInputAnalyzing]);
+
+  // Auto-trigger analysis if analyzeUrl is present in query params after login
+  useEffect(() => {
+    const analyzeUrl = searchParams.get('analyzeUrl');
+    if (isSignedIn && analyzeUrl && !isInputAnalyzing) {
+      setInputUrl(analyzeUrl);
+      setIsInputAnalyzing(true);
+      setError(null);
+      (async () => {
+        try {
+          const isServerRunning = await AEOApiService.isServerRunning();
+          if (!isServerRunning) {
+            throw new Error('AEO analysis server is not running. Please start the backend server first.');
+          }
+          await analyzeMutation.mutateAsync(analyzeUrl);
+          // Remove analyzeUrl from query params after triggering
+          searchParams.delete('analyzeUrl');
+          setSearchParams(searchParams, { replace: true });
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+          setIsInputAnalyzing(false);
+        }
+      })();
+    }
+  }, [isSignedIn, searchParams, setSearchParams, isInputAnalyzing]);
 
   const analyzeMutation = useMutation({
     mutationFn: (url: string) => AEOApiService.analyzeWebsite({ url, max_pages: 10 }),
@@ -100,8 +128,12 @@ export default function Dashboard() {
 
   const handleInputAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsInputAnalyzing(true);
     setError(null);
+    if (!isSignedIn) {
+      navigate(`/sign-in?analyzeUrl=${encodeURIComponent(inputUrl)}`);
+      return;
+    }
+    setIsInputAnalyzing(true);
     try {
       const isServerRunning = await AEOApiService.isServerRunning();
       if (!isServerRunning) {

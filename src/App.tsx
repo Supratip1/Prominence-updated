@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn, SignIn, SignUp } from '@clerk/clerk-react';
 import { AnalysisProvider } from './contexts/AnalysisContext'
 import Onboarding from './pages/Onboarding'
 import HowItWorksSection from './components/HowItWorksSection'
@@ -12,6 +13,8 @@ import BoltWidget from './components/ChartWidget'
 import ModelScores from './pages/ModelScores'
 import TrackCompetitors from './pages/TrackCompetitors'
 import IntegrateBoards from './pages/IntegrateBoards'
+import CenteredAuthWrapper from './components/auth/CenteredAuthWrapper'
+import { SidebarProvider } from './contexts/SidebarContext'
 
 // Lazy load pages for better performance
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -85,29 +88,59 @@ function HomePage() {
   )
 }
 
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_your_publishable_key_here';
+
 function App() {
   return (
     <ErrorBoundary>
-      <AnalysisProvider>
-        <Router>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/analysis" element={<Analysis />} />
-              <Route path="/optimization" element={<Optimization />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/aeo-analysis" element={<AEOAnalysis />} />
-              <Route path="/model-scores" element={<ModelScores />} />
-              <Route path="/track-competitors" element={<TrackCompetitors />} />
-              <Route path="/integrate-boards" element={<IntegrateBoards />} />
-              <Route path="/dashboard" element={<HomePage />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-            <ProminenceChatWidget />
-            <BoltWidget />
-          </Suspense>
-        </Router>
-      </AnalysisProvider>
+      <ClerkProvider publishableKey={clerkPubKey}>
+        <SidebarProvider>
+          <AnalysisProvider>
+            <Router>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/dashboard" element={<HomePage />} />
+                  <Route path="/sign-in" element={<CenteredAuthWrapper><SignIn routing="path" path="/sign-in" /></CenteredAuthWrapper>} />
+                  <Route path="/sign-up" element={<CenteredAuthWrapper><SignUp routing="path" path="/sign-up" /></CenteredAuthWrapper>} />
+
+                  {/* Protected routes */}
+                  <Route
+                    path="/*"
+                    element={
+                      <SignedIn>
+                        <Routes>
+                          <Route path="/onboarding" element={<Onboarding />} />
+                          <Route path="/analysis" element={<Analysis />} />
+                          <Route path="/optimization" element={<Optimization />} />
+                          <Route path="/signup" element={<Signup />} />
+                          <Route path="/aeo-analysis" element={<AEOAnalysis />} />
+                          <Route path="/model-scores" element={<ModelScores />} />
+                          <Route path="/track-competitors" element={<TrackCompetitors />} />
+                          <Route path="/integrate-boards" element={<IntegrateBoards />} />
+                          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                        </Routes>
+                      </SignedIn>
+                    }
+                  />
+
+                  {/* Redirect unauthenticated users trying to access protected routes */}
+                  <Route
+                    path="*"
+                    element={
+                      <SignedOut>
+                        <RedirectToSignIn />
+                      </SignedOut>
+                    }
+                  />
+                </Routes>
+                <ProminenceChatWidget />
+                <BoltWidget />
+              </Suspense>
+            </Router>
+          </AnalysisProvider>
+        </SidebarProvider>
+      </ClerkProvider>
     </ErrorBoundary>
   )
 }

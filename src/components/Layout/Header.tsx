@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, NavLink as RouterNavLink } from 'react-router-dom';
-import { Menu, X, User, LogIn } from 'lucide-react';
+import { Menu, X, User, LogIn, PanelLeft } from 'lucide-react';
+import { useUser, UserButton } from '@clerk/clerk-react';
+import { useSidebar } from '../../contexts/SidebarContext';
 
 // Desktop NavLink
 const NavLink = ({ onClick, children, isActive }: { onClick: () => void, children: React.ReactNode, isActive?: boolean }) => (
@@ -23,6 +25,19 @@ export default function Header() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { isSignedIn, user } = useUser();
+  const { openSidebar } = useSidebar();
+
+  // Only show sidebar toggle on these routes
+  const sidebarRoutes = [
+    '/aeo-analysis',
+    '/analysis',
+    '/optimization',
+    '/track-competitors',
+    '/integrate-boards',
+    '/model-scores',
+  ];
+  const showSidebarToggle = sidebarRoutes.some(route => location.pathname.startsWith(route));
 
   const smoothScrollTo = useCallback((elementId: string) => {
     setMobileMenuOpen(false);
@@ -106,6 +121,16 @@ export default function Header() {
             />
           </div>
         </button>
+        {/* Sidebar toggle for mobile (PanelLeft icon) */}
+        {showSidebarToggle && (
+          <button
+            className="md:hidden p-2 rounded focus:outline-none ml-2"
+            onClick={openSidebar}
+            aria-label="Open sidebar menu"
+          >
+            <PanelLeft className="w-7 h-7 text-black" />
+          </button>
+        )}
         
         {/* Centered Nav Pill */}
         <nav className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -124,14 +149,30 @@ export default function Header() {
 
         {/* Right: Auth Actions */}
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-black transition-colors duration-200">
-            <LogIn className="w-4 h-4" />
-            <span className="text-sm font-medium">Log In</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200">
-            <User className="w-4 h-4" />
-            <span className="text-sm font-medium">Sign Up</span>
-          </button>
+          {isSignedIn ? (
+            <>
+              <UserButton afterSignOutUrl="/dashboard" />
+              {/* Optionally show user info */}
+              {/* <span className="ml-2">{user?.firstName}</span> */}
+            </>
+          ) : (
+            <>
+              <button
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-black transition-colors duration-200"
+                onClick={() => navigate('/sign-in')}
+              >
+                <LogIn className="w-4 h-4" />
+                <span className="text-sm font-medium">Log In</span>
+              </button>
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
+                onClick={() => navigate('/sign-up')}
+              >
+                <User className="w-4 h-4" />
+                <span className="text-sm font-medium">Sign Up</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Hamburger for mobile */}
@@ -163,12 +204,24 @@ export default function Header() {
           
           {/* Mobile Auth Actions */}
           <div className="w-full border-t border-gray-200 mt-4 pt-4 flex flex-col gap-2 px-4">
-            <button className="w-full py-3 text-center text-gray-600 hover:text-black transition-colors duration-200">
-              Log In
-            </button>
-            <button className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200">
-              Sign Up
-            </button>
+            {isSignedIn ? (
+              <UserButton afterSignOutUrl="/dashboard" />
+            ) : (
+              <>
+                <button
+                  className="w-full py-3 text-center text-gray-600 hover:text-black transition-colors duration-200"
+                  onClick={() => { setMobileMenuOpen(false); navigate('/sign-in'); }}
+                >
+                  Log In
+                </button>
+                <button
+                  className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
+                  onClick={() => { setMobileMenuOpen(false); navigate('/sign-up'); }}
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
