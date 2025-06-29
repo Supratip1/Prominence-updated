@@ -20,12 +20,12 @@ const steps = [
   {
     title: 'Competitor Issues',
     description: 'See a detailed breakdown of competitor strengths and weaknesses, including technical, content, and structured data issues for every site.',
-    image: '/screenshots/CompetitorIssue.PNG',
+    image: '/screenshots/competitorissue.png',
   },
   {
     title: 'AEO Score Comparison',
     description: "Visually compare your site's AEO score with all competitors in a single glance to instantly identify leaders and laggards.",
-    image: '/screenshots/Comparison.PNG',
+    image: '/screenshots/comparison.png',
   },
 ];
 
@@ -79,7 +79,7 @@ export default function HowItWorksSection() {
                   <img
                     src={step.image}
                     alt={step.title}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-contain object-center"
                   />
                   {/* Fading effect at the bottom */}
                   <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#f7f8fa] via-[#f7f8fa]/70 to-transparent pointer-events-none" />

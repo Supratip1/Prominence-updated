@@ -189,6 +189,17 @@ const TrackCompetitors = () => {
     };
   });
 
+  // Remove duplicate domains from sortedRanking (keep first occurrence)
+  const uniqueSortedRanking = [];
+  const seenDomains = new Set();
+  for (const row of sortedRanking) {
+    const domain = row.domain?.toLowerCase();
+    if (!seenDomains.has(domain)) {
+      uniqueSortedRanking.push(row);
+      seenDomains.add(domain);
+    }
+  }
+
   return (
     <>
       <Header />
@@ -303,7 +314,7 @@ const TrackCompetitors = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {sortedRanking.map((row: any, index: number) => {
+                      {uniqueSortedRanking.map((row: any, index: number) => {
                         const isUser = row.is_user_site;
                         const details = getDetailsForRow(row);
                         return (
