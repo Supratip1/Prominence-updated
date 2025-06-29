@@ -156,13 +156,14 @@ export default function Dashboard() {
           backgroundImage:
             'radial-gradient(circle, #d1d5db 1px, transparent 1.2px)',
           backgroundSize: '14px 14px',
-          opacity: 0.45,
-          WebkitMaskImage: 'linear-gradient(120deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,1) 40%, rgba(255,255,255,0.7) 100%)',
-          maskImage: 'linear-gradient(120deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,1) 40%, rgba(255,255,255,0.7) 100%)',
+          opacity: 0.2,
+          backgroundColor: '#fff',
+          WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 30%, #000 80%, transparent 100%)',
+          maskImage: 'radial-gradient(ellipse 80% 60% at 50% 30%, #000 80%, transparent 100%)',
         }}
       />
       <Header />
-      <main className="flex flex-col items-center justify-center min-h-[90vh] px-4 pt-8 pb-2 md:pt-32 md:pb-8 relative z-10 bg-[#f7f8fa]">
+      <main className="flex flex-col items-center justify-center min-h-[90vh] px-4 pt-24 pb-2 md:pt-32 md:pb-8 relative z-10">
         <motion.h1
           className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-normal tracking-tight text-black text-center mb-4"
           initial={{ opacity: 0, y: 20 }}

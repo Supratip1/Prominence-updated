@@ -20,7 +20,6 @@ import { SidebarProvider } from './contexts/SidebarContext'
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Analysis = lazy(() => import('./pages/Analysis'))
 const Optimization = lazy(() => import('./pages/Optimization'))
-const Signup = lazy(() => import('./pages/Signup'))
 const AEOAnalysis = lazy(() => import('./pages/AEOAnalysis'))
 
 // Loading component
@@ -90,6 +89,10 @@ function HomePage() {
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_your_publishable_key_here';
 
+// Add debugging
+console.log('Clerk Publishable Key:', clerkPubKey);
+console.log('Environment variables:', import.meta.env);
+
 function App() {
   return (
     <ErrorBoundary>
@@ -99,10 +102,14 @@ function App() {
             <Router>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
-                  {/* Public routes */}
+                  {/* Always redirect root to dashboard */}
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  {/* Dashboard route */}
                   <Route path="/dashboard" element={<HomePage />} />
+                  {/* Public routes */}
                   <Route path="/sign-in" element={<CenteredAuthWrapper><SignIn routing="path" path="/sign-in" /></CenteredAuthWrapper>} />
-                  <Route path="/sign-up" element={<CenteredAuthWrapper><SignUp routing="path" path="/sign-up" /></CenteredAuthWrapper>} />
+                  {/* Clerk SSO callback routes */}
+                  <Route path="/sign-in/sso-callback" element={<div>Loading...</div>} />
 
                   {/* Protected routes */}
                   <Route
@@ -113,7 +120,6 @@ function App() {
                           <Route path="/onboarding" element={<Onboarding />} />
                           <Route path="/analysis" element={<Analysis />} />
                           <Route path="/optimization" element={<Optimization />} />
-                          <Route path="/signup" element={<Signup />} />
                           <Route path="/aeo-analysis" element={<AEOAnalysis />} />
                           <Route path="/model-scores" element={<ModelScores />} />
                           <Route path="/track-competitors" element={<TrackCompetitors />} />

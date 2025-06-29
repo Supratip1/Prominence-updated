@@ -6,29 +6,28 @@ import Header from '../components/Layout/Header';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, TrendingDown, Minus, Target, Award, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { AEOApiService } from '../services/aeoApi';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const TrackCompetitors = () => {
   const [searchParams] = useSearchParams();
   const rawUrl = searchParams.get('url') || localStorage.getItem('lastAnalyzedUrl') || '';
   const url = normalizeUrl(rawUrl);
+  const queryClient = useQueryClient();
 
-  const [analysisData, setAnalysisData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Use React Query to cache competitor analysis
+  const { data: analysisDataRaw, isLoading: loading, error } = useQuery({
+    queryKey: ['competitor-analysis', url],
+    queryFn: () => AEOApiService.analyzeWebsiteWithCompetitors({ url }).then(res => res.data),
+    enabled: !!url,
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    initialData: queryClient.getQueryData(['competitor-analysis', url])
+  });
+  const analysisData = analysisDataRaw || {};
+
+  // Debug: log the full competitor analysis response
+  console.log('analysisData', analysisData);
+
   const [selectedCompetitor, setSelectedCompetitor] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!url) return;
-    setLoading(true);
-    setError(null);
-    AEOApiService.analyzeWebsiteWithCompetitors({ url })
-      .then((res) => {
-        if (res.success) setAnalysisData(res.data);
-        else setError(res.error || 'Unknown error');
-      })
-      .catch((err) => setError(err.message || 'API error'))
-      .finally(() => setLoading(false));
-  }, [url]);
 
   if (loading) {
     return (
@@ -52,7 +51,7 @@ const TrackCompetitors = () => {
         <div className="pt-20">
           <DashboardLayout pageTitle="">
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
-              <span className="text-lg text-red-600">{error}</span>
+              <span className="text-lg text-red-600">{(error as Error).message}</span>
             </div>
           </DashboardLayout>
         </div>
@@ -78,8 +77,8 @@ const TrackCompetitors = () => {
   }
 
   // Extract competitor data from enhanced backend
-  const competitorData = analysisData.competitor_analysis || analysisData.audit_report?.competitor_analysis;
-  const mainSiteData = analysisData.audit_report || analysisData;
+  const competitorData = (analysisData as any)?.competitor_analysis || (analysisData as any)?.audit_report?.competitor_analysis;
+  const mainSiteData = (analysisData as any)?.audit_report || analysisData;
 
   // Extract competitor information
   const competitors = competitorData?.competitors || [];
@@ -88,7 +87,7 @@ const TrackCompetitors = () => {
   const userRanking = competitorData?.your_ranking || 1;
   const averageCompetitorScore = competitorData?.average_competitor_score || 0;
   const scoreDifference = competitorData?.score_difference || 0;
-  const mainSiteScore = mainSiteData?.aeo_score_pct || 0;
+  const mainSiteScore = mainSiteData?.aeo_score ?? mainSiteData?.aeo_score_pct ?? 0;
 
   // Find user's ranking data for advantages/disadvantages
   const userRankingData = ranking.find((r: any) => r.is_user_site);
@@ -116,6 +115,80 @@ const TrackCompetitors = () => {
   const getScoreColor = (score: number) => 'text-black';
   const getScoreBgColor = (score: number) => 'bg-gray-100';
 
+  // Helper to get detailed data for each row
+  function getDetailsForRow(row: any) {
+    if (row.is_user_site) {
+      return {
+        structured_data_score: mainSiteData?.structured_data_score ?? mainSiteData?.structured_data?.score ?? '-',
+        snippet_optimization_score: mainSiteData?.snippet_optimization_score ?? mainSiteData?.snippet_optimization?.score ?? '-',
+        crawlability_score: mainSiteData?.technical_seo_score ?? mainSiteData?.crawlability_score ?? mainSiteData?.crawlability?.score ?? '-',
+        total_pages_analyzed: mainSiteData?.total_pages_analyzed ?? mainSiteData?.snippet_optimization?.overall_findings?.total_pages ?? '-',
+        schema_types_found: mainSiteData?.schema_types_found ?? mainSiteData?.structured_data?.schema_types_found ? Object.keys(mainSiteData?.structured_data?.schema_types_found).length : '-',
+        status: mainSiteData?.status ?? '-',
+      };
+    }
+    const comp = competitorData?.competitors?.find((c: any) => c.domain === row.domain) || {};
+    return {
+      structured_data_score: comp.structured_data_score ?? '-',
+      snippet_optimization_score: comp.snippet_optimization_score ?? '-',
+      crawlability_score: comp.crawlability_score ?? '-',
+      total_pages_analyzed: comp.total_pages_analyzed ?? '-',
+      schema_types_found: comp.schema_types_found ?? '-',
+      status: comp.status ?? '-',
+    };
+  }
+
+  // Sort ranking array with multi-level tiebreakers before rendering
+  const sortedRanking = [...ranking].sort((a: any, b: any) => {
+    // 1. AEO Score
+    const aAEO = typeof a.aeo_score === 'number' ? a.aeo_score : (typeof a.score === 'number' ? a.score : 0);
+    const bAEO = typeof b.aeo_score === 'number' ? b.aeo_score : (typeof b.score === 'number' ? b.score : 0);
+    if (bAEO !== aAEO) return bAEO - aAEO;
+    // 2. Structured Data
+    const aDetails = getDetailsForRow(a);
+    const bDetails = getDetailsForRow(b);
+    const aSD = Number(aDetails.structured_data_score) || 0;
+    const bSD = Number(bDetails.structured_data_score) || 0;
+    if (bSD !== aSD) return bSD - aSD;
+    // 3. Content
+    const aContent = Number(aDetails.snippet_optimization_score) || 0;
+    const bContent = Number(bDetails.snippet_optimization_score) || 0;
+    if (bContent !== aContent) return bContent - aContent;
+    // 4. Technical
+    const aTech = Number(aDetails.crawlability_score) || 0;
+    const bTech = Number(bDetails.crawlability_score) || 0;
+    if (bTech !== aTech) return bTech - aTech;
+    // 5. Pages Analyzed
+    const aPages = Number(aDetails.total_pages_analyzed) || 0;
+    const bPages = Number(bDetails.total_pages_analyzed) || 0;
+    if (bPages !== aPages) return bPages - aPages;
+    // 6. Schemas Found
+    const aSchemas = Number(aDetails.schema_types_found) || 0;
+    const bSchemas = Number(bDetails.schema_types_found) || 0;
+    if (bSchemas !== aSchemas) return bSchemas - aSchemas;
+    // 7. Domain (alphabetical)
+    return String(a.domain).localeCompare(String(b.domain));
+  });
+
+  // Find your rank in the sorted array
+  const yourIndex = sortedRanking.findIndex((row: any) => row.is_user_site);
+  const yourRank = yourIndex >= 0 ? yourIndex + 1 : '-';
+
+  // Prepare data for graphs using sortedRanking so user's site is always included
+  const graphData = sortedRanking.map((row: any) => {
+    const details = getDetailsForRow(row);
+    return {
+      domain: row.domain,
+      aeo_score: typeof row.aeo_score === 'number' ? row.aeo_score : (typeof row.score === 'number' ? row.score : 0),
+      structured_data: Number(details.structured_data_score) || 0,
+      content: Number(details.snippet_optimization_score) || 0,
+      technical: Number(details.crawlability_score) || 0,
+      pages: Number(details.total_pages_analyzed) || 0,
+      schemas: Number(details.schema_types_found) || 0,
+      isUser: row.is_user_site,
+    };
+  });
+
   return (
     <>
       <Header />
@@ -129,7 +202,7 @@ const TrackCompetitors = () => {
                 <div className="flex items-center justify-center md:justify-between w-full">
                   <div>
                     <p className="text-sm text-gray-600">Your Rank</p>
-                    <p className="text-2xl font-bold text-black">#{userRanking}</p>
+                    <p className="text-2xl font-bold text-black">#{yourRank}</p>
                   </div>
                   <Award className="w-8 h-8 ml-4 md:ml-0 text-black" />
                 </div>
@@ -181,12 +254,12 @@ const TrackCompetitors = () => {
                 <h3 className="text-lg sm:text-xl font-semibold text-black mb-4 text-center md:text-left">AEO Score Comparison</h3>
                 <div className="w-full min-w-0">
                   <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={chartData} margin={{ left: -20, right: 10, top: 10, bottom: 10 }}>
+                    <BarChart data={graphData} margin={{ left: -20, right: 10, top: 10, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" angle={-20} textAnchor="end" height={60} interval={0} tick={{ fontSize: 10 }} />
+                      <XAxis dataKey="domain" angle={-20} textAnchor="end" height={60} interval={0} tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Bar dataKey="score" fill="#000000" />
+                      <Bar dataKey="aeo_score" fill="#000000" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -197,14 +270,14 @@ const TrackCompetitors = () => {
                 <h3 className="text-lg sm:text-xl font-semibold text-black mb-4 text-center md:text-left">Component Breakdown</h3>
                 <div className="w-full min-w-0">
                   <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={chartData} margin={{ left: -20, right: 10, top: 10, bottom: 10 }}>
+                    <BarChart data={graphData} margin={{ left: -20, right: 10, top: 10, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" angle={-20} textAnchor="end" height={60} interval={0} tick={{ fontSize: 10 }} />
+                      <XAxis dataKey="domain" angle={-20} textAnchor="end" height={60} interval={0} tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Bar dataKey="structured" fill="#222222" name="Structured Data" />
-                      <Bar dataKey="snippet" fill="#444444" name="Snippet Optimization" />
-                      <Bar dataKey="crawlability" fill="#888888" name="Crawlability" />
+                      <Bar dataKey="structured_data" fill="#222222" name="Structured Data" />
+                      <Bar dataKey="content" fill="#444444" name="Snippet Optimization" />
+                      <Bar dataKey="technical" fill="#888888" name="Crawlability" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -227,17 +300,16 @@ const TrackCompetitors = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Technical</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pages</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schemas</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {competitors.map((comp: any, index: number) => {
-                        const isUser = comp.domain === url;
+                      {sortedRanking.map((row: any, index: number) => {
+                        const isUser = row.is_user_site;
+                        const details = getDetailsForRow(row);
                         return (
-                          <tr 
-                            key={index} 
-                            className={`hover:bg-gray-50 cursor-pointer ${isUser ? 'bg-blue-50' : ''}`}
-                            onClick={() => setSelectedCompetitor(comp.domain)}
+                          <tr
+                            key={index}
+                            className={`hover:bg-gray-50 cursor-pointer ${isUser ? 'bg-blue-50 font-bold' : ''}`}
                           >
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
@@ -246,41 +318,20 @@ const TrackCompetitors = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
-                                {comp.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-900">
+                                  {row.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
+                                </span>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <span className={`text-sm font-bold ${getScoreColor(comp.aeo_score || 0)}`}>{comp.aeo_score || 0}%</span>
-                                {!isUser && getTrendIcon(mainSiteScore, comp.aeo_score || 0)}
-                              </div>
+                            <td className="px-6 py-4 whitespace-nowrap font-bold">
+                              {typeof row.aeo_score === 'number' ? `${row.aeo_score}%` : typeof row.score === 'number' ? `${row.score}%` : '-'}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.structured_data_score || 0)} ${getScoreColor(comp.structured_data_score || 0)}`}>{comp.structured_data_score || 0}/10</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.snippet_optimization_score || 0)} ${getScoreColor(comp.snippet_optimization_score || 0)}`}>{comp.snippet_optimization_score || 0}/10</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.crawlability_score || 0)} ${getScoreColor(comp.crawlability_score || 0)}`}>{comp.crawlability_score || 0}/10</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{comp.total_pages_analyzed || 0}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{comp.schema_types_found || 0}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                {comp.technical_status?.robots_txt_accessible ? (
-                                  <CheckCircle className="w-4 h-4 text-green-500" />
-                                ) : (
-                                  <XCircle className="w-4 h-4 text-red-500" />
-                                )}
-                                <span className="ml-2 text-sm text-gray-500">{comp.technical_status?.robots_txt_accessible ? 'Accessible' : 'Blocked'}</span>
-                              </div>
-                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">{details.structured_data_score}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{details.snippet_optimization_score}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{details.crawlability_score}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{details.total_pages_analyzed}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{details.schema_types_found}</td>
                           </tr>
                         );
                       })}
@@ -468,100 +519,17 @@ const TrackCompetitors = () => {
                             </span>
                             <span className="text-xs text-gray-500">#{index + 1}</span>
                           </div>
-                          <div className="space-y-2 text-xs">
-                            <div className="flex items-center gap-2">
-                              <span>Robots.txt:</span>
-                              {comp.technical_status?.robots_txt_accessible ? (
-                                <CheckCircle className="w-3 h-3 text-green-500" />
-                              ) : (
-                                <XCircle className="w-3 h-3 text-red-500" />
-                              )}
-                              <span className={comp.technical_status?.robots_txt_accessible ? 'text-green-600' : 'text-red-600'}>
-                                {comp.technical_status?.robots_txt_accessible ? 'Accessible' : 'Blocked'}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span>Sitemap:</span>
-                              {comp.technical_status?.sitemap_found ? (
-                                <CheckCircle className="w-3 h-3 text-green-500" />
-                              ) : (
-                                <XCircle className="w-3 h-3 text-red-500" />
-                              )}
-                              <span className={comp.technical_status?.sitemap_found ? 'text-green-600' : 'text-red-600'}>
-                                {comp.technical_status?.sitemap_found ? 'Found' : 'Missing'}
-                              </span>
-                            </div>
-                            <div>Schema Types: {comp.schema_types_found || 0}</div>
-                            {comp.key_schema_types && comp.key_schema_types.length > 0 && (
-                              <div className="text-gray-600">
-                                Key: {comp.key_schema_types.slice(0, 3).join(', ')}
-                                {comp.key_schema_types.length > 3 && '...'}
-                              </div>
-                            )}
-                            <div>Issues Found: {comp.issues_count || 0}</div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div>Avg Paragraph: {comp.content_quality?.avg_paragraph_length || 'N/A'} words</div>
+                            <div>Pages w/ Lists: {comp.content_quality?.pages_with_lists || 'N/A'}</div>
+                            <div>Pages w/ Questions: {comp.content_quality?.pages_with_questions || 'N/A'}</div>
+                            <div>Total Pages: {comp.total_pages_analyzed || 'N/A'}</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Insights Section */}
-            {insights && Object.keys(insights).length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 mb-8">
-                <h3 className="text-xl font-semibold text-black mb-4">Market Insights</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {insights.market_position && (
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Market Position</h4>
-                      <p className="text-gray-600">{insights.market_position}</p>
-                    </div>
-                  )}
-                  {insights.key_advantages && insights.key_advantages.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Your Advantages</h4>
-                      <ul className="text-gray-600 space-y-1">
-                        {insights.key_advantages.map((advantage: string, idx: number) => (
-                          <li key={idx} className="flex items-start">
-                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                            {advantage}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {insights.key_disadvantages && insights.key_disadvantages.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Areas to Improve</h4>
-                      <ul className="text-gray-600 space-y-1">
-                        {insights.key_disadvantages.map((disadvantage: string, idx: number) => (
-                          <li key={idx} className="flex items-start">
-                            <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 mr-2 flex-shrink-0" />
-                            {disadvantage}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* No Competitor Data Message */}
-            {competitors.length === 0 && (
-              <div className="bg-white rounded-2xl border border-gray-200 shadow p-8 text-center">
-                <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Competitor Data Available</h3>
-                <p className="text-gray-600 mb-4">
-                  The enhanced analysis didn't find competitor data for this domain. This could be because:
-                </p>
-                <ul className="text-gray-600 text-left max-w-md mx-auto space-y-1">
-                  <li>• The domain is too niche or new</li>
-                  <li>• Competitor analysis is still processing</li>
-                  <li>• No direct competitors were identified</li>
-                </ul>
               </div>
             )}
           </div>
@@ -571,4 +539,4 @@ const TrackCompetitors = () => {
   );
 };
 
-export default TrackCompetitors; 
+export default TrackCompetitors;

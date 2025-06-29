@@ -17,13 +17,23 @@ const steps = [
     description: "Receive tailored, step-by-step recommendations to boost your AI search ranking and see exactly what to improve for maximum impact.",
     image: "/screenshots/Recommendations.PNG",
   },
+  {
+    title: 'Competitor Issues',
+    description: 'See a detailed breakdown of competitor strengths and weaknesses, including technical, content, and structured data issues for every site.',
+    image: '/screenshots/CompetitorIssue.PNG',
+  },
+  {
+    title: 'AEO Score Comparison',
+    description: "Visually compare your site's AEO score with all competitors in a single glance to instantly identify leaders and laggards.",
+    image: '/screenshots/Comparison.PNG',
+  },
 ];
 
 export default function HowItWorksSection() {
   return (
     <motion.section
       id="our-services"
-      className="pt-0 pb-20 bg-[#f7f8fa] text-black w-full -mt-48 md:mt-24"
+      className="pt-0 pb-20 bg-white text-black w-full -mt-48 md:mt-24"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

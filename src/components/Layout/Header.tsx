@@ -102,9 +102,12 @@ export default function Header() {
   ];
 
   return (
-    <header className={`fixed top-0 left-0 w-full py-6 px-8 z-[100] transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100' : 'bg-white'
-    }`}>
+    <header
+      className={`fixed top-0 left-0 w-full py-2 px-4 z-[100] transition-all duration-300 ${
+        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100' : 'bg-white'
+      }`}
+      style={{}}
+    >
       <div className="relative flex items-center w-full">
         {/* Left: Logo (text only) */}
         <button
@@ -158,18 +161,11 @@ export default function Header() {
           ) : (
             <>
               <button
-                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-black transition-colors duration-200"
+                className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
                 onClick={() => navigate('/sign-in')}
               >
                 <ArrowRightEndOnRectangleIcon className="w-4 h-4" />
                 <span className="text-sm font-medium">Log In</span>
-              </button>
-              <button
-                className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
-                onClick={() => navigate('/sign-up')}
-              >
-                <UserIcon className="w-4 h-4" />
-                <span className="text-sm font-medium">Sign Up</span>
               </button>
             </>
           )}
@@ -209,16 +205,10 @@ export default function Header() {
             ) : (
               <>
                 <button
-                  className="w-full py-3 text-center text-gray-600 hover:text-black transition-colors duration-200"
+                  className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
                   onClick={() => { setMobileMenuOpen(false); navigate('/sign-in'); }}
                 >
                   Log In
-                </button>
-                <button
-                  className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
-                  onClick={() => { setMobileMenuOpen(false); navigate('/sign-up'); }}
-                >
-                  Sign Up
                 </button>
               </>
             )}
