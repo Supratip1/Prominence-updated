@@ -27,7 +27,7 @@ export default function Dashboard() {
   useEffect(() => {
     const loadSpiderAnimation = async () => {
       try {
-        const response = await fetch('/lottie/Spider.json');
+        const response = await fetch('/lottie/Robot.json');
         const data = await response.json();
         setSpiderAnimation(data);
       } catch (error) {
@@ -76,6 +76,11 @@ export default function Dashboard() {
         const normUrl = normalizeUrl(variables);
         queryClient.setQueryData(['aeo-analysis', normUrl], data.data);
         localStorage.setItem('lastAnalyzedUrl', normUrl);
+        try {
+          localStorage.setItem(`aeo-analysis-${normUrl}`, JSON.stringify(data.data));
+        } catch (err) {
+          console.error('Failed saving analysis to localStorage', err);
+        }
         
         // Ensure animation plays fully at least once before navigating
         setTimeout(() => {
@@ -114,6 +119,11 @@ export default function Dashboard() {
         const normUrl = normalizeUrl(analysisRequest.url);
         queryClient.setQueryData(['aeo-analysis', normUrl], response.data);
         localStorage.setItem('lastAnalyzedUrl', normUrl);
+        try {
+          localStorage.setItem(`aeo-analysis-${normUrl}`, JSON.stringify(response.data));
+        } catch (err) {
+          console.error('Failed saving analysis to localStorage', err);
+        }
         navigate(`/aeo-analysis?url=${encodeURIComponent(normUrl)}`);
       } else {
         throw new Error(response.error || 'Analysis failed');
@@ -170,7 +180,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          Be the First Brand AI Finds
+          Be the answer that AI finds
         </motion.h1>
         <motion.p
           className="text-base sm:text-lg md:text-3xl text-gray-600 text-center mb-16 max-w-2xl"
@@ -215,7 +225,7 @@ export default function Dashboard() {
         <div className="relative w-full py-20 md:py-32">
           {/* 1px line, centered vertically */}
           <div
-            className="absolute inset-x-0 top-1/2 h-px bg-gray-200 opacity-60"
+            className="absolute inset-x-0 top-1/2 h-px bg-gray-200 opacity-60 dark:hidden"
             style={{ transform: 'translateY(-50%)' }}
           />
 
@@ -258,12 +268,7 @@ export default function Dashboard() {
               }}
             />
           </div>
-          <div className="mt-8 text-2xl font-bold text-black animate-pulse">
-            Crawling your website...
-          </div>
-          <div className="mt-2 text-lg text-gray-600 text-center px-4 sm:px-0">
-            Analyzing {inputUrl || 'your site'} for AI optimization
-          </div>
+          <div className="mt-6 text-lg font-semibold text-black">Analyzing...</div>
         </div>
       )}
     </div>

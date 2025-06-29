@@ -4,17 +4,35 @@ import { normalizeUrl } from '../utils/hooks';
 import DashboardLayout from '../components/Layout/DashboardLayout';
 import Modal from '../components/UI/Modal';
 import { Info, ShieldCheck, ShieldX } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const ModelScores = () => {
   const [searchParams] = useSearchParams();
   const rawUrl = searchParams.get('url') || localStorage.getItem('lastAnalyzedUrl') || '';
   const url = normalizeUrl(rawUrl);
   const queryClient = useQueryClient();
-  const analysisData = queryClient.getQueryData(['aeo-analysis', url]) as any;
+  const storedData = (() => {
+    try {
+      const raw = localStorage.getItem(`aeo-analysis-${url}`);
+      return raw ? JSON.parse(raw) : undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+  const analysisData = (queryClient.getQueryData(['aeo-analysis', url]) as any) || storedData;
   const chatbotAccess = analysisData?.audit_report?.crawlability?.robots_txt?.chatbot_access || {};
   const modelScores = analysisData?.audit_report?.model_scores || {};
   const [activeModal, setActiveModal] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    if (analysisData) {
+      try {
+        localStorage.setItem(`aeo-analysis-${url}`, JSON.stringify(analysisData));
+      } catch (err) {
+        console.error('Failed saving analysis to localStorage', err);
+      }
+    }
+  }, [analysisData, url]);
 
   if (!analysisData || !analysisData.audit_report) {
     return (

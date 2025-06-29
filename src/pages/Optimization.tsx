@@ -1,12 +1,14 @@
 "use client"
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import DashboardLayout from '../components/Layout/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUrl } from '../utils/hooks';
 import { Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import Header from '../components/Layout/Header';
+import ImpactEffortMatrix from '../components/Optimization/ImpactEffortMatrix';
+import { Suggestion } from '../components/Optimization/SuggestionList';
 
 const impactOrder = ['High', 'Medium', 'Low'];
 
@@ -42,12 +44,30 @@ const Optimization = () => {
   const url = normalizeUrl(rawUrl);
   
   const queryClient = useQueryClient();
-  const initialData = queryClient.getQueryData(['aeo-analysis', url]);
+  const storedData = (() => {
+    try {
+      const raw = localStorage.getItem(`aeo-analysis-${url}`);
+      return raw ? JSON.parse(raw) : undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+  const initialData = queryClient.getQueryData(['aeo-analysis', url]) || storedData;
   const { data: analysisData = initialData } = useQuery({
     queryKey: ['aeo-analysis', url],
     enabled: false,
     initialData
   });
+  
+  useEffect(() => {
+    if (analysisData) {
+      try {
+        localStorage.setItem(`aeo-analysis-${url}`, JSON.stringify(analysisData));
+      } catch (err) {
+        console.error('Failed saving analysis to localStorage', err);
+      }
+    }
+  }, [analysisData, url]);
   
   // Debug logs to help diagnose data issues
   console.log('Optimization page - url:', url);
@@ -91,28 +111,75 @@ const Optimization = () => {
     }));
   };
 
+  // Intelligently estimate effort based on description/category
+  function estimateEffort(rec: Recommendation): 'low' | 'medium' | 'high' {
+    const desc = (rec.description || '').toLowerCase();
+    const cat = (rec.category || '').toLowerCase();
+    if (cat.includes('technical') || desc.includes('implement') || desc.includes('complex') || desc.includes('integration')) return 'high';
+    if (desc.includes('add') || desc.includes('update') || desc.includes('refine') || cat.includes('content')) return 'medium';
+    return 'low';
+  }
+
+  // Helper to disperse points within each zone
+  function disperseValue(base: number) {
+    const offset = (Math.random() - 0.5) * 0.6; // random between -0.3 and +0.3
+    return Math.max(1, Math.min(3, base + offset));
+  }
+
+  // Map impact_level and estimated effort to 'low', 'medium', or 'high' for the matrix
+  const normalizeLevel = (val: string | undefined): 'low' | 'medium' | 'high' => {
+    const v = (val || '').toLowerCase();
+    if (v === 'high') return 'high';
+    if (v === 'medium') return 'medium';
+    return 'low';
+  };
+
+  // Map impact_level and estimated effort to 'low', 'medium', or 'high' for the matrix, and disperse points
+  const matrixSuggestions: Suggestion[] = recommendations.map((rec, idx) => {
+    const impactLevel = normalizeLevel(rec.impact_level);
+    const effortLevel = estimateEffort(rec);
+    const impactNum = disperseValue({ low: 1, medium: 2, high: 3 }[impactLevel]);
+    const effortNum = disperseValue({ low: 1, medium: 2, high: 3 }[effortLevel]);
+    return {
+      id: String(idx),
+      assetId: '',
+      type: 'content',
+      priority: 'medium',
+      suggestion: rec.description,
+      impact: impactLevel,
+      effort: effortLevel,
+      category: rec.category,
+      impactNum,
+      effortNum,
+    } as any; // pass extra fields for plotting
+  });
+
   return (
     <>
       <Header />
       <div className="pt-20">
-        <DashboardLayout>
+        <DashboardLayout pageTitle="Optimization Recommendations">
           <div className="max-w-5xl mx-auto mt-16 px-4">
+            {/* Impact vs Effort matrix - now above the cards */}
+            <div className="mb-10">
+              <ImpactEffortMatrix suggestions={matrixSuggestions} />
+            </div>
             <div className="flex items-center justify-between mb-6">
               <div className="relative">
                 <button
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white shadow-sm hover:bg-gray-50"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white shadow-sm hover:bg-gray-50 text-black"
                   onClick={() => setFilterOpen(f => !f)}
                   aria-label="Filter by impact"
                 >
-                  <Filter className="w-5 h-5" />
-                  <span className="hidden sm:inline text-base">{impactFilter === 'All' ? 'Filter' : impactFilter}</span>
+                  <Filter className="w-5 h-5 text-black" />
+                  <span className="hidden sm:inline text-base text-black">{impactFilter === 'All' ? 'Filter' : impactFilter}</span>
                 </button>
                 {filterOpen && (
                   <div className="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                     {['All', ...impactOrder].map(option => (
                       <button
                         key={option}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${impactFilter === option ? 'bg-gray-100 font-semibold' : ''}`}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-black ${impactFilter === option ? 'bg-gray-100 font-semibold' : ''}`}
                         onClick={() => { setImpactFilter(option as any); setFilterOpen(false); }}
                       >
                         {option}

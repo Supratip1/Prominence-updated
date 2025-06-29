@@ -95,7 +95,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
         onClick={onClose}
       >
         <motion.div 
-          className="bg-white rounded-2xl border border-gray-200 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+          className="bg-white text-black dark:text-black rounded-2xl border border-gray-200 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}

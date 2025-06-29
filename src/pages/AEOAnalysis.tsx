@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardLayout from '../components/Layout/DashboardLayout';
 import { Info, ShieldCheck, ShieldX, BarChart2, FileText, Globe, Star, Target, Settings, Tag, AlertTriangle, Bot, BookOpen, ListChecks } from 'lucide-react';
@@ -92,13 +92,30 @@ const AEOAnalysis = () => {
   const url = normalizeUrl(rawUrl);
   console.log('rawUrl:', rawUrl, 'normalized url:', url);
   const queryClient = useQueryClient();
-  const initialData = queryClient.getQueryData(['aeo-analysis', url]);
+  const storedData = (() => {
+    try {
+      const raw = localStorage.getItem(`aeo-analysis-${url}`);
+      return raw ? JSON.parse(raw) : undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+  const initialData = queryClient.getQueryData(['aeo-analysis', url]) || storedData;
   const { data: analysisData = initialData } = useQuery<any>({
     queryKey: ['aeo-analysis', url],
     enabled: false,
     initialData
   });
   const safeData = analysisData;
+  useEffect(() => {
+    if (analysisData) {
+      try {
+        localStorage.setItem(`aeo-analysis-${url}`, JSON.stringify(analysisData));
+      } catch (err) {
+        console.error('Failed saving analysis to localStorage', err);
+      }
+    }
+  }, [analysisData, url]);
   // Debug log
   console.log('AEOAnalysis data:', safeData);
   const analyzedUrl = safeData?.audit_report?.url || url;
@@ -328,7 +345,7 @@ const AEOAnalysis = () => {
                 </div>
                 {/* Donut Chart: Model Scores */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow p-8 flex flex-col">
-                  <h3 className="text-xl font-normal text-black mb-6">Model Scores</h3>
+                  <h3 className="text-xl font-normal text-black mb-6">Search traffic % by AI model</h3>
                     {modelScoreData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={320}>
                     <PieChart>
@@ -565,12 +582,14 @@ const AEOAnalysis = () => {
             )}
           </div>
         </DashboardLayout>
-        <Modal isOpen={!!activeModal} onClose={() => setActiveModal(null)}>
-          <div>
-            <div className="text-xl font-semibold mb-4">{getModalTitle(activeModal)}</div>
-            {getModalContent(activeModal)}
-          </div>
-        </Modal>
+        {activeModal && getModalContent(activeModal) && (
+          <Modal isOpen={!!activeModal} onClose={() => setActiveModal(null)}>
+            <div>
+              <div className="text-xl font-semibold mb-4">{getModalTitle(activeModal)}</div>
+              {getModalContent(activeModal)}
+            </div>
+          </Modal>
+        )}
       </>
     );
 };

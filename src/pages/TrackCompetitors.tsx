@@ -14,15 +14,34 @@ const TrackCompetitors = () => {
   const url = normalizeUrl(rawUrl);
   const queryClient = useQueryClient();
 
+  const storedComp = (() => {
+    try {
+      const raw = localStorage.getItem(`competitor-analysis-${url}`);
+      return raw ? JSON.parse(raw) : undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+
   // Use React Query to cache competitor analysis
   const { data: analysisDataRaw, isLoading: loading, error } = useQuery({
     queryKey: ['competitor-analysis', url],
     queryFn: () => AEOApiService.analyzeWebsiteWithCompetitors({ url }).then(res => res.data),
     enabled: !!url,
     staleTime: 1000 * 60 * 10, // 10 minutes
-    initialData: queryClient.getQueryData(['competitor-analysis', url])
+    initialData: queryClient.getQueryData(['competitor-analysis', url]) || storedComp
   });
   const analysisData = analysisDataRaw || {};
+
+  useEffect(() => {
+    if (analysisDataRaw) {
+      try {
+        localStorage.setItem(`competitor-analysis-${url}`, JSON.stringify(analysisDataRaw));
+      } catch (err) {
+        console.error('Failed saving competitor analysis to localStorage', err);
+      }
+    }
+  }, [analysisDataRaw, url]);
 
   // Debug: log the full competitor analysis response
   console.log('analysisData', analysisData);
@@ -203,7 +222,7 @@ const TrackCompetitors = () => {
   return (
     <>
       <Header />
-      <div className="pt-20">
+      <div>
         <DashboardLayout pageTitle="">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Summary Cards */}
@@ -303,17 +322,17 @@ const TrackCompetitors = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Domain</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AEO Score</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Structured Data</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Technical</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pages</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schemas</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black dark:text-black">Rank</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black dark:text-black">Domain</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black dark:text-black">AEO Score</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black dark:text-black">Structured Data</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black dark:text-black">Snippet Optimization</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black dark:text-black">Crawlability</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black dark:text-black">Pages</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black dark:text-black">Schemas</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-gray-200 text-gray-900 dark:text-black">
                       {uniqueSortedRanking.map((row: any, index: number) => {
                         const isUser = row.is_user_site;
                         const details = getDetailsForRow(row);
@@ -324,25 +343,25 @@ const TrackCompetitors = () => {
                           >
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
-                                <span className="text-sm font-medium text-gray-900">#{index + 1}</span>
+                                <span className="text-sm font-medium text-gray-900 dark:text-black">#{index + 1}</span>
                                 {isUser && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">You</span>}
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium text-gray-900">
+                                <span className="text-sm font-medium text-gray-900 dark:text-black">
                                   {row.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
                                 </span>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap font-bold">
+                            <td className="px-6 py-4 whitespace-nowrap font-bold dark:text-black">
                               {typeof row.aeo_score === 'number' ? `${row.aeo_score}%` : typeof row.score === 'number' ? `${row.score}%` : '-'}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">{details.structured_data_score}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{details.snippet_optimization_score}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{details.crawlability_score}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{details.total_pages_analyzed}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{details.schema_types_found}</td>
+                            <td className="px-6 py-4 whitespace-nowrap dark:text-black">{typeof details.structured_data_score === 'number' ? `${details.structured_data_score}/10` : '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap dark:text-black">{typeof details.snippet_optimization_score === 'number' ? `${details.snippet_optimization_score}/10` : '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap dark:text-black">{typeof details.crawlability_score === 'number' ? `${details.crawlability_score}/10` : '-'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap dark:text-black">{details.total_pages_analyzed}</td>
+                            <td className="px-6 py-4 whitespace-nowrap dark:text-black">{details.schema_types_found}</td>
                           </tr>
                         );
                       })}
@@ -359,18 +378,18 @@ const TrackCompetitors = () => {
                       onClick={() => setSelectedCompetitor(comp.domain)}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-gray-900">#{index + 1}</span>
+                          <span className="text-lg font-bold text-gray-900 dark:text-black">#{index + 1}</span>
                           {isUser && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">You</span>}
                         </div>
                         <span className={`text-sm font-bold ${getScoreColor(comp.aeo_score || 0)}`}>{comp.aeo_score || 0}%</span>
                       </div>
-                      <div className="text-sm font-medium text-gray-900 mb-1">
+                      <div className="text-sm font-medium text-gray-900 dark:text-black mb-1">
                         {comp.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
                       </div>
                       <div className="flex flex-wrap gap-2 mb-2">
-                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.structured_data_score || 0)} ${getScoreColor(comp.structured_data_score || 0)}`}>SD: {comp.structured_data_score || 0}/10</div>
-                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.snippet_optimization_score || 0)} ${getScoreColor(comp.snippet_optimization_score || 0)}`}>Content: {comp.snippet_optimization_score || 0}/10</div>
-                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.crawlability_score || 0)} ${getScoreColor(comp.crawlability_score || 0)}`}>Tech: {comp.crawlability_score || 0}/10</div>
+                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.structured_data_score || 0)} ${getScoreColor(comp.structured_data_score || 0)}`}>SD: {typeof comp.structured_data_score === 'number' ? `${comp.structured_data_score}/10` : '-'}</div>
+                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.snippet_optimization_score || 0)} ${getScoreColor(comp.snippet_optimization_score || 0)}`}>Content: {typeof comp.snippet_optimization_score === 'number' ? `${comp.snippet_optimization_score}/10` : '-'}</div>
+                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.crawlability_score || 0)} ${getScoreColor(comp.crawlability_score || 0)}`}>Tech: {typeof comp.crawlability_score === 'number' ? `${comp.crawlability_score}/10` : '-'}</div>
                       </div>
                       <div className="flex items-center gap-2 mb-1">
                         {comp.technical_status?.robots_txt_accessible ? (
@@ -382,7 +401,7 @@ const TrackCompetitors = () => {
                       </div>
                       {/* Additional competitor analysis key details */}
                       <div className="mt-2 pt-2 border-t border-gray-100">
-                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
                           <div>Pages: {comp.total_pages_analyzed || 0}</div>
                           <div>Schemas: {comp.schema_types_found || 0}</div>
                           {comp.content_quality?.avg_paragraph_length && (
@@ -408,7 +427,7 @@ const TrackCompetitors = () => {
             {/* Score Difference and Competitive Position */}
             {scoreDifference !== 0 && (
               <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 mb-8">
-                <h3 className="text-xl font-semibold text-black mb-4">Competitive Position</h3>
+                <h3 className="text-xl font-semibold text-black dark:text-white mb-4">Competitive Position</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="text-center">
                     <div className={`text-3xl font-bold ${scoreDifference > 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -419,46 +438,62 @@ const TrackCompetitors = () => {
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Your Competitive Edge</h4>
-                    {userAdvantages.length > 0 ? (
+                    <h4 className="font-semibold text-gray-900 mb-3">What Your Competitors Are Doing Better</h4>
+                    {userDisadvantages.length > 0 ? (
                       <ul className="space-y-2">
-                        {userAdvantages.map((advantage: string, idx: number) => (
+                        {userDisadvantages.map((disadvantage: string, idx: number) => (
                           <li key={idx} className="flex items-start">
-                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">{advantage}</span>
+                            <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 mr-2 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">{disadvantage}</span>
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-sm text-gray-500">No significant advantages identified</p>
+                      (() => {
+                        // Fallback: compare user to top competitor for key metrics
+                        const userRow = uniqueSortedRanking.find((row: any) => row.is_user_site);
+                        const topCompetitor = uniqueSortedRanking.find((row: any) => !row.is_user_site);
+                        if (!userRow || !topCompetitor) return <p className="text-sm text-gray-500">No competitor data available.</p>;
+                        const detailsUser = getDetailsForRow(userRow);
+                        const detailsComp = getDetailsForRow(topCompetitor);
+                        const diffs = [];
+                        if (typeof detailsComp.structured_data_score === 'number' && typeof detailsUser.structured_data_score === 'number' && detailsComp.structured_data_score > detailsUser.structured_data_score) {
+                          diffs.push(`Higher Structured Data score (+${detailsComp.structured_data_score - detailsUser.structured_data_score})`);
+                        }
+                        if (typeof detailsComp.snippet_optimization_score === 'number' && typeof detailsUser.snippet_optimization_score === 'number' && detailsComp.snippet_optimization_score > detailsUser.snippet_optimization_score) {
+                          diffs.push(`Higher Snippet Optimization score (+${detailsComp.snippet_optimization_score - detailsUser.snippet_optimization_score})`);
+                        }
+                        if (typeof detailsComp.crawlability_score === 'number' && typeof detailsUser.crawlability_score === 'number' && detailsComp.crawlability_score > detailsUser.crawlability_score) {
+                          diffs.push(`Higher Crawlability score (+${detailsComp.crawlability_score - detailsUser.crawlability_score})`);
+                        }
+                        return diffs.length > 0 ? (
+                          <ul className="space-y-2">
+                            {diffs.map((msg, idx) => (
+                              <li key={idx} className="flex items-start">
+                                <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 mr-2 flex-shrink-0" />
+                                <span className="text-sm text-gray-700">{msg}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-sm text-gray-500">You are on par with or ahead of your competitors on key metrics.</p>
+                        );
+                      })()
                     )}
                   </div>
                 </div>
-                {userDisadvantages.length > 0 && (
-                  <div className="mt-6">
-                    <h4 className="font-semibold text-gray-900 mb-3">Areas to Improve</h4>
-                    <ul className="space-y-2">
-                      {userDisadvantages.map((disadvantage: string, idx: number) => (
-                        <li key={idx} className="flex items-start">
-                          <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 mr-2 flex-shrink-0" />
-                          <span className="text-sm text-gray-700">{disadvantage}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
             )}
 
             {/* Detailed Competitor Issues */}
             {competitors.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 mb-8">
-                <h3 className="text-xl font-semibold text-black mb-4">Competitor Issues Analysis</h3>
+                <h3 className="text-xl font-semibold text-black dark:text-white mb-4">Competitor Issues Analysis</h3>
                 <div className="space-y-6">
                   {competitors.map((comp: any, index: number) => (
                     <div key={index} className="border border-gray-100 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-semibold text-gray-900">
+                        <h4 className="font-semibold text-gray-900 dark:text-black">
                           {comp.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
                         </h4>
                         <span className="text-sm text-gray-500">#{index + 1} • {comp.aeo_score || 0}%</span>
@@ -468,7 +503,7 @@ const TrackCompetitors = () => {
                           {comp.main_issues.map((issue: any, issueIdx: number) => (
                             <div key={issueIdx} className="bg-gray-50 rounded-lg p-3">
                               <div className="flex items-start justify-between mb-2">
-                                <h5 className="font-medium text-gray-900 text-sm">{issue.issue}</h5>
+                                <h5 className="font-medium text-gray-900 dark:text-black text-sm">{issue.issue}</h5>
                                 <span className={`text-xs px-2 py-1 rounded-full ${
                                   issue.impact === 'High' ? 'bg-red-100 text-red-800' :
                                   issue.impact === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
@@ -493,7 +528,7 @@ const TrackCompetitors = () => {
             {/* Enhanced Competitor Analysis Key Details Section */}
             {competitors.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 mb-8">
-                <h3 className="text-xl font-semibold text-black mb-4">Competitor Analysis Key Details</h3>
+                <h3 className="text-xl font-semibold text-black dark:text-white mb-4">Competitor Analysis Key Details</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Content Quality Comparison */}
                   <div>
@@ -502,12 +537,12 @@ const TrackCompetitors = () => {
                       {competitors.map((comp: any, index: number) => (
                         <div key={index} className="border border-gray-100 rounded-lg p-3">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-900">
+                            <span className="text-sm font-medium text-gray-900 dark:text-black">
                               {comp.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
                             </span>
                             <span className="text-xs text-gray-500">#{index + 1}</span>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
                             <div>Avg Paragraph: {comp.content_quality?.avg_paragraph_length || 'N/A'} words</div>
                             <div>Pages w/ Lists: {comp.content_quality?.pages_with_lists || 'N/A'}</div>
                             <div>Pages w/ Questions: {comp.content_quality?.pages_with_questions || 'N/A'}</div>
@@ -525,17 +560,23 @@ const TrackCompetitors = () => {
                       {competitors.map((comp: any, index: number) => (
                         <div key={index} className="border border-gray-100 rounded-lg p-3">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-900">
+                            <span className="text-sm font-medium text-gray-900 dark:text-black">
                               {comp.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
                             </span>
                             <span className="text-xs text-gray-500">#{index + 1}</span>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div>Avg Paragraph: {comp.content_quality?.avg_paragraph_length || 'N/A'} words</div>
-                            <div>Pages w/ Lists: {comp.content_quality?.pages_with_lists || 'N/A'}</div>
-                            <div>Pages w/ Questions: {comp.content_quality?.pages_with_questions || 'N/A'}</div>
-                            <div>Total Pages: {comp.total_pages_analyzed || 'N/A'}</div>
+                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+                            <div>Robots.txt: {comp.technical_status?.robots_txt_accessible === true ? 'Accessible' : comp.technical_status?.robots_txt_accessible === false ? 'Blocked' : 'N/A'}</div>
+                            <div>Structured Data Score: {typeof comp.structured_data_score === 'number' ? `${comp.structured_data_score}/10` : '-'}</div>
+                            <div>Schemas Found: {comp.schema_types_found || 'N/A'}</div>
+                            <div>Crawlability Score: {typeof comp.crawlability_score === 'number' ? `${comp.crawlability_score}/10` : '-'}</div>
                           </div>
+                          {comp.key_schema_types && comp.key_schema_types.length > 0 && (
+                            <div className="mt-1 text-xs text-gray-500">
+                              Key schemas: {comp.key_schema_types.slice(0, 3).join(', ')}
+                              {comp.key_schema_types.length > 3 && '...'}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

@@ -23,6 +23,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMarketingMenuOpen, setMarketingMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { isSignedIn, user } = useUser();
@@ -93,6 +94,17 @@ export default function Header() {
     };
   }, [isMobileMenuOpen]);
 
+  const dashboardRoutes = [
+    '/dashboard',
+    '/aeo-analysis',
+    '/analysis',
+    '/optimization',
+    '/track-competitors',
+    '/integrate-boards',
+    '/model-scores',
+  ];
+  const isDashboardPage = dashboardRoutes.some(route => location.pathname.startsWith(route) && location.pathname !== '/dashboard');
+  const isHomePage = location.pathname === '/dashboard' || location.pathname === '/';
 
   const links = [
     { label: 'Dashboard', to: 'hero' },
@@ -124,31 +136,92 @@ export default function Header() {
             />
           </div>
         </button>
-        {/* Sidebar toggle for mobile (PanelLeft icon) */}
-        {showSidebarToggle && (
+        {/* Hamburger for marketing pages (mobile only) */}
+        {!isDashboardPage && (
           <button
-            className="md:hidden p-2 rounded focus:outline-none ml-2"
+            className="md:hidden p-2 ml-auto"
+            onClick={() => setMarketingMenuOpen(v => !v)}
+            aria-label="Open navigation menu"
+            style={{ position: 'absolute', right: 0 }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-black">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5m-16.5 5.25h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        )}
+        {/* Hamburger for mobile (only on dashboard/analysis pages) */}
+        {isDashboardPage && (
+          <button
+            className="md:hidden p-2 ml-auto"
             onClick={openSidebar}
             aria-label="Open sidebar menu"
+            style={{ position: 'absolute', right: 0 }}
           >
-            <Bars3Icon className="w-6 h-6 text-black" />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-black">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5m-16.5 5.25h16.5m-16.5 5.25h16.5" />
+            </svg>
           </button>
         )}
         
-        {/* Centered Nav Pill */}
-        <nav className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="flex gap-2 px-6 py-2 rounded-full shadow-lg border border-gray-200 bg-white/80 backdrop-blur-md">
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                onClick={() => smoothScrollTo(link.to)}
-                isActive={activeSection === link.to}
+        {/* Centered Nav Pill (only on marketing/public pages, desktop) */}
+        {!isDashboardPage && (
+          <nav className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="flex gap-2 px-4 py-1.5 rounded-full shadow-lg border border-gray-200 bg-white/80 backdrop-blur-md">
+              {links.map((link) => (
+                <NavLink
+                  key={link.to}
+                  onClick={() => smoothScrollTo(link.to)}
+                  isActive={activeSection === link.to}
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>
+          </nav>
+        )}
+        {/* Mobile marketing menu dropdown */}
+        {!isDashboardPage && isMarketingMenuOpen && (
+          <div className="md:hidden fixed inset-0 z-50 flex flex-col items-end">
+            <div className="w-48 bg-white border border-gray-200 shadow-lg rounded-b-xl animate-fade-in relative">
+              {/* Close button */}
+              <button
+                className="absolute top-2 right-2 p-2 text-gray-500 hover:text-black"
+                onClick={() => setMarketingMenuOpen(false)}
+                aria-label="Close menu"
               >
-                {link.label}
-              </NavLink>
-            ))}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <div className="pt-10 pb-2 flex flex-col">
+                {links.map((link) => (
+                  <button
+                    key={link.to}
+                    onClick={() => {
+                      setMarketingMenuOpen(false);
+                      setTimeout(() => smoothScrollTo(link.to), 100); // ensure menu closes before scroll
+                    }}
+                    className={`w-full text-left px-6 py-4 text-base font-medium text-gray-700 hover:bg-gray-50 ${activeSection === link.to ? 'bg-gray-100 font-semibold' : ''}`}
+                  >
+                    {link.label}
+                  </button>
+                ))}
+                <div className="border-t border-gray-100 my-2" />
+                {/* Auth Actions */}
+                {!isSignedIn && (
+                  <button
+                    className="w-full px-6 py-3 text-left text-base text-black bg-gray-100 rounded-lg mt-2"
+                    onClick={() => { setMarketingMenuOpen(false); navigate('/sign-in'); }}
+                  >
+                    Log In
+                  </button>
+                )}
+              </div>
+            </div>
+            {/* Overlay to close menu when clicking outside */}
+            <div className="fixed inset-0 z-40" onClick={() => setMarketingMenuOpen(false)} />
           </div>
-        </nav>
+        )}
 
         {/* Right: Auth Actions */}
         <div className="hidden md:flex items-center gap-3 ml-auto">
@@ -170,15 +243,6 @@ export default function Header() {
             </>
           )}
         </div>
-
-        {/* Hamburger for mobile */}
-        <button
-          className="md:hidden p-2 rounded focus:outline-none ml-auto"
-          onClick={() => setMobileMenuOpen((v) => !v)}
-          aria-label="Open navigation menu"
-        >
-          {isMobileMenuOpen ? <XMarkIcon className="w-6 h-6 text-black" /> : <Bars3Icon className="w-6 h-6 text-black" />}
-        </button>
       </div>
       
       {/* Mobile Nav Dropdown */}

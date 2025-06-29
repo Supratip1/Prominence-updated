@@ -13,7 +13,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 flex flex-col">
-      <div className="p-8 pb-4">
+      <div className="p-4 pb-2 flex items-center justify-between">
         <div className="flex items-end">
           <img 
             src="/logos/mainlogo.png" 
