@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://aeo-analysis-api-1057830450124.us-central1.run.app';
 
 export interface AnalysisRequest {
   url: string;

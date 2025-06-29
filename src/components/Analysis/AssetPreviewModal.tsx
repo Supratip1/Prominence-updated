@@ -172,7 +172,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
                   // Any other "video" type—fall back to screenshot
                   return (
                     <img
-                      src={`http://localhost:3001/api/screenshot?url=${encodeURIComponent(asset.url)}`}
+                      src={`https://aeo-analysis-api-1057830450124.us-central1.run.app/api/screenshot?url=${encodeURIComponent(asset.url)}`}
                       alt={asset.title}
                       className="w-full h-full object-cover"
                       onLoad={() => setIsLoading(false)}
@@ -186,7 +186,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
               ) : (
                 // EVERY non‐video asset now shows a screenshot
                 <img
-                  src={`http://localhost:3001/api/screenshot?url=${encodeURIComponent(asset.url)}`}
+                  src={`https://aeo-analysis-api-1057830450124.us-central1.run.app/api/screenshot?url=${encodeURIComponent(asset.url)}`}
                   alt={asset.title}
                   className="w-full h-full object-cover"
                   onLoad={() => setIsLoading(false)}
