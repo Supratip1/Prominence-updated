@@ -231,7 +231,7 @@ export default function Dashboard() {
               <div className="relative w-full h-full flex items-center justify-center rounded-2xl overflow-hidden">
                 <video
                   className="w-full h-full object-cover"
-                  src="/16296848-uhd_3840_2160_24fps.mp4"
+                  src="/herovideo.mp4"
                   autoPlay
                   loop
                   muted
