@@ -5,54 +5,35 @@ import { useRef } from "react"
 import { motion, useInView } from "framer-motion"
 import { Eye, Activity, BarChart3, Zap, Target, GitBranch, Users, Lightbulb } from "lucide-react"
 
-// Feature cards data
+// Feature cards data with actual screenshots
 const featureCardsData = [
   {
-    key: "discover",
-    icon: <Eye className="w-6 h-6" />,
-    title: "Discover Assets",
+    key: "dashboard",
+    icon: <BarChart3 className="w-6 h-6" />,
+    title: "AI Visibility Dashboard",
     description:
-      "Automatically discover and fetch your digital assets from websites, social media, and other online sources.",
-    imageSrc: "/screenshots/Assetfetching.mp4",
+      "Get a comprehensive overview of your brand's AI search presence with real-time metrics and performance indicators.",
+    imageSrc: "/screenshots/Screensht1.PNG",
     borderColor: "#7c3aed", // deep purple
-    isVideo: true,
+    isVideo: false,
   },
   {
-    key: "competitors",
-    icon: <Users className="w-6 h-6" />,
-    title: "Analyze Competitors",
-    description: "See how you stack up against competitors in AI responses and identify content gaps.",
-    imageSrc: "/screenshots/competitor.png",
+    key: "analysis",
+    icon: <Activity className="w-6 h-6" />,
+    title: "Deep Content Analysis",
+    description: "Advanced AI-powered analysis of your content quality, readability, and AI search optimization potential.",
+    imageSrc: "/screenshots/Screensht2.PNG",
     borderColor: "#b91c1c", // deep red
     isVideo: false,
   },
   {
-    key: "integrate",
-    icon: <GitBranch className="w-6 h-6" />,
-    title: "Integrate Workflows",
+    key: "optimization",
+    icon: <Target className="w-6 h-6" />,
+    title: "Smart Optimization",
     description:
-      "Seamlessly integrate with your existing workflow tools like Jira, Notion, and GitHub for project management.",
-    imageSrc: "/screenshots/integrations.png",
-    borderColor: "#b45309", // deep amber
-    isVideo: false,
-  },
-  {
-    key: "optimize",
-    icon: <Zap className="w-6 h-6" />,
-    title: "Optimize Content",
-    description:
-      "Get intelligent optimization suggestions to improve your content's AI search visibility and performance.",
-    imageSrc: "/screenshots/optimization.png",
+      "Receive intelligent recommendations to improve your content's visibility in AI-powered search engines and assistants.",
+    imageSrc: "/screenshots/Screensht3.PNG",
     borderColor: "#4d7c0f", // deep lime (neon)
-    isVideo: false,
-  },
-  {
-    key: "recommendations",
-    icon: <Lightbulb className="w-6 h-6" />,
-    title: "Get Recommendations",
-    description: "Receive actionable recommendations and track their implementation as fixes.",
-    imageSrc: "/screenshots/recommendation.png",
-    borderColor: "#15803d", // deep green
     isVideo: false,
   },
 ]
@@ -104,7 +85,7 @@ function PortfolioCard({
         style={{ borderColor }}
       >
         {/* Content Overlay */}
-        <div className="absolute inset-0 z-10 p-4 md:p-6 flex flex-col justify-between bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-0 z-10 p-4 md:p-6 flex flex-col justify-between bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {/* Top Section */}
           <div className="flex items-start gap-2 md:gap-3">
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
@@ -147,8 +128,10 @@ function PortfolioCard({
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )}
-          {/* Subtle overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+          {/* Enhanced overlay with fading effect at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+          {/* Additional fading effect at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
 
         {/* Corner Badge */}
@@ -188,11 +171,11 @@ export default function PortfolioScreenshotsSection() {
           </motion.p>
         </motion.div>
 
-        {/* Dynamic Portfolio Grid */}
+        {/* Dynamic Portfolio Grid - Made bigger */}
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 auto-rows-[220px] lg:auto-rows-[350px]">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 auto-rows-[400px] lg:auto-rows-[500px]">
             <PortfolioCard
-              className="col-span-2 row-span-2"
+              className="col-span-1 row-span-1 lg:col-span-1 lg:row-span-1"
               icon={featureCardsData[0].icon}
               title={featureCardsData[0].title}
               description={featureCardsData[0].description}
@@ -202,7 +185,7 @@ export default function PortfolioScreenshotsSection() {
               index={0}
             />
             <PortfolioCard
-              className="col-span-1 row-span-2 lg:col-span-1 lg:row-span-1"
+              className="col-span-1 row-span-1 lg:col-span-1 lg:row-span-1"
               icon={featureCardsData[1].icon}
               title={featureCardsData[1].title}
               description={featureCardsData[1].description}
@@ -220,26 +203,6 @@ export default function PortfolioScreenshotsSection() {
               borderColor={featureCardsData[2].borderColor}
               isVideo={featureCardsData[2].isVideo}
               index={2}
-            />
-            <PortfolioCard
-              className="col-span-1 row-span-1 lg:col-span-1 lg:row-span-1"
-              icon={featureCardsData[3].icon}
-              title={featureCardsData[3].title}
-              description={featureCardsData[3].description}
-              imageSrc={featureCardsData[3].imageSrc}
-              borderColor={featureCardsData[3].borderColor}
-              isVideo={featureCardsData[3].isVideo}
-              index={3}
-            />
-            <PortfolioCard
-              className="col-span-1 row-span-1 lg:col-span-1 lg:row-span-1"
-              icon={featureCardsData[4].icon}
-              title={featureCardsData[4].title}
-              description={featureCardsData[4].description}
-              imageSrc={featureCardsData[4].imageSrc}
-              borderColor={featureCardsData[4].borderColor}
-              isVideo={featureCardsData[4].isVideo}
-              index={4}
             />
           </div>
         </div>

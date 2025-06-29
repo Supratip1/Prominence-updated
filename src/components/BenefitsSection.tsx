@@ -39,7 +39,7 @@ const FAQSection = () => {
     <section id="key-benefits" className="relative py-10 sm:py-24 bg-[#181A20] text-white">
       <div className="max-w-3xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-16">
-          <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white mb-4 sm:mb-6 font-display">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white mb-4 sm:mb-6">
             FAQ
           </h2>
           <p className="text-base sm:text-lg text-gray-200 mb-6 sm:mb-8 font-normal">

@@ -7,6 +7,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUrl } from '../utils/hooks';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Header from '../components/Layout/Header';
+import { motion } from 'framer-motion';
 
 // Mock trend data for the last 30 days
 const generateTrendData = () => {
@@ -36,19 +37,26 @@ const generateTrendData = () => {
 
 // Custom tooltip for black and white theme
 const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200">
-        <p className="font-semibold text-gray-800 mb-2">{new Date(label).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={index} className="text-sm text-gray-700">
-            {entry.name}: <span className="font-semibold">{entry.value}</span>
-          </p>
-        ))}
-      </div>
-    );
+  if (!active || !payload || !Array.isArray(payload) || !payload.length) return null;
+  let dateString = '';
+  if (label) {
+    const dateObj = new Date(label);
+    if (!isNaN(dateObj.getTime())) {
+      dateString = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } else {
+      dateString = String(label);
+    }
   }
-  return null;
+  return (
+    <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200">
+      {dateString && <p className="font-semibold text-gray-800 mb-2">{dateString}</p>}
+      {payload.map((entry: any, index: number) => (
+        <p key={index} className="text-sm text-gray-700">
+          {entry.name}: <span className="font-semibold">{entry.value}</span>
+        </p>
+      ))}
+    </div>
+  );
 };
 
 // Placeholder for the real API call
@@ -196,54 +204,71 @@ const AEOAnalysis = () => {
     }
   }
 
+  function renderIssue(iss: any) {
+    if (typeof iss === 'string') return iss;
+    if (iss && typeof iss === 'object') {
+      // Try to render common keys nicely
+      if ('issue' in iss || 'impact' in iss || 'fix' in iss) {
+        return `${iss.issue || ''}${iss.impact ? ' (Impact: ' + iss.impact + ')' : ''}${iss.fix ? ' [Fix: ' + iss.fix + ']' : ''}`;
+      }
+      // Fallback to JSON
+      return JSON.stringify(iss);
+    }
+    return String(iss);
+  }
+
   function getModalContent(key: string | null) {
     switch (key) {
       case 'structured':
         return (
           <div>
-            <div className="font-semibold mb-2">Score: {structured?.score ?? '-'}/10</div>
-            <div className="mb-2">Schema Types Found: {Object.keys(structured?.schema_types_found || {}).join(', ') || '-'}</div>
-            <div className="mb-2">AEO Schemas: {Array.isArray(structured?.aeo_schemas_found) ? structured.aeo_schemas_found.join(', ') : '-'}</div>
-            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{structured?.issues?.length ? structured.issues.map((iss: any, i: number) => <li key={i}>{iss}</li>) : <li>None</li>}</ul></div>
+            <div className="font-semibold mb-2">Score: {structured && typeof structured.score === 'number' ? structured.score : '-'} /10</div>
+            <div className="mb-2">Schema Types Found: {structured && typeof structured === 'object' && structured.schema_types_found && typeof structured.schema_types_found === 'object' && !Array.isArray(structured.schema_types_found) ? Object.keys(structured.schema_types_found).join(', ') : '-'}</div>
+            <div className="mb-2">AEO Schemas: {structured && Array.isArray(structured.aeo_schemas_found) ? structured.aeo_schemas_found.join(', ') : '-'}</div>
+            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{structured && Array.isArray(structured.issues) && structured.issues.length ? structured.issues.map((iss: any, i: number) => <li key={i}>{renderIssue(iss)}</li>) : <li>None</li>}</ul></div>
           </div>
         );
       case 'snippet':
         return (
           <div>
-            <div className="font-semibold mb-2">Score: {snippet?.score ?? '-'}/10</div>
-            <div className="mb-2">Featured Snippet Readiness: {snippet?.featured_snippet_readiness ?? '-'}/10</div>
-            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{snippet?.issues?.length ? snippet.issues.map((iss: any, i: number) => <li key={i}>{iss}</li>) : <li>None</li>}</ul></div>
+            <div className="font-semibold mb-2">Score: {snippet && typeof snippet === 'object' && typeof snippet.score === 'number' ? snippet.score : '-'} /10</div>
+            <div className="mb-2">Featured Snippet Readiness: {snippet && typeof snippet === 'object' && typeof snippet.featured_snippet_readiness === 'number' ? snippet.featured_snippet_readiness : '-'} /10</div>
+            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{snippet && typeof snippet === 'object' && Array.isArray(snippet.issues) && snippet.issues.length ? snippet.issues.map((iss: any, i: number) => <li key={i}>{renderIssue(iss)}</li>) : <li>None</li>}</ul></div>
           </div>
         );
       case 'crawlability':
         return (
           <div>
-            <div className="font-semibold mb-2">Score: {crawlability?.score ?? '-'}/10</div>
-            <div className="mb-2">Robots.txt Accessible: {crawlability?.robots_txt?.accessible ? 'Yes' : 'No'}</div>
-            <div className="mb-2">Sitemap Found: {crawlability?.sitemap?.found ? 'Yes' : 'No'}</div>
-            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{crawlability?.issues?.length ? crawlability.issues.map((iss: any, i: number) => <li key={i}>{iss}</li>) : <li>None</li>}</ul></div>
+            <div className="font-semibold mb-2">Score: {crawlability && typeof crawlability === 'object' && typeof crawlability.score === 'number' ? crawlability.score : '-'} /10</div>
+            <div className="mb-2">Robots.txt Accessible: {crawlability && typeof crawlability === 'object' && crawlability.robots_txt && typeof crawlability.robots_txt.accessible === 'boolean' ? (crawlability.robots_txt.accessible ? 'Yes' : 'No') : '-'}</div>
+            <div className="mb-2">Sitemap Found: {crawlability && typeof crawlability === 'object' && crawlability.sitemap && typeof crawlability.sitemap.found === 'boolean' ? (crawlability.sitemap.found ? 'Yes' : 'No') : '-'}</div>
+            <div className="mb-2">Issues: <ul className="list-disc ml-6 text-sm">{crawlability && typeof crawlability === 'object' && Array.isArray(crawlability.issues) && crawlability.issues.length ? crawlability.issues.map((iss: any, i: number) => <li key={i}>{renderIssue(iss)}</li>) : <li>None</li>}</ul></div>
           </div>
         );
       case 'featured-snippet':
-        return <div>Featured Snippet Readiness: {snippet?.featured_snippet_readiness ?? '-'}/10</div>;
+        return <div>Featured Snippet Readiness: {snippet && typeof snippet.featured_snippet_readiness === 'number' ? snippet.featured_snippet_readiness : '-'} /10</div>;
       case 'content-quality':
-        return <div>Content Quality Score: {contentQualityScore ?? '-'}</div>;
+        return <div>Content Quality Score: {typeof contentQualityScore === 'number' ? contentQualityScore : '-'}</div>;
       case 'technical-seo':
-        return <div>Technical SEO Score: {technicalSeoScore ?? '-'}/10</div>;
+        return <div>Technical SEO Score: {typeof technicalSeoScore === 'number' ? technicalSeoScore : '-'} /10</div>;
       case 'pages-analyzed':
-        return <div>Total Pages Analyzed: {totalPagesAnalyzed}</div>;
+        return <div>Total Pages Analyzed: {typeof totalPagesAnalyzed === 'number' ? totalPagesAnalyzed : '-'}</div>;
       case 'aeo-schemas':
         return <div>AEO Schemas Found: {Array.isArray(aeoSchemasFound) ? aeoSchemasFound.join(', ') : '-'}</div>;
       case 'issues':
-        return <div>Total Issues: {issuesCount}</div>;
+        return <div>Total Issues: {typeof issuesCount === 'number' ? issuesCount : '-'}</div>;
       case 'model-access':
         return (
           <div>
             <div className="mb-2">AI Model Access:</div>
             <ul className="list-disc ml-6 text-sm">
-              {Object.entries(chatbotAccess).map(([model, access]: any, i) => (
-                <li key={i}>{model}: {access.allowed ? 'Allowed' : 'Blocked'}</li>
-              ))}
+              {chatbotAccess && typeof chatbotAccess === 'object' && Object.entries(chatbotAccess).length > 0 ? (
+                Object.entries(chatbotAccess).map(([model, access]: any, i) => (
+                  <li key={i}>{model}: {access && typeof access.allowed === 'boolean' ? (access.allowed ? 'Allowed' : 'Blocked') : 'N/A'}</li>
+                ))
+              ) : (
+                <li>N/A</li>
+              )}
             </ul>
           </div>
         );
@@ -337,107 +362,195 @@ const AEOAnalysis = () => {
                 {/* Row 1: Four stat cards (Overall Score first) */}
                 <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                   {/* Overall Score Card (dark, premium) */}
-                  <div className="bg-black rounded-2xl border border-gray-900 shadow p-6 flex flex-col items-center min-h-[120px]">
+                  <motion.div
+                    className="bg-black rounded-2xl border border-gray-900 shadow p-6 flex flex-col items-center min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.05 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <Star className="w-8 h-8 mb-2 text-white" />
                     <h3 className="text-lg font-normal text-white mb-1">Overall AEO Score</h3>
                     <div className="text-2xl font-bold text-white">{overall !== undefined ? overall : '-'}</div>
-                  </div>
+                  </motion.div>
                   {/* Structured Data Card */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('structured')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Structured Data Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <FileText className="w-8 h-8 mb-2 text-gray-500" />
                     <h3 className="text-lg font-normal text-black mb-1">Structured Data</h3>
                     <div className="text-2xl font-bold text-black">{structured?.score !== undefined ? structured.score : '-'}/10</div>
-                  </div>
+                  </motion.div>
                   {/* Snippet Optimization Card */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.15 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('snippet')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Snippet Optimization Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <BarChart2 className="w-8 h-8 mb-2 text-gray-500" />
                     <h3 className="text-lg font-normal text-black mb-1">Snippet Optimization</h3>
                     <div className="text-2xl font-bold text-black">{snippet?.score !== undefined ? snippet.score : '-'}/10</div>
-                  </div>
+                  </motion.div>
                   {/* Crawlability Card */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('crawlability')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Crawlability Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <Globe className="w-8 h-8 mb-2 text-gray-500" />
                     <h3 className="text-lg font-normal text-black mb-1">Crawlability</h3>
                     <div className="text-2xl font-bold text-black">{crawlability?.score !== undefined ? crawlability.score : '-'}/10</div>
-                  </div>
+                  </motion.div>
                 </div>
                 
                 {/* Row 2: Advanced metrics from enhanced backend */}
                 <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                   {/* Featured Snippet Readiness */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.25 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('featured-snippet')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Featured Snippet Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <Target className="w-8 h-8 mb-2 text-gray-500" />
                     <h3 className="text-lg font-normal text-black mb-1">Featured Snippet Ready</h3>
                     <div className="text-2xl font-bold text-black">{featuredSnippetReadiness}/10</div>
-                  </div>
+                  </motion.div>
                   
                   {/* Content Quality Score */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('content-quality')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Content Quality Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <BookOpen className="w-8 h-8 mb-2 text-gray-500" />
                     <h3 className="text-lg font-normal text-black mb-1">Content Quality</h3>
                     <div className="text-2xl font-bold text-black">{contentQualityScore > 0 ? contentQualityScore : '-'}</div>
-                  </div>
+                  </motion.div>
                   
                   {/* Technical SEO Score */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.35 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('technical-seo')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Technical SEO Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <Settings className="w-8 h-8 mb-2 text-gray-500" />
                     <h3 className="text-lg font-normal text-black mb-1">Technical SEO</h3>
                     <div className="text-2xl font-bold text-black">{technicalSeoScore}/10</div>
-                  </div>
+                  </motion.div>
                   
                   {/* Pages Analyzed */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('pages-analyzed')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Pages Analyzed Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <BarChart2 className="w-8 h-8 mb-2 text-gray-500" />
                     <h3 className="text-lg font-normal text-black mb-1">Pages Analyzed</h3>
                     <div className="text-2xl font-bold text-black">{totalPagesAnalyzed}</div>
-                  </div>
+                  </motion.div>
                 </div>
                 
                 {/* Row 3: Additional metrics row */}
                 <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                   {/* AEO Schemas Found */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.45 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('aeo-schemas')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="AEO Schemas Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <Tag className="w-8 h-8 mb-2 text-gray-500" />
                     <h3 className="text-lg font-normal text-black mb-1">AEO Schemas</h3>
                     <div className="text-2xl font-bold text-black">{aeoSchemasFound.length}</div>
-                  </div>
+                  </motion.div>
                   
                   {/* Total Issues */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('issues')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Issues Details">
                       <Info className="w-5 h-5" />
                     </button>
                     <AlertTriangle className="w-8 h-8 mb-2 text-yellow-500" />
                     <h3 className="text-lg font-normal text-black mb-1">Total Issues</h3>
                     <div className="text-2xl font-bold text-black">{issuesCount}</div>
-                  </div>
+                  </motion.div>
                   
                   {/* Model Access Score */}
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px]">
+                  <motion.div
+                    className="bg-white rounded-2xl border border-gray-200 shadow p-6 flex flex-col items-center relative min-h-[120px] transition-all duration-300"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.55 }}
+                    whileHover={{ scale: 1.03, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <button onClick={() => setActiveModal('model-access')} className="absolute top-4 right-4 text-gray-400 hover:text-black" aria-label="Model Access Details">
                       <Info className="w-5 h-5" />
                     </button>
@@ -446,7 +559,7 @@ const AEOAnalysis = () => {
                     <div className="text-2xl font-bold text-black">
                       {Object.values(chatbotAccess).filter((access: any) => access.allowed).length}/{Object.keys(chatbotAccess).length}
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               </>
             )}

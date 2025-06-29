@@ -162,7 +162,7 @@ export default function Dashboard() {
         }}
       />
       <Header />
-      <main className="flex flex-col items-center justify-center min-h-[90vh] px-4 pt-8 pb-2 md:pt-32 md:pb-8 relative z-10">
+      <main className="flex flex-col items-center justify-center min-h-[90vh] px-4 pt-8 pb-2 md:pt-32 md:pb-8 relative z-10 bg-[#f7f8fa]">
         <motion.h1
           className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-normal tracking-tight text-black text-center mb-4"
           initial={{ opacity: 0, y: 20 }}
@@ -179,7 +179,6 @@ export default function Dashboard() {
         >
           Instant visibility in AI-powered search.
         </motion.p>
-        
         {/* Error Message */}
         {error && (
           <motion.div

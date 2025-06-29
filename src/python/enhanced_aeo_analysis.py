@@ -10,8 +10,6 @@ import extruct
 from w3lib.html import get_base_url
 import google.generativeai as genai
 from dotenv import load_dotenv
-import aiohttp
-import asyncio
 
 # Load environment variables from .env file
 load_dotenv()
@@ -409,7 +407,7 @@ Here is the AEO audit output:
 {json.dumps(audit_results, indent=2)}
 """
         try:
-            model = genai.GenerativeModel("gemini-2.5-flash-lite-preview-06-17")
+            model = genai.GenerativeModel("gemini-2.5-flash")
             response = model.generate_content(prompt)
             raw = response.text.strip()
             
@@ -440,51 +438,62 @@ Here is the AEO audit output:
     }
 
     
-async def fetch_title_and_desc(session, url):
+def fetch_site_description(url):
+    """Fetch site title and description using competitor.py approach"""
     try:
-        async with session.get(url, timeout=5) as resp:
-            html = await resp.text()
-            soup = BeautifulSoup(html, 'html.parser')
-            title = soup.title.string if soup.title else ''
-            desc_tag = soup.find('meta', attrs={'name': 'description'})
-            desc = desc_tag['content'] if desc_tag and 'content' in desc_tag.attrs else ''
-            return {"url": url, "title": title, "desc": desc}
-    except Exception:
-        return {"url": url, "title": "", "desc": ""}
-
-async def filter_competitors_by_domain(main_url, candidate_urls):
-    async with aiohttp.ClientSession() as session:
-        main_res = await fetch_title_and_desc(session, main_url)
-        main_keywords = set(main_res["title"].lower().split() + main_res["desc"].lower().split())
-        tasks = [fetch_title_and_desc(session, url) for url in candidate_urls]
-        results = await asyncio.gather(*tasks)
-    filtered = []
-    for res in results:
-        comp_keywords = set(res["title"].lower().split() + res["desc"].lower().split())
-        # Relaxed: accept if at least 1 keyword overlaps
-        if len(main_keywords & comp_keywords) >= 1:
-            filtered.append(res["url"])
-    print("Main site keywords:", main_keywords)
-    print("LLM candidates:", candidate_urls)
-    print("Filtered competitors:", filtered)
-    # Fallback: if no filtered, return first 3 candidates
-    if not filtered:
-        print("No filtered competitors, falling back to LLM candidates.")
-        return candidate_urls[:3]
-    return filtered[:3]
+        resp = session.get(url, timeout=CONFIG['timeout'])
+        if resp.status_code != 200:
+            return {"title": "", "description": ""}
+        
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        title = ""
+        if soup.title and soup.title.string:
+            title = soup.title.string.strip()
+        
+        # Try multiple meta description sources
+        desc = ""
+        meta_desc = soup.find("meta", attrs={"name":"description"}) or soup.find("meta", attrs={"property":"og:description"})
+        if meta_desc:
+            try:
+                content = meta_desc.get("content")
+                if content:
+                    desc = content.strip()
+            except (KeyError, TypeError):
+                desc = ""
+        
+        return {"title": title, "description": desc}
+    except Exception as e:
+        return {"title": "", "description": ""}
 
 def get_competitor_links(domain):
-    """Get competitor links using Gemini and filter by domain similarity"""
+    """Get competitor links using Gemini with enhanced site information"""
     if not api_key:
         return []
+    
+    # Fetch site description to provide context to Gemini
+    site_info = fetch_site_description(domain)
+    title = site_info.get("title", "")
+    description = site_info.get("description", "")
+    
     prompt = f"""
-Given the domain \"{domain}\", return a list of 5 competing websites in the same space. Just output a JSON list of the root URLs, no extra explanation.
-Example output:
-[\"https://competitor1.com\", \"https://competitor2.com\"]
-Respond only with the JSON array, no additional text.
+You are an expert in Answer Engine Optimization (AEO) competitor analysis. 
+
+Given this website:
+- Domain: {domain}
+- Title: {title}
+- Description: {description}
+
+Identify exactly 5 direct competitors that:
+1. Offer highly similar products or services
+2. Operate in the same industry or niche
+3. Target the same audience
+4. Have strong AEO practices (rich structured data, optimized snippets, clear content hierarchy)
+
+Provide only a JSON array of exactly 5 root URLs, no additional text.
+Example: ["https://competitor1.com", "https://competitor2.com", "https://competitor3.com", "https://competitor4.com", "https://competitor5.com"]
 """
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash-lite-preview-06-17")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(prompt)
         raw = response.text.strip()
         start = raw.find('[')
@@ -493,15 +502,18 @@ Respond only with the JSON array, no additional text.
             return []
         json_str = raw[start:end]
         candidates = json.loads(json_str)
-        # Advanced: filter by domain similarity using asyncio
-        filtered = asyncio.run(filter_competitors_by_domain(domain, [url for url in candidates if url.startswith("http") or url.startswith("https")]))
-        return filtered
+        # Return exactly 5 valid URLs without filtering
+        valid_candidates = [url for url in candidates if url.startswith("http") or url.startswith("https")]
+        return valid_candidates[:5]  # Ensure exactly 5 competitors
     except Exception as e:
         return []
 
 
 def run_with_competitors(main_url):
     """Run AEO analysis with competitor comparison"""
+    # Fetch site description for context
+    site_info = fetch_site_description(main_url)
+    
     # Get main site full analysis
     main_result = run_full_aeo_pipeline(main_url)
     
@@ -572,19 +584,15 @@ def run_with_competitors(main_url):
             comp['aeo_score'] = min(100.0, max(0.0, comp['aeo_score']))
         
         # Create ranking list with all sites
-        all_sites = [(main_score, main_url, True)] + [(comp['aeo_score'], comp['domain'], False) for comp in competitor_results]
-        all_sites.sort(key=lambda x: x[0], reverse=True)
+        all_sites = [(main_score, main_result['audit_report']['structured_data']['score'], main_url, True)] + [(comp['aeo_score'], comp['structured_data_score'], comp['domain'], False) for comp in competitor_results]
+        all_sites.sort(key=lambda x: (x[0], x[1]), reverse=True)  # Sort by AEO score first, then structured data score as tiebreaker
         
         # Generate ranking list
         ranking = []
-        current_rank = 1
-        current_score = None
         
-        for i, (score, domain, is_user) in enumerate(all_sites):
-            # Handle ties - same rank for same scores
-            if current_score is not None and score < current_score:
-                current_rank = i + 1
-            current_score = score
+        for i, (score, structured_score, domain, is_user) in enumerate(all_sites):
+            # Calculate rank based on position (1-based indexing)
+            current_rank = i + 1
             
             # Generate insights for each site
             key_advantages = []
@@ -631,6 +639,10 @@ def run_with_competitors(main_url):
     return {
         "status": "success",
         "target_domain": main_url,
+        "link_details": {
+            "title": site_info.get("title", ""),
+            "description": site_info.get("description", "")
+        },
         "audit_report": {
             "aeo_score": main_result['audit_report']['aeo_score_pct'],
             "aeo_score_raw": main_result['audit_report']['aeo_score_raw'],
@@ -673,8 +685,3 @@ if __name__ == "__main__":
     url = "https://www.superimpress.com/"
     final_output = run_with_competitors(url)
     print(json.dumps(final_output, indent=2)) 
-
-
-
-
-

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, FileText } from 'lucide-react';
+import { ArrowDownTrayIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 
 interface Asset {
@@ -59,7 +59,7 @@ export default function ExportCSVButton({ assets }: ExportCSVButtonProps) {
       whileHover={{ scale: assets.length > 0 ? 1.05 : 1 }}
       whileTap={{ scale: assets.length > 0 ? 0.95 : 1 }}
     >
-      <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+      <ArrowDownTrayIcon className="w-5 h-5" />
       <span className="hidden sm:inline">Export to CSV</span>
       <span className="sm:hidden">Export</span>
       {assets.length > 0 && (

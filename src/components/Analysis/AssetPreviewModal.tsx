@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, ExternalLink, Download, FileText, Video, Camera, File, Globe } from 'lucide-react';
+import { XMarkIcon, ArrowTopRightOnSquareIcon, ArrowDownTrayIcon, DocumentTextIcon, VideoCameraIcon, CameraIcon, DocumentIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FrontendAsset as BaseFrontendAsset } from '../../pages/Analysis';
 
@@ -67,11 +67,11 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
   const getIcon = (type: FrontendAsset['type']) => {
     const iconClass = "w-6 h-6";
     switch (type) {
-      case 'video': return <Video className={iconClass} />;
-      case 'webpage': return <FileText className={iconClass} />;
-      case 'document': return <File className={iconClass} />;
-      case 'social': return <Globe className={iconClass} />;
-      default: return <FileText className={iconClass} />;
+      case 'video': return <VideoCameraIcon className={iconClass} />;
+      case 'webpage': return <DocumentTextIcon className={iconClass} />;
+      case 'document': return <DocumentIcon className={iconClass} />;
+      case 'social': return <GlobeAltIcon className={iconClass} />;
+      default: return <DocumentTextIcon className={iconClass} />;
     }
   };
 
@@ -119,7 +119,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <X className="w-6 h-6 text-gray-600" />
+              <XMarkIcon className="w-6 h-6 text-gray-600" />
             </motion.button>
           </div>
 
@@ -201,14 +201,14 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
             {/* Details */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-gray-600" />
+                <DocumentTextIcon className="w-5 h-5 text-gray-600" />
                 <h3 className="text-lg font-normal text-gray-900">{asset.title}</h3>
               </div>
               {asset.description && (
                 <p className="text-gray-700 text-sm">{asset.description}</p>
               )}
               <div className="flex items-center gap-2 text-sm text-gray-600">
-                <ExternalLink className="w-4 h-4" />
+                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                 <a href={asset.url} target="_blank" rel="noopener noreferrer" className="hover:text-purple-600 transition-colors">
                   {asset.url}
                 </a>
@@ -224,7 +224,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ArrowTopRightOnSquareIcon className="w-4 h-4 mr-2" />
               Open Original
             </motion.button>
             <motion.button
@@ -238,7 +238,7 @@ export default function AssetPreviewModal({ asset, onClose }: AssetPreviewModalP
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Download className="w-4 h-4 mr-2" />
+              <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
               Download
             </motion.button>
           </div>

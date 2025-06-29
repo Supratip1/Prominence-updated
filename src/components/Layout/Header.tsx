@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, NavLink as RouterNavLink } from 'react-router-dom';
-import { Menu, X, User, LogIn, PanelLeft } from 'lucide-react';
+import { Bars3Icon, XMarkIcon, UserIcon, ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/outline';
 import { useUser, UserButton } from '@clerk/clerk-react';
 import { useSidebar } from '../../contexts/SidebarContext';
 
@@ -128,7 +128,7 @@ export default function Header() {
             onClick={openSidebar}
             aria-label="Open sidebar menu"
           >
-            <PanelLeft className="w-7 h-7 text-black" />
+            <Bars3Icon className="w-6 h-6 text-black" />
           </button>
         )}
         
@@ -161,14 +161,14 @@ export default function Header() {
                 className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-black transition-colors duration-200"
                 onClick={() => navigate('/sign-in')}
               >
-                <LogIn className="w-4 h-4" />
+                <ArrowRightEndOnRectangleIcon className="w-4 h-4" />
                 <span className="text-sm font-medium">Log In</span>
               </button>
               <button
                 className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
                 onClick={() => navigate('/sign-up')}
               >
-                <User className="w-4 h-4" />
+                <UserIcon className="w-4 h-4" />
                 <span className="text-sm font-medium">Sign Up</span>
               </button>
             </>
@@ -181,7 +181,7 @@ export default function Header() {
           onClick={() => setMobileMenuOpen((v) => !v)}
           aria-label="Open navigation menu"
         >
-          {isMobileMenuOpen ? <X className="w-7 h-7 text-black" /> : <Menu className="w-7 h-7 text-black" />}
+          {isMobileMenuOpen ? <XMarkIcon className="w-6 h-6 text-black" /> : <Bars3Icon className="w-6 h-6 text-black" />}
         </button>
       </div>
       

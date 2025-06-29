@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, X } from 'lucide-react';
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 
 interface AssetDiscoveryFormProps {
@@ -33,7 +33,7 @@ export default function AssetDiscoveryForm({ value, onChange, onSubmit, disableS
     >
       <div className="flex flex-col sm:flex-row gap-4 w-full items-stretch sm:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-white/50 w-6 h-6" />
+          <MagnifyingGlassIcon className="absolute left-5 top-1/2 transform -translate-y-1/2 text-white/50 w-6 h-6" />
           <input
             type="text"
             value={value}
@@ -47,7 +47,7 @@ export default function AssetDiscoveryForm({ value, onChange, onSubmit, disableS
               onClick={handleClear}
               className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors"
             >
-              <X className="w-5 h-5" />
+              <XMarkIcon className="w-5 h-5" />
             </button>
           )}
         </div>

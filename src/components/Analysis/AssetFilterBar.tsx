@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Filter, X } from 'lucide-react';
+import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 
 interface AssetFilterBarProps {
@@ -37,7 +37,7 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
     >
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-normal text-white flex items-center">
-          <Filter className="w-5 h-5 mr-3 text-purple-400" />
+          <FunnelIcon className="w-5 h-5 mr-3 text-purple-400" />
           Filter Assets
         </h3>
         {(selectedType !== 'all' || selectedSource !== 'all') && (
@@ -47,7 +47,7 @@ export default function AssetFilterBar({ filters, sources, onFilterChange }: Ass
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <X className="w-4 h-4 mr-1" />
+            <XMarkIcon className="w-4 h-4 mr-1" />
             Clear Filters
           </motion.button>
         )}

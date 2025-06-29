@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { FileText, Video, Camera } from 'lucide-react';
+import { DocumentTextIcon, VideoCameraIcon, CameraIcon } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { FrontendAsset } from '../../pages/Analysis';
 
@@ -11,11 +11,11 @@ export default function LiveAssetFeed({ assets }: LiveAssetFeedProps) {
   const getIcon = (type: FrontendAsset['type']) => {
     switch (type) {
       case 'video':
-        return <Video className="w-4 h-4" />;
+        return <VideoCameraIcon className="w-5 h-5" />;
       case 'webpage':
-        return <FileText className="w-4 h-4" />;
+        return <DocumentTextIcon className="w-5 h-5" />;
       default:
-        return <FileText className="w-4 h-4" />;
+        return <DocumentTextIcon className="w-5 h-5" />;
     }
   };
 

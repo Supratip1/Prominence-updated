@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle, XCircle, MessageSquare, User, Calendar } from 'lucide-react';
+import { CheckCircleIcon, XCircleIcon, ChatBubbleLeftEllipsisIcon, UserIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { FrontendAsset } from '../../pages/Analysis';
 
@@ -119,9 +119,9 @@ export default function AEOValidationPanel({
                           : 'bg-red-500/20 text-red-400 border-red-400/50'
                       }`}>
                         {validation.passed ? (
-                          <CheckCircle className="w-4 h-4" />
+                          <CheckCircleIcon className="w-5 h-5" />
                         ) : (
-                          <XCircle className="w-4 h-4" />
+                          <XCircleIcon className="w-5 h-5" />
                         )}
                         <span className="text-sm font-medium">
                           {validation.passed ? 'Validated' : 'Rejected'}
@@ -136,7 +136,7 @@ export default function AEOValidationPanel({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircleIcon className="w-5 h-5" />
                         Pass
                       </motion.button>
                       <motion.button
@@ -145,7 +145,7 @@ export default function AEOValidationPanel({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <XCircle className="w-4 h-4" />
+                        <XCircleIcon className="w-5 h-5" />
                         Fail
                       </motion.button>
                       <motion.button
@@ -154,7 +154,7 @@ export default function AEOValidationPanel({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <MessageSquare className="w-4 h-4" />
+                        <ChatBubbleLeftEllipsisIcon className="w-5 h-5" />
                         Notes
                       </motion.button>
                     </div>
@@ -182,16 +182,16 @@ export default function AEOValidationPanel({
                 {validation && validation.notes && (
                   <div className="mt-4 pt-4 border-t border-white/10">
                     <div className="flex items-start gap-3">
-                      <MessageSquare className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
+                      <ChatBubbleLeftEllipsisIcon className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" />
                       <div className="flex-1">
                         <p className="text-sm text-gray-300 mb-2">{validation.notes}</p>
                         <div className="flex items-center gap-4 text-xs text-gray-500">
                           <div className="flex items-center gap-1">
-                            <User className="w-3 h-3" />
+                            <UserIcon className="w-4 h-4" />
                             {validation.validatedBy}
                           </div>
                           <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
+                            <CalendarIcon className="w-4 h-4" />
                             {validation.validatedAt.toLocaleDateString()}
                           </div>
                         </div>

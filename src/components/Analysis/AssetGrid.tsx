@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Video, Camera, ExternalLink, Loader2 } from 'lucide-react';
+import { DocumentTextIcon, VideoCameraIcon, CameraIcon, ArrowTopRightOnSquareIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 
 interface Asset {
@@ -22,11 +22,11 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
   const getIcon = (type: Asset['type']) => {
     switch (type) {
       case 'video':
-        return <Video className="w-5 h-5" />;
+        return <VideoCameraIcon className="w-5 h-5" />;
       case 'webpage':
-        return <FileText className="w-5 h-5" />;
+        return <DocumentTextIcon className="w-5 h-5" />;
       default:
-        return <FileText className="w-5 h-5" />;
+        return <DocumentTextIcon className="w-5 h-5" />;
     }
   };
 
@@ -49,7 +49,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
         transition={{ duration: 0.6 }}
       >
         <div className="text-gray-400 mb-4">
-          <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+          <DocumentTextIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
           <p className="text-lg">No assets found matching your criteria</p>
           <p className="text-sm mt-2">Try adjusting your filters or search terms</p>
         </div>
@@ -116,7 +116,7 @@ export default function AssetGrid({ assets, onCardClick }: AssetGridProps) {
                 <h4 className="text-white font-normal text-sm line-clamp-2 flex-1">
                   {asset.title}
                 </h4>
-                <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#adff2f] transition-colors ml-2 flex-shrink-0" />
+                <ArrowTopRightOnSquareIcon className="w-4 h-4 text-gray-400 group-hover:text-[#adff2f] transition-colors ml-2 flex-shrink-0" />
               </div>
               
               <p className="text-gray-400 text-xs line-clamp-2">

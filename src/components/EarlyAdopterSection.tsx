@@ -1,6 +1,14 @@
 import React from "react";
 
 export default function EarlyAdopterSection() {
+  // Smooth scroll to Book a Call section
+  const handleScheduleDemo = () => {
+    const el = document.getElementById("book-a-call");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="w-full min-h-screen flex items-center justify-center bg-[#f7f8fa] relative overflow-visible">
       {/* Vertical lines - guaranteed visible */}
@@ -15,10 +23,10 @@ export default function EarlyAdopterSection() {
           Join the select group of companies positioning themselves for the AI search revolution. Early access users get lifetime pricing and priority support.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 w-full justify-center items-center">
-          <button className="bg-black text-white text-lg sm:text-xl font-semibold rounded-full px-10 py-5 shadow-lg hover:bg-gray-900 transition mb-2 sm:mb-0">
-            Get Early Access
-          </button>
-          <button className="bg-white border border-gray-300 text-black text-lg sm:text-xl font-semibold rounded-full px-10 py-5 hover:bg-gray-100 transition">
+          <button
+            className="bg-black text-white text-lg sm:text-xl font-semibold rounded-full px-10 py-5 shadow-lg hover:bg-gray-900 transition"
+            onClick={handleScheduleDemo}
+          >
             Schedule Demo
           </button>
         </div>

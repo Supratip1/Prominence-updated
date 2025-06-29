@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Home, BarChart2, Users, Settings } from 'lucide-react';
+import { HomeIcon, ChartBarIcon, UsersIcon, Cog6ToothIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 interface SidebarProps {
   onClose?: () => void;
@@ -32,7 +32,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
               : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
           }
         >
-          <Home className="w-5 h-5" />
+          <HomeIcon className="w-5 h-5" />
           <span>Dashboard</span>
         </NavLink>
         <NavLink
@@ -44,7 +44,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
               : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
           }
         >
-          <BarChart2 className="w-5 h-5" />
+          <ChartBarIcon className="w-5 h-5" />
           <span>Optimization</span>
         </NavLink>
         <NavLink
@@ -56,7 +56,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
               : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
           }
         >
-          <Users className="w-5 h-5" />
+          <UsersIcon className="w-5 h-5" />
           <span>Track Competitors</span>
         </NavLink>
         <NavLink
@@ -68,7 +68,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
               : 'flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl'
           }
         >
-          <Settings className="w-5 h-5" />
+          <Cog6ToothIcon className="w-5 h-5" />
           <span>Integrate with your boards</span>
         </NavLink>
       </nav>
@@ -78,7 +78,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           className="flex items-center gap-2 px-4 py-3 text-lg font-normal font-display tracking-tight text-gray-500 hover:text-black hover:bg-gray-50 rounded-l-xl transition-all"
           onClick={() => { navigate('/dashboard'); handleClick(); }}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeftIcon className="w-5 h-5" />
           Back
         </button>
       </div>

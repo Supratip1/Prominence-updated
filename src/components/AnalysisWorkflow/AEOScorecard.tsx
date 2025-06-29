@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, TrendingUp, Brain, Loader2 } from 'lucide-react';
+import { ChartBarIcon, ArrowTrendingUpIcon, AcademicCapIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { FrontendAsset } from '../../pages/Analysis';
 
@@ -118,7 +118,7 @@ export default function AEOScorecard({
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
               className="inline-block mb-4"
             >
-              <Loader2 className="w-8 h-8 sm:w-12 sm:h-12 text-[#adff2f]" />
+              <ArrowPathIcon className="w-8 h-8 sm:w-12 sm:h-12 text-[#adff2f]" />
             </motion.div>
             <h4 className="text-lg sm:text-xl font-normal text-white mb-2">
               Analyzing with {engine.charAt(0).toUpperCase() + engine.slice(1)}
@@ -163,7 +163,7 @@ export default function AEOScorecard({
             {/* Detailed Scores */}
             <div className="space-y-4">
               <h4 className="text-lg sm:text-xl font-normal text-white flex items-center gap-3">
-                <BarChart3 className="w-5 h-5 text-[#adff2f]" />
+                <ChartBarIcon className="w-6 h-6 text-[#adff2f]" />
                 Asset Scores
               </h4>
               
@@ -224,7 +224,7 @@ export default function AEOScorecard({
         {/* Empty State */}
         {!isScoring && scores.length === 0 && (
           <div className="text-center py-8 sm:py-12">
-            <Brain className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-400 opacity-50" />
+            <AcademicCapIcon className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-400 opacity-50" />
             <h4 className="text-lg sm:text-xl font-normal text-white mb-2">
               Ready for AEO Analysis
             </h4>

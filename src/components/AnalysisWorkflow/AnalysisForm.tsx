@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Sparkles } from 'lucide-react';
+import { MagnifyingGlassIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 
 interface AnalysisFormProps {
@@ -35,14 +35,14 @@ export default function AnalysisForm({ value, onChange, onSubmit, disabled }: An
           transition={{ delay: 0.2, duration: 0.6 }}
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-[#adff2f]" />
+            <SparklesIcon className="w-6 h-6 sm:w-8 sm:h-8 text-[#adff2f]" />
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white">
               <span className="bg-gradient-to-r from-[#adff2f] to-[#7cfc00] bg-clip-text text-transparent">
                 Complete Analysis
               </span>{' '}
               Workflow
             </h2>
-            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-[#adff2f]" />
+            <SparklesIcon className="w-6 h-6 sm:w-8 sm:h-8 text-[#adff2f]" />
           </div>
           <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
             Discover, score, validate, and optimize your digital assets with AI-powered insights
@@ -63,7 +63,7 @@ export default function AnalysisForm({ value, onChange, onSubmit, disabled }: An
             <div className="relative z-10">
               <div className="flex flex-col sm:flex-row gap-4 w-full items-stretch sm:items-center">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50 w-5 h-5 sm:w-6 sm:h-6" />
+                  <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50 w-5 h-5 sm:w-6 sm:h-6" />
                   <input
                     type="text"
                     value={value}
