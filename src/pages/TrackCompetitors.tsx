@@ -13,6 +13,8 @@ const TrackCompetitors = () => {
   const rawUrl = searchParams.get('url') || localStorage.getItem('lastAnalyzedUrl') || '';
   const url = normalizeUrl(rawUrl);
   const queryClient = useQueryClient();
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
   const storedComp = (() => {
     try {
@@ -31,6 +33,48 @@ const TrackCompetitors = () => {
     staleTime: 1000 * 60 * 10, // 10 minutes
     initialData: queryClient.getQueryData(['competitor-analysis', url]) || storedComp
   });
+
+  // Dynamic witty loading messages for competitor analysis
+  const competitorLoadingMessages = [
+    "Spying on your competitors...",
+    "Analyzing the competition...",
+    "Gathering competitive intelligence...",
+    "Comparing digital strategies...",
+    "Mapping competitor strengths...",
+    "Identifying market gaps...",
+    "Benchmarking your performance...",
+    "Uncovering competitor secrets...",
+    "Analyzing market positioning...",
+    "Evaluating competitive landscape...",
+    "Measuring against industry leaders...",
+    "Discovering competitive advantages...",
+    "Assessing market opportunities...",
+    "Building competitive insights...",
+    "Preparing your competitive report..."
+  ];
+
+  // Update loading message every 3 seconds
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setLoadingMessageIndex(prev => (prev + 1) % competitorLoadingMessages.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [loading, competitorLoadingMessages.length]);
+
+  // Set initial loading message
+  useEffect(() => {
+    if (loading) {
+      setLoadingMessage(competitorLoadingMessages[0]);
+    }
+  }, [loading]);
+
+  // Update current message when index changes
+  useEffect(() => {
+    setLoadingMessage(competitorLoadingMessages[loadingMessageIndex]);
+  }, [loadingMessageIndex, competitorLoadingMessages]);
+
   const analysisData = analysisDataRaw || {};
 
   useEffect(() => {
@@ -55,7 +99,11 @@ const TrackCompetitors = () => {
         <div className="pt-20">
           <DashboardLayout pageTitle="">
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
-              <span className="text-lg text-gray-700">Loading competitor analysis...</span>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mb-4"></div>
+              <span className="text-lg text-gray-700 mb-2">Loading competitor analysis...</span>
+              <span className="text-sm text-gray-500 max-w-md text-center px-4">
+                {loadingMessage}
+              </span>
             </div>
           </DashboardLayout>
         </div>
@@ -278,12 +326,12 @@ const TrackCompetitors = () => {
             </div>
 
             {/* Charts Section */}
-            <div className="flex flex-col gap-8 mb-8 lg:grid lg:grid-cols-2">
+            <div className="flex flex-col gap-6 md:gap-8 mb-8 lg:grid lg:grid-cols-2">
               {/* Score Comparison Chart */}
               <div className="bg-white rounded-2xl border border-gray-200 shadow p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-semibold text-black mb-4 text-center md:text-left">AEO Score Comparison</h3>
+                <h3 className="text-base sm:text-lg md:text-xl font-semibold text-black mb-4 text-center md:text-left">AEO Score Comparison</h3>
                 <div className="w-full min-w-0">
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={200} className="sm:h-[250px]">
                     <BarChart data={graphData} margin={{ left: -20, right: 10, top: 10, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="domain" angle={-20} textAnchor="end" height={60} interval={0} tick={{ fontSize: 10 }} />
@@ -297,9 +345,9 @@ const TrackCompetitors = () => {
 
               {/* Component Breakdown */}
               <div className="bg-white rounded-2xl border border-gray-200 shadow p-4 sm:p-6">
-                <h3 className="text-lg sm:text-xl font-semibold text-black mb-4 text-center md:text-left">Component Breakdown</h3>
+                <h3 className="text-base sm:text-lg md:text-xl font-semibold text-black mb-4 text-center md:text-left">Component Breakdown</h3>
                 <div className="w-full min-w-0">
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={200} className="sm:h-[250px]">
                     <BarChart data={graphData} margin={{ left: -20, right: 10, top: 10, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="domain" angle={-20} textAnchor="end" height={60} interval={0} tick={{ fontSize: 10 }} />
@@ -369,58 +417,61 @@ const TrackCompetitors = () => {
                   </table>
                 </div>
               </div>
-              {/* Cards for mobile */}
-              <div className="md:hidden flex flex-col gap-4">
-                {competitors.map((comp: any, index: number) => {
-                  const isUser = comp.domain === url;
+              
+              {/* Mobile-friendly table with same data as desktop */}
+              <div className="md:hidden bg-white rounded-2xl border border-gray-200 shadow overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[800px]">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">Rank</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">Domain</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">AEO Score</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">Structured Data</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">Snippet Optimization</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">Crawlability</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">Pages</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">Schemas</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200 text-gray-900">
+                      {uniqueSortedRanking.map((row: any, index: number) => {
+                        const isUser = row.is_user_site;
+                        const details = getDetailsForRow(row);
                   return (
-                    <div key={index} className={`rounded-2xl border border-gray-200 shadow p-4 bg-white ${isUser ? 'bg-blue-50 border-blue-200' : ''}`}
-                      onClick={() => setSelectedCompetitor(comp.domain)}>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-gray-900 dark:text-black">#{index + 1}</span>
-                          {isUser && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">You</span>}
+                          <tr
+                            key={index}
+                            className={`hover:bg-gray-50 cursor-pointer ${isUser ? 'bg-blue-50 font-bold' : ''}`}
+                          >
+                            <td className="px-3 py-2 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <span className="text-xs font-medium text-gray-900">#{index + 1}</span>
+                                {isUser && <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">You</span>}
                         </div>
-                        <span className={`text-sm font-bold ${getScoreColor(comp.aeo_score || 0)}`}>{comp.aeo_score || 0}%</span>
-                      </div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-black mb-1">
-                        {comp.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
-                      </div>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.structured_data_score || 0)} ${getScoreColor(comp.structured_data_score || 0)}`}>SD: {typeof comp.structured_data_score === 'number' ? `${comp.structured_data_score}/10` : '-'}</div>
-                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.snippet_optimization_score || 0)} ${getScoreColor(comp.snippet_optimization_score || 0)}`}>Content: {typeof comp.snippet_optimization_score === 'number' ? `${comp.snippet_optimization_score}/10` : '-'}</div>
-                        <div className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getScoreBgColor(comp.crawlability_score || 0)} ${getScoreColor(comp.crawlability_score || 0)}`}>Tech: {typeof comp.crawlability_score === 'number' ? `${comp.crawlability_score}/10` : '-'}</div>
-                      </div>
-                      <div className="flex items-center gap-2 mb-1">
-                        {comp.technical_status?.robots_txt_accessible ? (
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <XCircle className="w-4 h-4 text-red-500" />
-                        )}
-                        <span className="text-xs text-gray-500">{comp.technical_status?.robots_txt_accessible ? 'Accessible' : 'Blocked'}</span>
-                      </div>
-                      {/* Additional competitor analysis key details */}
-                      <div className="mt-2 pt-2 border-t border-gray-100">
-                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
-                          <div>Pages: {comp.total_pages_analyzed || 0}</div>
-                          <div>Schemas: {comp.schema_types_found || 0}</div>
-                          {comp.content_quality?.avg_paragraph_length && (
-                            <div>Avg Para: {comp.content_quality.avg_paragraph_length}w</div>
-                          )}
-                          {comp.content_quality?.pages_with_lists && (
-                            <div>Lists: {comp.content_quality.pages_with_lists}</div>
-                          )}
-                        </div>
-                        {comp.key_schema_types && comp.key_schema_types.length > 0 && (
-                          <div className="mt-1 text-xs text-gray-500">
-                            Key schemas: {comp.key_schema_types.slice(0, 3).join(', ')}
-                            {comp.key_schema_types.length > 3 && '...'}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                            </td>
+                            <td className="px-3 py-2 whitespace-nowrap">
+                              <span className="text-xs font-medium text-gray-900">
+                                {row.domain?.replace(/^https?:\/\//, '').replace(/\/$/, '') || `Competitor ${index + 1}`}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2 whitespace-nowrap font-bold text-xs">
+                              {typeof row.aeo_score === 'number' ? `${row.aeo_score}%` : typeof row.score === 'number' ? `${row.score}%` : '-'}
+                            </td>
+                            <td className="px-3 py-2 whitespace-nowrap text-xs">{typeof details.structured_data_score === 'number' ? `${details.structured_data_score}/10` : '-'}</td>
+                            <td className="px-3 py-2 whitespace-nowrap text-xs">{typeof details.snippet_optimization_score === 'number' ? `${details.snippet_optimization_score}/10` : '-'}</td>
+                            <td className="px-3 py-2 whitespace-nowrap text-xs">{typeof details.crawlability_score === 'number' ? `${details.crawlability_score}/10` : '-'}</td>
+                            <td className="px-3 py-2 whitespace-nowrap text-xs">{details.total_pages_analyzed}</td>
+                            <td className="px-3 py-2 whitespace-nowrap text-xs">{details.schema_types_found}</td>
+                          </tr>
                   );
                 })}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Scroll indicator for mobile */}
+                <div className="md:hidden bg-gray-50 px-4 py-2 text-center">
+                  <span className="text-xs text-gray-500">← Scroll horizontally to see all data →</span>
+                </div>
               </div>
             </div>
 

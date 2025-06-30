@@ -190,6 +190,49 @@ const AEOAnalysis = () => {
 
   const [loading, setLoading] = useState(false);
   const [activeModal, setActiveModal] = useState<null | 'structured' | 'snippet' | 'crawlability' | 'featured-snippet' | 'content-quality' | 'technical-seo' | 'pages-analyzed' | 'aeo-schemas' | 'issues' | 'model-access' | string>(null);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  // Dynamic witty loading messages for AEO analysis
+  const aeoLoadingMessages = [
+    "Analyzing your AI search visibility...",
+    "Evaluating structured data implementation...",
+    "Assessing snippet optimization...",
+    "Checking crawlability and technical SEO...",
+    "Measuring content quality metrics...",
+    "Analyzing schema markup effectiveness...",
+    "Evaluating featured snippet readiness...",
+    "Assessing AI model accessibility...",
+    "Calculating AEO performance scores...",
+    "Generating optimization recommendations...",
+    "Analyzing page-level metrics...",
+    "Evaluating search engine compatibility...",
+    "Measuring content discoverability...",
+    "Assessing technical implementation...",
+    "Preparing comprehensive analysis report..."
+  ];
+
+  // Update loading message every 3 seconds
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setLoadingMessageIndex(prev => (prev + 1) % aeoLoadingMessages.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [loading, aeoLoadingMessages.length]);
+
+  // Set initial loading message
+  useEffect(() => {
+    if (loading) {
+      setLoadingMessage(aeoLoadingMessages[0]);
+    }
+  }, [loading]);
+
+  // Update current message when index changes
+  useEffect(() => {
+    setLoadingMessage(aeoLoadingMessages[loadingMessageIndex]);
+  }, [loadingMessageIndex, aeoLoadingMessages]);
 
   // Modal keys for all possible modals
   const modalKeys = [
@@ -300,8 +343,12 @@ const AEOAnalysis = () => {
       <DashboardLayout pageTitle={`Analytics for ${analyzedDomain || 'your site'}`}>
         <div className="pt-20">
           {loading && (
-            <div className="flex justify-center items-center py-10">
-              <span className="text-gray-500">Analyzing...</span>
+            <div className="flex flex-col justify-center items-center py-10">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-4"></div>
+              <span className="text-gray-500 mb-2">Analyzing...</span>
+              <span className="text-sm text-gray-400 max-w-md text-center px-4">
+                {loadingMessage}
+              </span>
             </div>
           )}
           {!loading && !analysisData ? (

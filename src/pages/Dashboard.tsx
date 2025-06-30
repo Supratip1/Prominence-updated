@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Play, Pause } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../components/Layout/Header';
 import AEOApiService from '../services/aeoApi';
@@ -9,7 +9,6 @@ import { normalizeUrl } from '../utils/hooks';
 import Player from 'lottie-react';
 import animationData from '../../public/lottie/Animation2.json';
 import Lottie from 'lottie-react';
-import { useUser } from '@clerk/clerk-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -20,8 +19,52 @@ export default function Dashboard() {
   const [isInputAnalyzing, setIsInputAnalyzing] = useState(false);
   const [spiderAnimation, setSpiderAnimation] = useState(null);
   const [hasPlayedOnce, setHasPlayedOnce] = useState(false);
-  const { isSignedIn } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  // Dynamic witty loading messages
+  const loadingMessages = [
+    "Teaching AI to find your content...",
+    "Analyzing your digital footprint...",
+    "Cracking the SEO code...",
+    "Making you discoverable...",
+    "Optimizing for AI search...",
+    "Preparing your competitive edge...",
+    "Unleashing your online potential...",
+    "Crafting your AI visibility...",
+    "Decoding search algorithms...",
+    "Building your digital presence...",
+    "Mapping your content strategy...",
+    "Elevating your search ranking...",
+    "Optimizing for the future of search...",
+    "Making you the answer AI finds...",
+    "Preparing your competitive analysis..."
+  ];
+
+  // Update loading message every 3 seconds
+  useEffect(() => {
+    if (isInputAnalyzing) {
+      const interval = setInterval(() => {
+        setLoadingMessageIndex(prev => (prev + 1) % loadingMessages.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isInputAnalyzing, loadingMessages.length]);
+
+  // Set initial loading message
+  useEffect(() => {
+    if (isInputAnalyzing) {
+      setLoadingMessage(loadingMessages[0]);
+    }
+  }, [isInputAnalyzing]);
+
+  // Update current message when index changes
+  useEffect(() => {
+    setLoadingMessage(loadingMessages[loadingMessageIndex]);
+  }, [loadingMessageIndex, loadingMessages]);
 
   // Load spider animation data
   useEffect(() => {
@@ -44,10 +87,10 @@ export default function Dashboard() {
     }
   }, [isInputAnalyzing]);
 
-  // Auto-trigger analysis if analyzeUrl is present in query params after login
+  // Auto-trigger analysis if analyzeUrl is present in query params
   useEffect(() => {
     const analyzeUrl = searchParams.get('analyzeUrl');
-    if (isSignedIn && analyzeUrl && !isInputAnalyzing) {
+    if (analyzeUrl && !isInputAnalyzing) {
       setInputUrl(analyzeUrl);
       setIsInputAnalyzing(true);
       setError(null);
@@ -67,7 +110,7 @@ export default function Dashboard() {
         }
       })();
     }
-  }, [isSignedIn, searchParams, setSearchParams, isInputAnalyzing]);
+  }, [searchParams, setSearchParams, isInputAnalyzing]);
 
   const analyzeMutation = useMutation({
     mutationFn: (url: string) => AEOApiService.analyzeWebsite({ url, max_pages: 10 }),
@@ -139,10 +182,6 @@ export default function Dashboard() {
   const handleInputAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!isSignedIn) {
-      navigate(`/sign-in?analyzeUrl=${encodeURIComponent(inputUrl)}`);
-      return;
-    }
     setIsInputAnalyzing(true);
     try {
       const isServerRunning = await AEOApiService.isServerRunning();
@@ -154,6 +193,25 @@ export default function Dashboard() {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       setIsInputAnalyzing(false); // Only set to false on error
     }
+  };
+
+  const handleVideoToggle = () => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsVideoPlaying(!isVideoPlaying);
+    }
+  };
+
+  const handleVideoPlay = () => {
+    setIsVideoPlaying(true);
+  };
+
+  const handleVideoPause = () => {
+    setIsVideoPlaying(false);
   };
 
   return (
@@ -173,7 +231,7 @@ export default function Dashboard() {
         }}
       />
       <Header />
-      <main className="flex flex-col items-center justify-center min-h-[90vh] px-4 pt-24 pb-2 md:pt-32 md:pb-8 relative z-10">
+      <main id="hero" className="flex flex-col items-center justify-center min-h-[90vh] px-4 pt-24 pb-2 md:pt-32 md:pb-8 relative z-10">
         <motion.h1
           className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-normal tracking-tight text-black text-center mb-4"
           initial={{ opacity: 0, y: 20 }}
@@ -203,6 +261,7 @@ export default function Dashboard() {
 
         <form onSubmit={handleInputAnalyze} className="flex flex-col items-center gap-3 mb-20 w-full max-w-2xl">
           <input
+            id="analyze-input"
             type="url"
             className="border border-gray-300 rounded-full px-6 py-4 text-lg font-normal focus:outline-none focus:ring-2 focus:ring-black bg-white text-black placeholder-gray-400 w-full"
             placeholder="Enter your website URL (e.g. https://yourdomain.com)"
@@ -240,16 +299,39 @@ export default function Dashboard() {
             <div className="bg-white w-full h-full">
               <div className="relative w-full h-full flex items-center justify-center rounded-2xl overflow-hidden">
                 <video
+                  ref={videoRef}
                   className="w-full h-full object-cover"
                   src="/herovideo.mp4"
-                  autoPlay
                   loop
-                  muted
                   playsInline
                   preload="metadata"
+                  onPlay={handleVideoPlay}
+                  onPause={handleVideoPause}
                 />
                 {/* Video Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-2xl" />
+                
+                {/* Custom Play/Pause Button */}
+                <button
+                  onClick={handleVideoToggle}
+                  className="absolute inset-0 flex items-center justify-center group"
+                  aria-label={isVideoPlaying ? 'Pause video' : 'Play video'}
+                >
+                  <div className="relative">
+                    {/* White outer circle */}
+                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
+                      {/* Black inner circle */}
+                      <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center">
+                        {/* White play/pause icon */}
+                        {isVideoPlaying ? (
+                          <Pause className="w-8 h-8 text-white" />
+                        ) : (
+                          <Play className="w-8 h-8 text-white ml-1" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </button>
               </div>
             </div>
           </motion.div>
@@ -269,6 +351,9 @@ export default function Dashboard() {
             />
           </div>
           <div className="mt-6 text-lg font-semibold text-black">Analyzing...</div>
+          <div className="mt-2 text-sm text-gray-600 max-w-md text-center px-4">
+            {loadingMessage}
+          </div>
         </div>
       )}
     </div>

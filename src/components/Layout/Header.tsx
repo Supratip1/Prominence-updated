@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, NavLink as RouterNavLink } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon, UserIcon, ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/outline';
-import { useUser, UserButton } from '@clerk/clerk-react';
 import { useSidebar } from '../../contexts/SidebarContext';
 
 // Desktop NavLink
@@ -26,7 +25,6 @@ export default function Header() {
   const [isMarketingMenuOpen, setMarketingMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isSignedIn, user } = useUser();
   const { openSidebar } = useSidebar();
 
   // Only show sidebar toggle on these routes
@@ -47,13 +45,17 @@ export default function Header() {
       const headerOffset = 100;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      
-      window.scrollTo({
-         top: offsetPosition,
-         behavior: "smooth"
-      });
+
+      // Delay scrolling slightly to ensure body overflow is reset on mobile
+      setTimeout(() => {
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+      }, 50);
     } else {
-        navigate(`/#${elementId}`);
+      // Navigate to the dashboard page with the hash if section isn't found
+      navigate(`/dashboard#${elementId}`);
     }
   }, [navigate]);
 
@@ -206,16 +208,6 @@ export default function Header() {
                     {link.label}
                   </button>
                 ))}
-                <div className="border-t border-gray-100 my-2" />
-                {/* Auth Actions */}
-                {!isSignedIn && (
-                  <button
-                    className="w-full px-6 py-3 text-left text-base text-black bg-gray-100 rounded-lg mt-2"
-                    onClick={() => { setMarketingMenuOpen(false); navigate('/sign-in'); }}
-                  >
-                    Log In
-                  </button>
-                )}
               </div>
             </div>
             {/* Overlay to close menu when clicking outside */}
@@ -223,25 +215,21 @@ export default function Header() {
           </div>
         )}
 
-        {/* Right: Auth Actions */}
+        {/* Right: Auth Actions - Removed Clerk authentication */}
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          {isSignedIn ? (
-            <>
-              <UserButton afterSignOutUrl="/dashboard" />
-              {/* Optionally show user info */}
-              {/* <span className="ml-2">{user?.firstName}</span> */}
-            </>
-          ) : (
-            <>
-              <button
-                className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
-                onClick={() => navigate('/sign-in')}
-              >
-                <ArrowRightEndOnRectangleIcon className="w-4 h-4" />
-                <span className="text-sm font-medium">Log In</span>
-              </button>
-            </>
+          {isHomePage && (
+            <button
+              className="flex items-center gap-2 px-4 py-2 border border-black rounded-lg text-sm font-medium text-black hover:bg-gray-50 transition-colors"
+              onClick={() => {
+                smoothScrollTo('analyze-input');
+                const input = document.getElementById('analyze-input') as HTMLInputElement | null;
+                input?.focus();
+              }}
+            >
+              Get Started
+            </button>
           )}
+          {/* Authentication removed - no login/logout buttons */}
         </div>
       </div>
       
@@ -262,20 +250,9 @@ export default function Header() {
             </button>
           ))}
           
-          {/* Mobile Auth Actions */}
+          {/* Mobile Auth Actions - Removed Clerk authentication */}
           <div className="w-full border-t border-gray-200 mt-4 pt-4 flex flex-col gap-2 px-4">
-            {isSignedIn ? (
-              <UserButton afterSignOutUrl="/dashboard" />
-            ) : (
-              <>
-                <button
-                  className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200"
-                  onClick={() => { setMobileMenuOpen(false); navigate('/sign-in'); }}
-                >
-                  Log In
-                </button>
-              </>
-            )}
+            {/* Authentication removed - no login/logout buttons */}
           </div>
         </div>
       )}
